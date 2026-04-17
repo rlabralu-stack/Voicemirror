@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceMirror FINAL</title>
+<meta name="theme-color" content="#090511">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;font-family:Arial,sans-serif;color:#fff;background:
+radial-gradient(circle at 50% 12%, rgba(255,40,60,.16) 0%, rgba(255,40,60,0) 18%),
+radial-gradient(circle at 50% 0%, rgba(255,80,40,.10) 0%, rgba(0,0,0,0) 22%),
+radial-gradient(circle at 50% 50%, rgba(40,60,180,.10) 0%, rgba(0,0,0,0) 30%),
+linear-gradient(180deg,#0a0610 0%, #06060d 55%, #04050a 100%)}
+body{padding-bottom:28px}
+.app{max-width:860px;margin:0 auto;padding:18px}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.langs,.actions{display:flex;gap:10px;flex-wrap:wrap}
+.lang-btn,.btn{border:none;border-radius:18px;padding:13px 16px;cursor:pointer;font-size:14px;font-weight:700;color:#fff}
+.lang-btn{background:linear-gradient(180deg,#161726 0%, #0d1020 100%);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 8px 18px rgba(0,0,0,.35)}
+.lang-btn.active,.btn-primary{background:linear-gradient(180deg,#ff5d61 0%, #ff3648 45%, #d5152f 100%);border:1px solid rgba(255,180,180,.55);box-shadow:0 0 20px rgba(255,54,72,.34), inset 0 1px 5px rgba(255,255,255,.2)}
+.btn-secondary{background:linear-gradient(180deg,#161726 0%, #0d1020 100%);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 8px 18px rgba(0,0,0,.35)}
+.brand{text-align:center;padding-top:8px;margin-bottom:18px}
+.hero-mic{width:150px;height:150px;margin:0 auto 18px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%, #2a151c 0%, #140910 58%, #0d0810 100%);border:2px solid rgba(255,132,104,.45);box-shadow:0 0 0 3px rgba(255,62,62,.10),0 0 28px rgba(255,75,75,.45),0 0 70px rgba(255,70,30,.22),inset 0 0 24px rgba(255,66,66,.22);position:relative}
+.hero-mic:before{content:"";position:absolute;inset:10px;border-radius:50%;border:1px solid rgba(255,130,130,.18)}
+.hero-mic svg{width:64px;height:64px;fill:#ff6c61;filter:drop-shadow(0 0 12px rgba(255,96,84,.45))}
+.logo-title{font-size:clamp(54px,10vw,92px);line-height:1;font-weight:800;letter-spacing:-2px;text-shadow:0 10px 26px rgba(0,0,0,.42)}
+.logo-title .voice{color:#f1f3f7}
+.logo-title .mirror{background:linear-gradient(180deg,#ff6666 0%, #ff3345 56%, #cf132a 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{margin-top:16px;color:#c7c9d8;letter-spacing:6px;text-transform:uppercase;font-size:clamp(12px,2.6vw,18px)}
+.home-stack{display:grid;gap:14px;max-width:780px;margin:22px auto 0}
+.mode-card{position:relative;display:flex;align-items:center;gap:18px;padding:18px 20px;border-radius:28px;cursor:pointer;background:linear-gradient(180deg,rgba(20,18,32,.96),rgba(9,10,18,.98));border:1px solid rgba(255,120,120,.18);box-shadow:0 0 0 1px rgba(255,70,70,.10),0 0 26px rgba(255,40,40,.14),inset 0 0 22px rgba(255,55,55,.05);transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease}
+.mode-card:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,90,90,.18),0 0 34px rgba(255,40,40,.22),inset 0 0 28px rgba(255,55,55,.08);border-color:rgba(255,140,140,.28)}
+.mode-icon{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:46px;flex:0 0 96px;background:linear-gradient(180deg,#171724 0%, #0d0e18 100%);border:2px solid rgba(255,255,255,.06);box-shadow:inset 0 0 30px rgba(255,255,255,.03), 0 0 20px rgba(255,70,70,.12)}
+.mode-copy{flex:1;min-width:0}
+.mode-title{font-size:clamp(24px,4.6vw,36px);font-weight:800;letter-spacing:.2px}
+.mode-desc{font-size:clamp(14px,2.9vw,17px);color:#b9bed0;margin-top:7px;line-height:1.38}
+.mode-arrow{font-size:44px;color:#ff947f;opacity:.92}
+.bottom-nav{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:24px auto 0;max-width:780px;color:#adb4c9}
+.bottom-item{width:110px;text-align:center;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.bottom-round{width:76px;height:76px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:34px;background:linear-gradient(180deg,#171724 0%, #0d0e18 100%);border:1px solid rgba(255,120,120,.18);box-shadow:0 0 18px rgba(255,40,40,.12), inset 0 0 16px rgba(255,255,255,.03)}
+.bottom-center{flex:1;text-align:center;font-size:clamp(13px,3vw,18px);letter-spacing:6px;text-transform:uppercase;color:#c6cbdd}
+.bottom-line{width:120px;height:3px;border-radius:99px;margin:12px auto 0;background:linear-gradient(90deg,rgba(255,0,0,0), rgba(255,50,50,.95), rgba(255,120,80,.95), rgba(255,0,0,0));box-shadow:0 0 16px rgba(255,70,70,.36)}
+.panel{background:linear-gradient(180deg,rgba(17,21,37,.96),rgba(9,12,24,.98));border:2px solid rgba(65,93,164,.55);border-radius:28px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.30), inset 0 0 18px rgba(60,90,180,.06)}
+.label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#aeb6cf;margin-bottom:8px}
+.prompt{min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(22px,5vw,42px);line-height:1.4;font-weight:800}
+.mic-wrap{text-align:center}
+.mic-btn{width:160px;height:160px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(180deg,#ff8a6f 0%, #ff4e4e 56%, #ff9948 100%);border:3px solid rgba(255,235,235,.22);box-shadow:0 0 26px rgba(255,85,85,.40), 0 14px 28px rgba(0,0,0,.28), inset 0 3px 14px rgba(255,255,255,.16);color:#fff;font-size:48px;font-weight:700}
+.mic-btn.recording{outline:10px solid rgba(255,70,70,.12)}
+.status{margin-top:12px;color:#d6dced;font-size:14px;min-height:18px}
+.bar-wrap{height:9px;background:#29365b;border-radius:999px;overflow:hidden;margin-top:16px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#ff524c,#ffb348)}
+.visualizer{display:flex;justify-content:center;gap:7px;height:26px;align-items:flex-end;margin-top:14px}
+.visualizer span{width:9px;height:8px;background:#ff6570;border-radius:999px}
+audio{width:100%;margin-top:10px}
+.result-title{font-size:clamp(40px,8vw,56px);font-weight:800;line-height:1.05;margin-bottom:10px}
+.result-desc{color:#d1d8eb;font-size:clamp(17px,3.4vw,22px);line-height:1.5;min-height:48px}
+.result-extra{margin-top:12px;color:#eef2fb;font-size:13px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pill{border-radius:999px;padding:8px 12px;background:#15203a;border:1px solid #35518b;color:#fff;font-size:12px;font-weight:700}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.metric{background:#15203a;border:2px solid #35518b;border-radius:18px;padding:14px;text-align:center}
+.metric-value{font-size:34px;font-weight:800}
+.metric-label{font-size:14px;color:#d3daf0;margin-top:2px}
+.box{margin-top:14px;background:#14243f;border:2px solid #3d6aba;border-radius:18px;padding:14px}
+.box-title{font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:#dfe6fa;margin-bottom:8px;font-weight:700}
+.small{color:#d6dced;font-size:14px}
+.dual{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.compare-hero{font-size:clamp(34px,6vw,50px);font-weight:800;margin-bottom:8px}
+.compare-card{background:#15203a;border:2px solid #35518b;border-radius:20px;padding:16px}
+.compare-card h3{margin:0 0 8px 0;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#dfe6fa}
+.compare-big{font-size:clamp(26px,4.8vw,40px);font-weight:800;line-height:1.1}
+.compare-text{margin-top:10px;color:#d1d8eb;line-height:1.5}
+.compare-note{margin-top:16px;background:linear-gradient(180deg,rgba(255,77,77,.10),rgba(255,77,77,.05));border:1px solid rgba(255,110,110,.18);border-radius:18px;padding:16px;color:#ffe2e2;font-size:15px;line-height:1.5}
+.hidden{display:none!important}
+.score-box{margin-top:14px;background:#2a1220;border:2px solid #ff6a78;border-radius:18px;padding:14px}
+.score-big{font-size:44px;font-weight:800;line-height:1}
+.score-note{margin-top:8px;color:#ffd7dc}
+@media(max-width:700px){.hero-mic{width:120px;height:120px}.hero-mic svg{width:52px;height:52px}.mode-card{padding:14px 16px}.mode-icon{width:78px;height:78px;flex-basis:78px;font-size:38px}.bottom-item{width:82px}.bottom-round{width:62px;height:62px;font-size:28px}.bottom-center{letter-spacing:4px}.dual{grid-template-columns:1fr}}
+@media(max-width:520px){.app{padding:14px}.mode-arrow{font-size:36px}.mic-btn{width:138px;height:138px}.metrics{grid-template-columns:1fr}}
+
+.duel-banner{padding:18px;border-radius:24px;margin-bottom:14px;text-align:center;background:linear-gradient(180deg,rgba(255,66,66,.18),rgba(255,66,66,.06));border:1px solid rgba(255,120,120,.22);box-shadow:0 0 24px rgba(255,60,60,.12)}
+.duel-trophy{font-size:54px;line-height:1;margin-bottom:10px}
+.duel-scoreline{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:16px}
+.duel-vs{font-size:28px;font-weight:800;color:#ffb3a7}
+.duel-bar-wrap{height:16px;border-radius:999px;background:#16233e;overflow:hidden;border:1px solid #35518b;margin-top:10px}
+.duel-bar{height:100%;background:linear-gradient(90deg,#ff5a57,#ffb14e);width:0%}
+.duel-side{text-align:center}
+.duel-side .big{font-size:36px;font-weight:800}
+.duel-side .sub{color:#d1d8eb;margin-top:6px}
+
+
+.prompt-instruction{
+font-size:clamp(22px,4.6vw,36px);
+font-weight:800;
+line-height:1.35;
+padding:14px 16px;
+border-radius:18px;
+background:linear-gradient(180deg,rgba(255,78,78,.10),rgba(255,78,78,.04));
+border:1px solid rgba(255,110,110,.22);
+box-shadow:inset 0 0 18px rgba(255,70,70,.05);
+margin-bottom:14px;
+text-align:center
+}
+.prompt-phrase{
+font-size:clamp(22px,4.6vw,36px);
+font-weight:800;
+line-height:1.35;
+padding:14px 16px;
+border-radius:18px;
+background:linear-gradient(180deg,rgba(71,118,255,.10),rgba(71,118,255,.04));
+border:1px solid rgba(100,140,255,.22);
+box-shadow:inset 0 0 18px rgba(70,120,255,.05);
+text-align:center
+}
+
+
+.prompt-split{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+}
+.prompt-instruction{
+  display:block;
+  width:100%;
+  font-size:clamp(22px,4.6vw,34px);
+  font-weight:800;
+  line-height:1.35;
+  padding:16px 18px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,78,78,.12),rgba(255,78,78,.05));
+  border:1px solid rgba(255,110,110,.24);
+  box-shadow:inset 0 0 18px rgba(255,70,70,.05);
+  text-align:center;
+}
+.prompt-phrase{
+  display:block;
+  width:100%;
+  font-size:clamp(22px,4.6vw,34px);
+  font-weight:800;
+  line-height:1.35;
+  padding:16px 18px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(71,118,255,.12),rgba(71,118,255,.05));
+  border:1px solid rgba(100,140,255,.24);
+  box-shadow:inset 0 0 18px rgba(70,120,255,.05);
+  text-align:center;
+}
+
+
+/* PRO viral prompt design */
+.prompt-shell{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  width:100%;
+}
+.prompt-context{
+  width:100%;
+  border-radius:22px;
+  padding:18px 18px 20px;
+  background:linear-gradient(180deg, rgba(255,72,72,.10), rgba(255,72,72,.04));
+  border:1px solid rgba(255,110,110,.20);
+  box-shadow:0 0 22px rgba(255,70,70,.08), inset 0 0 20px rgba(255,70,70,.04);
+  text-align:center;
+}
+.prompt-context-label{
+  font-size:12px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  opacity:.72;
+  margin-bottom:10px;
+}
+.prompt-context-text{
+  font-size:clamp(22px,4.7vw,34px);
+  font-weight:800;
+  line-height:1.34;
+}
+.prompt-quote{
+  width:100%;
+  border-radius:22px;
+  padding:18px 18px 22px;
+  background:linear-gradient(180deg, rgba(71,118,255,.11), rgba(71,118,255,.04));
+  border:1px solid rgba(110,145,255,.22);
+  box-shadow:0 0 22px rgba(70,120,255,.08), inset 0 0 20px rgba(70,120,255,.04);
+  text-align:center;
+}
+.prompt-quote-label{
+  font-size:12px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  opacity:.72;
+  margin-bottom:10px;
+}
+.prompt-quote-text{
+  font-size:clamp(24px,5.1vw,40px);
+  font-weight:800;
+  line-height:1.34;
+}
+.prompt-quote-mark{
+  color:#cfd8ff;
+  opacity:.9;
+}
+.panel-hero{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,50,50,.07), rgba(255,50,50,0) 28%),
+    linear-gradient(180deg,rgba(17,21,37,.96),rgba(9,12,24,.98));
+}
+.mode-sub-strong{
+  color:#d6dced;
+  font-size:clamp(16px,3vw,20px);
+}
+@media(max-width:520px){
+  .prompt-context,.prompt-quote{padding:16px 14px 18px}
+  .prompt-context-text{font-size:clamp(20px,6vw,30px)}
+  .prompt-quote-text{font-size:clamp(24px,7vw,36px)}
+}
+
+
+/* Radical redesign for challenge & scene */
+.prompt-radical{display:flex;flex-direction:column;gap:18px;width:100%}
+.prompt-kicker{
+  text-align:center;
+  font-size:clamp(15px,3vw,20px);
+  font-weight:700;
+  line-height:1.45;
+  color:#ffb8b0;
+  letter-spacing:.3px;
+  padding:0 8px;
+}
+.prompt-kicker.scene{color:#c9d7ff}
+.prompt-dialog{
+  position:relative;
+  border-radius:28px;
+  padding:24px 18px 26px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,80,80,.10), rgba(255,80,80,0) 34%),
+    linear-gradient(180deg, rgba(12,18,39,.98), rgba(7,10,22,.99));
+  border:1px solid rgba(98,130,255,.20);
+  box-shadow:0 0 28px rgba(55,90,255,.10), inset 0 0 24px rgba(70,120,255,.04);
+  overflow:hidden;
+}
+.prompt-dialog:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, rgba(255,60,60,.08), rgba(255,60,60,0) 26%, rgba(100,140,255,0) 74%, rgba(100,140,255,.08));
+  pointer-events:none;
+}
+.prompt-dialog-label{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  opacity:.66;
+  margin-bottom:14px;
+}
+.prompt-dialog-text{
+  text-align:center;
+  font-size:clamp(28px,6.2vw,48px);
+  font-weight:800;
+  line-height:1.28;
+  letter-spacing:-.4px;
+}
+.prompt-dialog-text .mark{opacity:.92;color:#d8defa}
+.prompt-scene-chip{
+  align-self:center;
+  border-radius:999px;
+  padding:10px 16px;
+  background:linear-gradient(180deg, rgba(255,84,84,.14), rgba(255,84,84,.06));
+  border:1px solid rgba(255,110,110,.20);
+  color:#ffd1cf;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+.prompt-scene-kicker{
+  text-align:center;
+  font-size:clamp(18px,3.9vw,28px);
+  font-weight:700;
+  line-height:1.42;
+  color:#dce4ff;
+  max-width:95%;
+  margin:0 auto;
+}
+@media(max-width:520px){
+  .prompt-dialog{padding:20px 14px 22px;border-radius:24px}
+  .prompt-dialog-text{font-size:clamp(26px,9vw,40px)}
+  .prompt-kicker{font-size:clamp(15px,4vw,18px)}
+  .prompt-scene-kicker{font-size:clamp(18px,5.6vw,24px)}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<section id="home" class="screen active">
+<div class="topbar"><div></div><div class="langs"><button id="langEs" class="lang-btn active" onclick="setLang('es')">ES</button><button id="langEn" class="lang-btn" onclick="setLang('en')">EN</button></div></div>
+<div class="brand">
+<div class="hero-mic"><svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 1 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Zm6-3.5a1 1 0 1 0-2 0 4 4 0 1 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.91V21H9.5a1 1 0 1 0 0 2h5a1 1 0 1 0 0-2H13v-3.09A6 6 0 0 0 18 12Z"/></svg></div>
+<div class="logo-title"><span class="voice">Voice</span><span class="mirror">Mirror</span></div>
+<div id="tagline" class="tagline">TU VOZ REVELA MÁS DE LO QUE CREES</div>
+</div>
+<div class="home-stack">
+<div class="mode-card" onclick="openMode('personality')"><div class="mode-icon">🧠</div><div class="mode-copy"><div id="homePersonalityTitle" class="mode-title">PERSONALIDAD</div><div id="homePersonalityDesc" class="mode-desc">Descubre el rasgo dominante de tu voz</div></div><div class="mode-arrow">›</div></div>
+<div class="mode-card" onclick="openMode('thoughts')"><div class="mode-icon">🪞</div><div class="mode-copy"><div id="homeThoughtsTitle" class="mode-title">¿QUÉ PIENSAN DE TI?</div><div id="homeThoughtsDesc" class="mode-desc">La primera impresión que transmites</div></div><div class="mode-arrow">›</div></div>
+<div class="mode-card" onclick="openMode('challenge')"><div class="mode-icon">🔥</div><div class="mode-copy"><div id="homeChallengeTitle" class="mode-title">DESAFÍOS</div><div id="homeChallengeDesc" class="mode-desc">Supera pruebas de tono, control e impacto</div></div><div class="mode-arrow">›</div></div>
+<div class="mode-card" onclick="openMode('scene')"><div class="mode-icon">🎬</div><div class="mode-copy"><div id="homeSceneTitle" class="mode-title">ESCENARIOS</div><div id="homeSceneDesc" class="mode-desc">Prueba tu voz en situaciones reales</div></div><div class="mode-arrow">›</div></div>
+<div id="compareHomeCard" class="mode-card hidden" onclick="showComparison()"><div class="mode-icon">⚖️</div><div class="mode-copy"><div id="homeCompareTitle" class="mode-title">COMPARATIVA</div><div id="homeCompareDesc" class="mode-desc">Mira la diferencia entre cómo eres y cómo te perciben</div></div><div class="mode-arrow">›</div></div>
+</div>
+<div class="bottom-nav"><div class="bottom-item" onclick="openHistory()" style="cursor:pointer"><div class="bottom-round">🕘</div><div id="bottomHistory">Historial</div></div><div class="bottom-center"><div id="bottomCenterText">TU VOZ. TU HISTORIA.</div><div class="bottom-line"></div></div><div class="bottom-item" onclick="openSettings()" style="cursor:pointer"><div class="bottom-round">⚙️</div><div id="bottomSettings">Ajustes</div></div></div>
+</section>
+
+<section id="mode" class="screen">
+<div class="topbar"><div><h2 id="modeTitle" style="margin:0">🧠 Personalidad</h2><div id="modeSub" class="small" style="margin-top:6px">Descubre qué rasgo transmite tu voz</div></div><div class="langs"><button id="langEs2" class="lang-btn active" onclick="setLang('es')">ES</button><button id="langEn2" class="lang-btn" onclick="setLang('en')">EN</button><button id="homeBtn" class="btn btn-secondary" onclick="showScreen('home')">← Inicio</button></div></div>
+<div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
+<div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+<div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" controls style="display:none"></audio></div>
+<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
+
+</section>
+
+<section id="history" class="screen">
+<div class="topbar"><div><h2 id="historyTitle" style="margin:0">🕘 Historial</h2><div id="historySub" class="small" style="margin-top:6px">Tus últimas lecturas</div></div><div class="langs"><button class="btn btn-secondary" id="historyHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
+<div class="panel">
+  <div id="historyList" class="small">Aún no hay historial.</div>
+  <div class="actions" style="margin-top:14px">
+    <button id="clearHistoryBtn" class="btn btn-secondary" onclick="clearHistory()">Borrar historial</button>
+  </div>
+</div>
+</section>
+
+<section id="settings" class="screen">
+<div class="topbar"><div><h2 id="settingsTitle" style="margin:0">⚙️ Ajustes</h2><div id="settingsSub" class="small" style="margin-top:6px">Controla la experiencia local</div></div><div class="langs"><button class="btn btn-secondary" id="settingsHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
+<div class="panel">
+  <div class="box" style="margin-top:0">
+    <div class="box-title" id="saveHistoryLabel">Guardar historial</div>
+    <div class="small" id="saveHistoryDesc">Guarda resultados en este dispositivo.</div>
+    <div class="actions" style="margin-top:10px">
+      <button id="toggleHistoryBtn" class="btn btn-secondary" onclick="toggleSaveHistory()">Activado</button>
+    </div>
+  </div>
+  <div class="box">
+    <div class="box-title" id="soundsLabel">Sonidos</div>
+    <div class="small" id="soundsDesc">Activa o desactiva los efectos de audio.</div>
+    <div class="actions" style="margin-top:10px">
+      <button id="toggleSoundsBtn" class="btn btn-secondary" onclick="toggleSounds()">Activado</button>
+    </div>
+  </div>
+  <div class="box">
+    <div class="box-title" id="micPermissionLabel">Comprobar permiso del micrófono</div>
+    <div class="small" id="micPermissionDesc">Revisa si el navegador ya recuerda el permiso.</div>
+    <div class="actions" style="margin-top:10px">
+      <button id="checkMicBtn" class="btn btn-secondary" onclick="checkMicPermission()">Comprobar</button>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<section id="duel" class="screen">
+<div class="topbar"><div><h2 id="duelTitle" style="margin:0">⚔️ Duelo</h2><div id="duelSub" class="small" style="margin-top:6px">Comparación automática de desafío</div></div><div class="langs"><button class="btn btn-secondary" id="duelHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
+<div class="panel">
+  <div class="duel-banner">
+    <div class="duel-trophy" id="duelTrophy">🏆</div>
+    <div class="compare-hero" id="duelWinnerLine">—</div>
+  </div>
+
+  <div class="duel-scoreline">
+    <div class="duel-side">
+      <div id="duelYouLabel" class="box-title">Tu resultado</div>
+      <div id="duelYouTitle" class="big">—</div>
+      <div id="duelYouScore" class="sub">—</div>
+      <div class="duel-bar-wrap"><div id="duelYouBar" class="duel-bar"></div></div>
+    </div>
+    <div id="duelVs" class="duel-vs">VS</div>
+    <div class="duel-side">
+      <div id="duelRivalLabel" class="box-title">Resultado rival</div>
+      <div id="duelRivalTitle" class="big">—</div>
+      <div id="duelRivalScore" class="sub">—</div>
+      <div class="duel-bar-wrap"><div id="duelRivalBar" class="duel-bar"></div></div>
+    </div>
+  </div>
+
+  <div class="compare-note" style="margin-top:18px"><strong id="duelReasonLabel">Motivo</strong><br><span id="duelReasonText">—</span></div>
+  <div class="actions" style="margin-top:14px">
+    <button id="duelShareBtn" class="btn btn-primary" onclick="shareDuel()">Compartir duelo</button>
+    <button id="duelRetryBtn" class="btn btn-secondary" onclick="startRematch()">Revancha</button>
+  </div>
+</div>
+</section>
+
+<section id="comparison" class="screen">
+
+<div class="topbar"><div><h2 id="comparisonTitle" style="margin:0">⚖️ Comparativa</h2><div id="comparisonSub" class="small" style="margin-top:6px">Cómo eres vs cómo te perciben</div></div><div class="langs"><button class="btn btn-secondary" id="compareHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
+<div class="panel">
+<div class="compare-hero" id="compareHero">Tu voz por dentro y por fuera</div>
+<div class="dual">
+  <div class="compare-card">
+    <h3 id="compareCard1Label">Cómo eres</h3>
+    <div class="compare-big" id="comparePersonalityTitle">—</div>
+    <div class="compare-text" id="comparePersonalityDesc">—</div>
+  </div>
+  <div class="compare-card">
+    <h3 id="compareCard2Label">Cómo te perciben</h3>
+    <div class="compare-big" id="compareThoughtsTitle">—</div>
+    <div class="compare-text" id="compareThoughtsDesc">—</div>
+  </div>
+</div>
+<div class="compare-note" id="compareNote">—</div>
+<div class="actions" style="margin-top:14px">
+  <button id="retestPersonalityBtn" class="btn btn-primary" onclick="openMode('personality')">Repetir Personalidad</button>
+  <button id="retestThoughtsBtn" class="btn btn-secondary" onclick="openMode('thoughts')">Repetir Percepción</button>
+  <button id="shareCompareBtn" class="btn btn-secondary" onclick="shareComparison()">Compartir</button>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}}};
+
+var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
+en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
+
+var prompts={
+personality:{
+es:[
+'Cuando hablo con seguridad, la gente suele notarlo incluso antes de que termine la frase.',
+'No necesito llamar demasiado la atención para que mi presencia se sienta cuando empiezo a hablar.',
+'Sé mantener la calma y transmitir firmeza incluso cuando el ambiente se vuelve algo tenso.',
+'Hay veces en las que digo poco, pero mi tono hace que lo que digo tenga más peso del esperado.',
+'A veces basta una frase bien dicha para que alguien se replantee quién tiene el control.',
+'Incluso cuando digo poco, el tono puede dejar más huella que una explicación larga.',
+'Puedo sonar tranquilo y aun así dejar claro que no estoy dudando.',
+'Mi voz cambia mucho según la intención, incluso si las palabras son sencillas.',
+'No siempre necesito subir el volumen para que se note autoridad.',
+'Cuando quiero sonar firme, intento que cada palabra entre sin vacilar.',
+'Hay días en los que mi tono transmite más de lo que estoy dispuesto a explicar.',
+'Si me escuchas con atención, suelo dejar bastante claro cómo me siento.',
+'No necesito acelerar para que una frase tenga impacto.',
+'Mi forma de hablar puede sonar cercana y dominante al mismo tiempo.',
+'Cuando estoy convencido, mi voz suele ir por delante de mis gestos.',
+'No todo depende de lo que digo, también importa cómo lo sostengo con el tono.',
+'Puedo parecer calmado aunque por dentro esté midiendo cada palabra.',
+'Mi voz a veces suena más segura de lo que la gente espera al conocerme.',
+'Hay frases que cambian por completo según el peso con el que las diga.',
+'Incluso un comentario breve puede sonar definitivo si el tono acompaña.',
+'No siempre hablo mucho, pero cuando entro en una conversación quiero dejar presencia.',
+'Mi voz puede sonar contenida sin perder intensidad.',
+'Cuando quiero convencer, suelo apoyarme más en el tono que en el discurso.',
+'La forma en la que digo algo cambia mucho la imagen que doy.'
+],
+en:[
+'When I speak with confidence, people usually notice it before I finish the sentence.',
+'I do not need too much attention for my presence to be felt when I start talking.',
+'Sometimes I say very little, but my tone gives my words more weight than expected.',
+'A well delivered sentence can completely change how people perceive me.',
+'I can sound calm and still make it clear that I am not doubting anything.',
+'My voice changes a lot depending on intention, even when the words are simple.',
+'I do not need to raise my volume for authority to be felt.',
+'When I want to sound firm, I try to make every word land without hesitation.',
+'Some days my tone reveals more than I am willing to explain.',
+'If you listen closely, my voice usually says quite a lot about how I feel.',
+'I do not need to rush for a sentence to have impact.',
+'I can sound close and dominant at the same time.',
+'When I am convinced, my voice often moves ahead of my gestures.',
+'Not everything depends on what I say; it also depends on how I hold the tone.',
+'I can seem calm while still measuring every word.',
+'My voice can sound more confident than people expect when they first meet me.',
+'Some sentences change completely depending on the weight behind them.',
+'Even a brief comment can sound final if the tone supports it.',
+'I do not always talk much, but when I enter a conversation I want to leave presence.',
+'My voice can sound contained without losing intensity.'
+]
+},
+thoughts:{
+es:[
+'Habla con naturalidad, como si alguien acabara de conocerte y estuviera formándose una impresión sobre ti.',
+'Puede que no lo parezca, pero suelo pensar bastante antes de mostrar lo que siento.',
+'No necesito exagerar para que se note que estoy aquí.',
+'A veces la gente no recuerda exactamente mis palabras, pero sí la sensación que les dejo.',
+'No siempre busco caer bien rápido; me importa más sonar real.',
+'Hay personas que inspiran confianza por cómo hablan antes que por lo que dicen.',
+'La primera impresión puede cambiar mucho solo por el tono.',
+'Puedo sonar cercano sin parecer necesitado de aprobación.',
+'No necesito parecer simpático todo el tiempo para caer bien.',
+'A veces un tono tranquilo genera más confianza que una energía exagerada.',
+'Si hablo con calma, la gente suele escucharme de otra manera.',
+'No siempre doy una impresión cálida, pero sí intento sonar claro y honesto.',
+'Hay voces que entran bien porque parecen seguras sin ser agresivas.',
+'La forma de hablar dice mucho sobre cómo te colocas frente a los demás.',
+'Puedo dar una imagen seria sin sonar distante.',
+'Cuando quiero conectar, prefiero sonar natural antes que impresionante.',
+'No todo el mundo genera la misma sensación al decir algo simple.',
+'A veces lo que transmite cercanía no es sonreír, sino el tono.',
+'La gente interpreta confianza, frialdad o interés mucho antes de pensar en las palabras.',
+'Una voz puede parecer abierta, reservada, cálida o cortante en segundos.',
+'Intento que mi tono no suene forzado cuando alguien me escucha por primera vez.',
+'Puedo parecer tranquilo o misterioso según cómo entre en la frase.',
+'La impresión que dejo no siempre depende del contenido, sino del ambiente que crea mi voz.',
+'Hay tonos que invitan a seguir hablando y otros que cierran la distancia.'
+],
+en:[
+'Speak naturally, as if someone had just met you and were forming a first impression.',
+'People may not notice it, but I usually think a lot before showing what I feel.',
+'I do not need to exaggerate for my presence to be noticed.',
+'Sometimes people do not remember my exact words, but they do remember the feeling I leave.',
+'I do not always try to be liked quickly; I care more about sounding real.',
+'Some people inspire trust through the way they speak before anything else.',
+'A first impression can change a lot through tone alone.',
+'I can sound close without seeming hungry for approval.',
+'I do not need to sound nice all the time to leave a good impression.',
+'Sometimes a calm tone creates more trust than exaggerated energy.',
+'If I speak calmly, people usually listen in a different way.',
+'I do not always sound warm, but I try to sound clear and honest.',
+'Some voices land well because they feel secure without becoming aggressive.',
+'The way you speak says a lot about how you position yourself around other people.',
+'I can sound serious without sounding distant.',
+'When I want to connect, I prefer sounding natural over sounding impressive.',
+'Not everyone creates the same feeling when saying something simple.',
+'Sometimes closeness comes more from tone than from smiling.',
+'People interpret confidence, coldness or interest long before they think about the words.',
+'A voice can feel open, reserved, warm or cutting within seconds.'
+]
+},
+challenge:{es:[],en:[]},
+scene:{es:[],en:[]}
+};
+
+function buildPromptPools(){
+  var esChallengeIntents = [
+    'Desafío: dilo como si entraras en una sala y supieras que la controlas. Frase: ',
+    'Desafío: dilo con calma quirúrgica, sin perder autoridad. Frase: ',
+    'Desafío: dilo como si estuvieras a punto de poner fin a una discusión. Frase: ',
+    'Desafío: dilo con intensidad contenida, sin sonar exagerado. Frase: ',
+    'Desafío: dilo como si escondieras algo que nadie debería saber. Frase: ',
+    'Desafío: dilo como si acabaras de ganar algo enorme y no necesitaras celebrarlo. Frase: ',
+    'Desafío: dilo con magnetismo, como si quisieras atraer sin perseguir. Frase: ',
+    'Desafío: dilo como si dieras una última advertencia con educación. Frase: ',
+    'Desafío: dilo como si tuvieras la razón y no necesitaras discutirla. Frase: ',
+    'Desafío: dilo como si todos esperaran tu reacción antes de moverse. Frase: ',
+    'Desafío: dilo como si estuvieras cansado de repetir lo evidente. Frase: ',
+    'Desafío: dilo como si tu tono tuviera más peligro que tus palabras. Frase: '
+  ];
+  var esChallengeShort = [
+    'Sé exactamente lo que estoy haciendo.',
+    'No hace falta gritar para imponer presencia.',
+    'Ya he tenido suficiente y no voy a repetirlo.',
+    'No tengo ninguna duda de lo que voy a hacer ahora.',
+    'No necesito demostrar nada para estar por encima.',
+    'Hoy sí que se ha notado quién estaba preparado.',
+    'No deberías subestimarme tan rápido.',
+    'No estoy preguntando, estoy decidiendo.',
+    'No todo el mundo está preparado para saberlo.',
+    'Esta vez no pienso dar ni un paso atrás.',
+    'Hoy empieza algo que no vais a olvidar fácilmente.',
+    'Lo que viene ahora lo decides conmigo, no sin mí.'
+  ];
+  var esChallengeMedium = [
+    'No necesito alargar esta conversación para que entiendas perfectamente dónde estoy y hasta dónde voy a llegar.',
+    'A veces basta una frase dicha con el tono correcto para que todo el mundo recuerde quién marcó el límite.',
+    'No me interesa parecer más grande de lo que soy; me basta con sonar imposible de ignorar.',
+    'Si has llegado hasta aquí pensando que ibas a decidirlo todo, creo que vas a tener que recalcular bastante rápido.',
+    'Hay momentos en los que hablar bajo pesa más que levantar la voz, y este es exactamente uno de esos momentos.',
+    'No quiero convencerte a la fuerza; quiero que notes por el tono que ya no queda espacio para dudar.'
+  ];
+  var esChallengeLong = [
+    'No hace falta montar una escena ni buscar palabras enormes cuando el tono ya deja claro que aquí se ha terminado la negociación.',
+    'No estoy intentando sonar peligroso; simplemente quiero que se note que he dejado de ceder y que esta vez no pienso retroceder.',
+    'A veces la diferencia entre una frase cualquiera y una frase inolvidable está en decirla como si ya supieras el desenlace de todo.',
+    'No necesito que estés de acuerdo conmigo ahora mismo; solo necesito que escuches el peso con el que lo estoy diciendo.'
+  ];
+
+  for(var i=0;i<96;i++){
+    var intent = esChallengeIntents[i % esChallengeIntents.length];
+    var phraseSet = i % 3 === 0 ? esChallengeShort : (i % 3 === 1 ? esChallengeMedium : esChallengeLong);
+    var phrase = phraseSet[i % phraseSet.length];
+    prompts.challenge.es.push(intent + phrase);
+  }
+
+  var enChallengeIntents = [
+    'Challenge: say it like you enter the room already owning it. Line: ',
+    'Challenge: say it with surgical calm, without losing authority. Line: ',
+    'Challenge: say it like you are about to end an argument. Line: ',
+    'Challenge: say it with controlled intensity, never exaggerated. Line: ',
+    'Challenge: say it like you are hiding something nobody should know. Line: ',
+    'Challenge: say it like you had just won something huge and did not need to celebrate it. Line: ',
+    'Challenge: say it with magnetism, as if you wanted to attract without chasing. Line: ',
+    'Challenge: say it like a final warning delivered politely. Line: ',
+    'Challenge: say it like you are right and do not need to argue it. Line: ',
+    'Challenge: say it like everyone is waiting for your reaction before moving. Line: ',
+    'Challenge: say it like you are tired of repeating the obvious. Line: ',
+    'Challenge: say it as if your tone carried more danger than your words. Line: '
+  ];
+  var enChallengeShort = [
+    'I know exactly what I am doing.',
+    'You do not need to shout to impose presence.',
+    'I have had enough and I am not repeating myself.',
+    'I have no doubt about what I am about to do.',
+    'I do not need to prove anything to be above this.',
+    'Today it really showed who was prepared.',
+    'You should not underestimate me that quickly.',
+    'I am not asking, I am deciding.',
+    'Not everyone is ready to know that.',
+    'This time I am not taking a single step back.',
+    'Today begins something you will not easily forget.',
+    'What happens next is decided with me, not without me.'
+  ];
+  var enChallengeMedium = [
+    'I do not need to stretch this conversation for you to understand exactly where I stand and how far I am willing to go.',
+    'Sometimes one sentence delivered with the right tone is enough for everyone to remember who set the limit.',
+    'I am not trying to sound bigger than I am; it is enough for me to sound impossible to ignore.',
+    'If you came this far thinking you would decide everything, I think you may need to recalculate very quickly.',
+    'There are moments when speaking quietly weighs more than raising your voice, and this is exactly one of those moments.',
+    'I am not trying to force you to agree; I want you to hear in the tone that doubt is no longer welcome.'
+  ];
+  var enChallengeLong = [
+    'There is no need for a dramatic scene or oversized words when the tone already makes it clear that the negotiation is over.',
+    'I am not trying to sound dangerous; I simply want it to be obvious that I have stopped yielding and I am not stepping back now.',
+    'Sometimes the difference between an ordinary sentence and an unforgettable one is saying it like you already know how everything ends.',
+    'I do not need you to agree with me right now; I only need you to hear the weight behind the way I am saying it.'
+  ];
+
+  for(var j=0;j<96;j++){
+    var intentEn = enChallengeIntents[j % enChallengeIntents.length];
+    var phraseSetEn = j % 3 === 0 ? enChallengeShort : (j % 3 === 1 ? enChallengeMedium : enChallengeLong);
+    var phraseEn = phraseSetEn[j % phraseSetEn.length];
+    prompts.challenge.en.push(intentEn + phraseEn);
+  }
+
+  var esSceneContexts = [
+    'Situación: estás en una entrevista importante y quieres sonar seguro sin parecer artificial. Frase: ',
+    'Situación: estás en una cita y quieres parecer interesante sin forzar nada. Frase: ',
+    'Situación: estás calmando a alguien en un momento tenso y necesitas bajar la intensidad sin perder firmeza. Frase: ',
+    'Situación: estás entrando en una reunión como alguien con autoridad real. Frase: ',
+    'Situación: estás negociando algo importante y no quieres regalar terreno. Frase: ',
+    'Situación: estás dando una mala noticia y necesitas que suene humana, no mecánica. Frase: ',
+    'Situación: estás intentando motivar a un equipo cansado cuando ya nadie tiene demasiada energía. Frase: ',
+    'Situación: estás hablando con alguien que te falló y no quieres sonar ni blando ni teatral. Frase: ',
+    'Situación: estás entrando en una sala donde nadie cree en ti todavía. Frase: ',
+    'Situación: estás grabando una escena final de película y todo depende del tono. Frase: ',
+    'Situación: estás defendiendo una idea delante de gente que duda de ti. Frase: ',
+    'Situación: estás conociendo a alguien y quieres generar intriga sin parecer calculado. Frase: '
+  ];
+  var esSceneShort = [
+    'Cuéntame por qué debería confiar en ti.',
+    'No suelo hablar demasiado al principio, pero me fijo en todo.',
+    'Ahora mismo lo más importante es que mantengamos la calma.',
+    'Vamos a ir al grano porque no hemos venido a perder el tiempo.',
+    'Estoy dispuesto a escuchar, pero no voy a aceptar cualquier cosa.',
+    'No necesito que me creáis ahora; lo entenderéis después.',
+    'Todavía no hemos llegado hasta aquí para rendirnos justo ahora.',
+    'No es fácil decir esto, pero prefiero que lo escuches claro.',
+    'No necesito demasiado tiempo para saber cuándo alguien merece la pena.',
+    'Después de todo lo que pasó, sigo aquí y eso ya lo dice todo.'
+  ];
+  var esSceneMedium = [
+    'No voy a venderte una imagen perfecta, pero sí quiero que tengas claro que sé exactamente lo que puedo aportar aquí.',
+    'No estoy buscando sonar impresionante porque sí; estoy intentando que entiendas por qué esta decisión también te afecta a ti.',
+    'Antes de seguir discutiendo, necesito que escuches la intención con la que estoy diciendo esto y no solo las palabras.',
+    'No quiero que esto suene frío, pero tampoco quiero endulzarlo hasta hacerlo irreconocible.',
+    'No hace falta dramatizar más de la cuenta para que notes que esto es serio y que no pienso esquivarlo.',
+    'Si me vas a juzgar por esta frase, prefiero que al menos la escuches con el peso con el que la estoy diciendo.'
+  ];
+  var esSceneLong = [
+    'No quiero darte una respuesta diseñada para gustarte; prefiero que suene real, aunque eso signifique que el tono tenga más verdad que comodidad.',
+    'Hay situaciones en las que una sola frase tiene que sostener contexto, emoción y credibilidad al mismo tiempo, y esta es una de ellas.',
+    'No hace falta que esta escena suene enorme; basta con que se sienta viva, concreta y honestamente metida dentro del momento.',
+    'Si esta frase no entra en la situación con naturalidad, todo se cae, así que necesito que suene dicha desde dentro y no desde fuera.'
+  ];
+
+  for(var k=0;k<120;k++){
+    var ctx = esSceneContexts[k % esSceneContexts.length];
+    var sset = k % 3 === 0 ? esSceneShort : (k % 3 === 1 ? esSceneMedium : esSceneLong);
+    var line = sset[k % sset.length];
+    prompts.scene.es.push(ctx + line);
+  }
+
+  var enSceneContexts = [
+    'Situation: you are in an important interview and want to sound confident without sounding artificial. Line: ',
+    'Situation: you are on a date and want to sound interesting without forcing it. Line: ',
+    'Situation: you are calming someone in a tense moment and need to lower the intensity without losing firmness. Line: ',
+    'Situation: you are entering a meeting as someone with real authority. Line: ',
+    'Situation: you are negotiating something important and do not want to give ground away. Line: ',
+    'Situation: you are delivering bad news and need it to sound human, not mechanical. Line: ',
+    'Situation: you are trying to motivate a tired team when nobody has much energy left. Line: ',
+    'Situation: you are speaking to someone who failed you and do not want to sound soft or theatrical. Line: ',
+    'Situation: you are entering a room where nobody believes in you yet. Line: ',
+    'Situation: you are recording a final movie scene and everything depends on tone. Line: ',
+    'Situation: you are defending an idea in front of people who doubt you. Line: ',
+    'Situation: you are meeting someone and want to create intrigue without sounding calculated. Line: '
+  ];
+  var enSceneShort = [
+    'Tell me why I should trust you.',
+    'I do not usually talk too much at first, but I notice everything.',
+    'Right now the most important thing is to stay calm.',
+    'Let us get straight to the point because we did not come here to waste time.',
+    'I am willing to listen, but I will not accept just anything.',
+    'I do not need you to believe me now; you will understand later.',
+    'We did not come this far just to give up right now.',
+    'This is not easy to say, but I would rather you hear it clearly.',
+    'I do not need much time to know when someone is worth it.',
+    'After everything that happened, I am still here and that says enough.'
+  ];
+  var enSceneMedium = [
+    'I am not going to sell you a perfect image, but I do want you to understand exactly what I can bring here.',
+    'I am not trying to sound impressive for the sake of it; I want you to understand why this decision affects you too.',
+    'Before we keep arguing, I need you to hear the intention in this, not just the words.',
+    'I do not want this to sound cold, but I also do not want to sweeten it until it becomes unrecognizable.',
+    'There is no need to overdramatize this for you to notice that it is serious and I am not going to dodge it.',
+    'If you are going to judge me by this sentence, at least hear it with the weight I am giving it.'
+  ];
+  var enSceneLong = [
+    'I do not want to give you a line designed to please you; I would rather it sound real, even if that means the tone carries more truth than comfort.',
+    'There are situations in which one sentence has to carry context, emotion and credibility all at once, and this is one of them.',
+    'This scene does not need to sound huge; it only needs to feel alive, specific and honestly inside the moment.',
+    'If this line does not enter the situation naturally, everything collapses, so it needs to sound spoken from inside the moment, not from outside it.'
+  ];
+
+  for(var m=0;m<120;m++){
+    var ctxEn = enSceneContexts[m % enSceneContexts.length];
+    var ssetEn = m % 3 === 0 ? enSceneShort : (m % 3 === 1 ? enSceneMedium : enSceneLong);
+    var lineEn = ssetEn[m % ssetEn.length];
+    prompts.scene.en.push(ctxEn + lineEn);
+  }
+}
+buildPromptPools();
+
+function buildPersonalityPool(lang){
+  var bases = lang==='es'
+    ? [['👑','Líder','Tu voz transmite autoridad natural y sensación clara de control.','authority'],['⚡','Dominante','Tu voz impone presencia y cuesta ignorarla.','power'],['🔥','Indomable','Hay una fuerza difícil de frenar en la manera en que proyectas.','power'],['🧠','Analítico','Tu voz suena ordenada, pensada y con bastante control mental.','mind'],['🦊','Perspicaz','Proyectas observación y una inteligencia que parece leer más de lo habitual.','mind'],['🕶️','Imperturbable','Suenas difícil de alterar, como alguien que no pierde el control fácilmente.','calm'],['🧲','Hipnótico','Tu voz tiene un ritmo que atrapa y dan ganas de seguir escuchando.','magnet'],['💎','Carismático','Conectas rápido y dejas una impresión agradable.','magnet'],['🌙','Enigmático','Tu voz sugiere fondo y reserva, como alguien que no se muestra entero de golpe.','mystery'],['🛡️','Seguro','Tu tono proyecta firmeza y una base emocional bastante estable.','calm'],['🎯','Directo','No das demasiadas vueltas y eso hace que tu voz suene eficaz.','authority'],['🌊','Sereno','Tu voz tiene calma y pausa, como si controlases bien el ritmo interno.','calm']]
+    : [['👑','Leader','Your voice projects natural authority and a clear sense of control.','authority'],['⚡','Dominant','Your voice imposes presence and is hard to ignore.','power'],['🔥','Indomitable','There is a force in your projection that feels hard to stop.','power'],['🧠','Analytical','Your voice sounds ordered, deliberate and mentally controlled.','mind'],['🦊','Perceptive','Your voice sounds observant and sharp.','mind'],['🕶️','Unshakable','You sound hard to disturb, like someone who keeps control.','calm'],['🧲','Hypnotic','Your voice has a rhythm that pulls people in.','magnet'],['💎','Charismatic','You connect quickly and leave a pleasant impression.','magnet'],['🌙','Enigmatic','Your voice suggests depth and reserve.','mystery'],['🛡️','Secure','Your tone projects firmness and inner stability.','calm'],['🎯','Direct','You do not overcomplicate and that makes your voice feel efficient.','authority'],['🌊','Serene','Your voice carries calm and pacing.','calm']];
+  var tagsMap = lang==='es'
+    ? {authority:[['presencia','control','mando'],['autoridad','peso','decisión'],['firmeza','dirección','seguridad']],power:[['impacto','fuerza','presión'],['intensidad','energía','dominio'],['rebeldía','potencia','impulso']],mind:[['orden','precisión','lectura'],['astucia','observación','criterio'],['mente fría','estructura','detalle']],calm:[['templanza','estabilidad','calma'],['control','sangre fría','pausa'],['serenidad','equilibrio','fondo']],magnet:[['atracción','enganche','ritmo'],['carisma','conexión','calidez'],['magnetismo','interés','presencia']],mystery:[['misterio','fondo','reserva'],['intriga','matiz','distancia'],['profundidad','rareza','silencio']]}
+    : {authority:[['presence','control','command'],['authority','weight','decision'],['firmness','direction','security']],power:[['impact','strength','pressure'],['intensity','energy','dominance'],['rebellion','power','drive']],mind:[['order','precision','reading'],['sharpness','observation','judgment'],['cold mind','structure','detail']],calm:[['temperance','stability','calm'],['control','cold blood','pause'],['serenity','balance','depth']],magnet:[['attraction','pull','rhythm'],['charisma','connection','warmth'],['magnetism','interest','presence']],mystery:[['mystery','depth','reserve'],['intrigue','nuance','distance'],['depth','rarity','silence']]};
+  var modifiers = lang==='es' ? ['con fondo silencioso','con una calma poco común','sin necesidad de exagerar','con intención contenida','con bastante peso interno'] : ['with quiet depth','with unusual calm','without needing exaggeration','with contained intention','with strong inner weight'];
+  var pool = [];
+  for (var i=0;i<60;i++){
+    var b=bases[i%bases.length], tags=tagsMap[b[3]][i%tagsMap[b[3]].length];
+    var title=b[1]+(i<bases.length?'':' '+(lang==='es'?['Nocturno','Nítido','Firme','Silencioso','Estratégico'][i%5]:['Nocturnal','Clear','Firm','Silent','Strategic'][i%5]));
+    var desc=b[2]+' '+(lang==='es'?'Se nota una forma de estar ':'There is a way of being ')+modifiers[i%modifiers.length]+'.';
+    pool.push({emoji:b[0],title:title,desc:desc,tags:tags,archetype:b[3]});
+  }
+  return pool;
+}
+
+function buildThoughtsPool(lang){
+  var bases = lang==='es'
+    ? [['🪞','Parece que sabes lo que haces','Tu voz transmite criterio y seguridad, como si tuvieras más control interno del que enseñas.','respect'],['🌙','Generas intriga','No suenas fácil de leer del todo, y eso hace que otros quieran entenderte mejor.','mystery'],['🤝','Das confianza, pero con distancia','Tu tono suena creíble y estable, aunque no completamente abierto desde el principio.','reserve'],['🧊','Suenas más frío de lo que quizá eres','La impresión general es sólida, pero algo contenida o emocionalmente lejana.','cold'],['✨','Tienes algo interesante','Tu voz deja una sensación de fondo poco obvia, como alguien que no enseña todo de golpe.','mystery'],['🌊','Transmites calma','Tu tono parece estable y poco caótico, como alguien que no se desordena fácilmente.','calm'],['🧭','Tienes presencia, pero te reservas','Hay base para impactar más, aunque pareces medir bastante lo que muestras.','reserve'],['🔍','Pareces observador','Tu forma de hablar sugiere que notas más de lo que dices.','respect'],['🫥','Suenas difícil de descifrar','No es fácil saber rápido qué hay detrás de tu tono.','mystery'],['☁️','Das suavidad, pero no debilidad','Tu tono parece amable, pero no completamente expuesto.','warm']]
+    : [['🪞','You sound like someone who knows what they are doing','Your voice conveys judgment and confidence, as if you have more inner control than you openly show.','respect'],['🌙','You create intrigue','You do not sound easy to read, and that can make people want to understand you better.','mystery'],['🤝','You inspire trust, but with distance','Your tone sounds credible and stable, although not fully open from the first moment.','reserve'],['🧊','You sound colder than you may be','The overall impression is solid, but emotionally restrained or distant.','cold'],['✨','There is something interesting about you','Your voice leaves a subtle feeling, like someone who does not reveal everything at once.','mystery'],['🌊','You project calm','Your tone feels stable and not chaotic, like someone who does not get thrown off easily.','calm'],['🧭','You have presence, but you hold back','There is a base to make more impact, although you seem measured in what you show.','reserve'],['🔍','You seem observant','The way you speak suggests you notice more than you say.','respect'],['🫥','You are hard to decode','It is not easy to quickly understand what is behind your tone.','mystery'],['☁️','You sound soft, but not weak','Your tone feels kind without sounding fully exposed.','warm']];
+  var tagsMap = lang==='es'
+    ? {respect:[['seguridad','criterio','presencia'],['respeto','lectura','control'],['seriedad','firmeza','criterio']],mystery:[['intriga','fondo','curiosidad'],['misterio','matiz','distancia'],['rareza','interés','silencio']],reserve:[['credibilidad','reserva','control'],['distancia','seguridad','medida'],['presencia','autocontrol','filtro']],cold:[['frialdad','seriedad','contención'],['reserva','corte','distancia'],['rigidez','filtro','silencio']],calm:[['calma','estabilidad','templanza'],['paz','equilibrio','pausa'],['serenidad','orden','control']],warm:[['cercanía','suavidad','comodidad'],['amabilidad','calma','apertura'],['trato fácil','humanidad','calidez']]}
+    : {respect:[['confidence','judgment','presence'],['respect','reading','control'],['seriousness','firmness','judgment']],mystery:[['intrigue','depth','curiosity'],['mystery','nuance','distance'],['rarity','interest','silence']],reserve:[['credibility','reserve','control'],['distance','security','measure'],['presence','self-control','filter']],cold:[['coldness','seriousness','restraint'],['reserve','distance','filter'],['rigidity','control','silence']],calm:[['calm','stability','temperance'],['peace','balance','pause'],['serenity','order','control']],warm:[['closeness','softness','comfort'],['kindness','calm','openness'],['easygoing','humanity','warmth']]};
+  var endings = lang==='es' ? ['desde el primer momento','sin necesidad de hablar demasiado','aunque no busques impresionar','de manera bastante natural','con una reserva que pesa'] : ['from the first moment','without needing to say much','even if you are not trying to impress','in a very natural way','with a reserve that carries weight'];
+  var pool = [];
+  for (var i=0;i<60;i++){
+    var b=bases[i%bases.length], tags=tagsMap[b[3]][i%tagsMap[b[3]].length];
+    var desc=b[2]+' '+(lang==='es'?'Eso se nota ':'That shows ')+endings[i%endings.length]+'.';
+    pool.push({emoji:b[0],title:b[1],desc:desc,tags:tags,archetype:b[3]});
+  }
+  return pool;
+}
+
+function buildChallengePool(lang){
+  var es = [
+    ['👑','Dominante absoluto','No suena a intento. Suena a decisión.','elite'],
+    ['🔥','Imposible ignorarte','Tu voz arrastra atención sin pedirla.','elite'],
+    ['⚡','Presencia brutal','Se siente impacto inmediato al escucharte.','elite'],
+    ['🦁','Autoridad natural','No fuerzas el control, lo tienes.','elite'],
+    ['🎯','Directo y firme','No hay duda en lo que transmites.','elite'],
+    ['💣','Golpe de voz','Cada palabra tiene peso.','elite'],
+    ['🚀','Energía arrolladora','Tu tono empuja hacia adelante.','elite'],
+    ['🎤','Control total','Dominas ritmo, tono y presencia.','elite'],
+    ['🧲','Magnetismo puro','Atraes atención sin esfuerzo.','elite'],
+    ['🛡️','Seguridad absoluta','No hay fisuras en tu voz.','elite'],
+    ['🔥','Intensidad real','Se siente intención de verdad.','elite'],
+    ['⚔️','Contundente','Tu voz corta cualquier duda.','elite'],
+    ['👊','Impacto directo','Llegas sin rodeos.','elite'],
+    ['🎬','Voz protagonista','Pareces el centro de la escena.','elite'],
+    ['🧠','Precisión emocional','Clavas exactamente lo que transmites.','elite'],
+    ['⚡','Vibración potente','Tu tono no pasa desapercibido.','elite'],
+    ['🔥','Convicción total','Suena a verdad absoluta.','elite'],
+    ['🎯','Seguridad dominante','Controlas el mensaje y la percepción.','elite'],
+    ['💥','Explosivo','Tu voz irrumpe con fuerza.','elite'],
+    ['👑','Liderazgo claro','Se siente que mandas.','elite'],
+    ['😏','Convincente pero irregular','Hay momentos buenos, pero no constantes.','mid'],
+    ['🎭','Falta intención real','La voz suena correcta, pero no creíble.','mid'],
+    ['🧩','Bien, pero no impacta','No hay error, pero tampoco huella.','mid'],
+    ['⚖️','Equilibrado','Todo correcto, pero sin destacar.','mid'],
+    ['🙂','Natural','Suena cómodo, pero sin fuerza.','mid'],
+    ['🧠','Racional','Más lógico que emocional.','mid'],
+    ['🎤','Correcto','Cumples, pero no impones.','mid'],
+    ['😐','Plano controlado','No fallas, pero tampoco subes.','mid'],
+    ['📏','Medido','Demasiado contenido.','mid'],
+    ['🔄','Inestable','Subes y bajas sin control.','mid'],
+    ['🎯','Intención parcial','Se nota, pero no se mantiene.','mid'],
+    ['😶','Neutral','No transmite nada fuerte.','mid'],
+    ['📉','Falta empuje','Le falta energía final.','mid'],
+    ['🪶','Ligero','No pesa lo suficiente.','mid'],
+    ['🎧','Agradable pero débil','Fácil de escuchar, difícil de recordar.','mid'],
+    ['😅','Duda leve','Pequeña inseguridad.','mid'],
+    ['🧊','Frío controlado','Poco emocional.','mid'],
+    ['📍','Sin dirección clara','No se percibe objetivo.','mid'],
+    ['🤏','Impacto bajo','Pasa desapercibido.','mid'],
+    ['🎭','Interpretado','Suena actuado.','mid'],
+    ['📊','Correcto técnico','Funciona pero no emociona.','mid'],
+    ['🧠','Pensado','Demasiado calculado.','mid'],
+    ['😶‍🌫️','Difuso','No termina de llegar.','mid'],
+    ['🪫','Energía justa','Falta intensidad.','mid'],
+    ['🎚️','Sin pico','No hay momento fuerte.','mid'],
+    ['🧊','Sin impacto','No genera reacción.','low'],
+    ['😶','Plano total','No hay variación.','low'],
+    ['🚫','No entra en el reto','No conecta con la intención.','low'],
+    ['📉','Muy débil','Falta energía clara.','low'],
+    ['😵','Inseguro','Duda evidente.','low'],
+    ['🫥','Sin presencia','No se siente.','low'],
+    ['📭','No llega','Se pierde el mensaje.','low'],
+    ['😬','Forzado','No suena natural.','low'],
+    ['🪫','Apagado','Muy poca intensidad.','low'],
+    ['📉','Caído','Se desinfla al hablar.','low'],
+    ['😶‍🌫️','Desconectado','No hay intención.','low'],
+    ['🚷','Sin control','Ritmo irregular.','low'],
+    ['🧩','Fragmentado','No fluye.','low'],
+    ['😓','Tenso','Falta naturalidad.','low'],
+    ['📉','Sin fuerza','No sostiene el tono.','low'],
+    ['😑','Monótono','Sin variación.','low'],
+    ['🫤','Duda constante','No transmite seguridad.','low'],
+    ['📉','Falta claridad','No se entiende bien.','low'],
+    ['🧊','Frío total','Sin emoción.','low'],
+    ['🚫','Sin intención','No transmite nada.','low'],
+    ['😶','Vacío','No hay contenido emocional.','low'],
+    ['📉','Muy plano','No cambia nada.','low'],
+    ['🫥','Invisible','No destaca en nada.','low'],
+    ['😴','Aburrido','No engancha.','low'],
+    ['📭','Desapercibido','No deja huella.','low']
+  ];
+  var en = [
+    ['👑','Absolute dominator','It does not sound like an attempt. It sounds like a decision.','elite'],
+    ['🔥','Impossible to ignore','Your voice pulls attention without asking for it.','elite'],
+    ['⚡','Brutal presence','The impact is immediate.','elite'],
+    ['🦁','Natural authority','You do not force control, you have it.','elite'],
+    ['🎯','Direct and firm','There is no doubt in what you transmit.','elite'],
+    ['💣','Voice strike','Every word carries weight.','elite'],
+    ['🚀','Overwhelming energy','Your tone pushes forward.','elite'],
+    ['🎤','Total control','You dominate rhythm, tone and presence.','elite'],
+    ['🧲','Pure magnetism','You attract attention effortlessly.','elite'],
+    ['🛡️','Absolute security','There are no cracks in your voice.','elite'],
+    ['🔥','Real intensity','The intention feels real.','elite'],
+    ['⚔️','Forceful','Your voice cuts through doubt.','elite'],
+    ['👊','Direct impact','You land without detours.','elite'],
+    ['🎬','Main-character voice','You sound like the center of the scene.','elite'],
+    ['🧠','Emotional precision','You hit exactly what you want to transmit.','elite'],
+    ['⚡','Power vibration','Your tone does not go unnoticed.','elite'],
+    ['🔥','Total conviction','It sounds unquestionably true.','elite'],
+    ['🎯','Dominant confidence','You control the message and the perception.','elite'],
+    ['💥','Explosive','Your voice bursts in with force.','elite'],
+    ['👑','Clear leadership','It feels like you are in command.','elite'],
+    ['😏','Convincing but uneven','There are good moments, but they are not constant.','mid'],
+    ['🎭','Missing real intent','The voice sounds correct, but not believable.','mid'],
+    ['🧩','Good, but not impactful','There is no mistake, but no mark either.','mid'],
+    ['⚖️','Balanced','Everything is fine, but nothing stands out.','mid'],
+    ['🙂','Natural','Comfortable, but not strong.','mid'],
+    ['🧠','Rational','More logical than emotional.','mid'],
+    ['🎤','Correct','You deliver, but do not impose.','mid'],
+    ['😐','Flat but controlled','You do not fail, but you do not rise either.','mid'],
+    ['📏','Measured','Too contained.','mid'],
+    ['🔄','Unstable','You go up and down without control.','mid'],
+    ['🎯','Partial intention','It shows, but it does not hold.','mid'],
+    ['😶','Neutral','It does not transmit anything strong.','mid'],
+    ['📉','Lacking push','It needs more final energy.','mid'],
+    ['🪶','Lightweight','It does not carry enough weight.','mid'],
+    ['🎧','Pleasant but weak','Easy to hear, hard to remember.','mid'],
+    ['😅','Slight hesitation','A small insecurity is noticeable.','mid'],
+    ['🧊','Controlled coldness','Not very emotional.','mid'],
+    ['📍','No clear direction','The goal is not easy to feel.','mid'],
+    ['🤏','Low impact','It passes quietly.','mid'],
+    ['🎭','Performed','It sounds acted.','mid'],
+    ['📊','Technically correct','It works, but does not move anyone.','mid'],
+    ['🧠','Overthought','Too calculated.','mid'],
+    ['😶‍🌫️','Diffuse','It does not fully land.','mid'],
+    ['🪫','Just enough energy','It needs more intensity.','mid'],
+    ['🎚️','No peak moment','There is no strong highlight.','mid'],
+    ['🧊','No impact','It creates no reaction.','low'],
+    ['😶','Totally flat','There is no variation.','low'],
+    ['🚫','Not inside the challenge','It does not connect with the intended tone.','low'],
+    ['📉','Very weak','It lacks clear energy.','low'],
+    ['😵','Insecure','The doubt is evident.','low'],
+    ['🫥','No presence','It does not feel present.','low'],
+    ['📭','Does not land','The message gets lost.','low'],
+    ['😬','Forced','It does not sound natural.','low'],
+    ['🪫','Dim','Very little intensity.','low'],
+    ['📉','Falling off','It deflates while speaking.','low'],
+    ['😶‍🌫️','Disconnected','There is no intention.','low'],
+    ['🚷','No control','The rhythm feels irregular.','low'],
+    ['🧩','Fragmented','It does not flow.','low'],
+    ['😓','Tense','It lacks naturalness.','low'],
+    ['📉','No strength','It cannot sustain the tone.','low'],
+    ['😑','Monotone','No variation at all.','low'],
+    ['🫤','Constant doubt','It does not transmit security.','low'],
+    ['📉','Lacking clarity','It is not very understandable.','low'],
+    ['🧊','Totally cold','No emotion comes through.','low'],
+    ['🚫','No intention','It transmits nothing.','low'],
+    ['😶','Empty','There is no emotional content.','low'],
+    ['📉','Very flat','Nothing shifts.','low'],
+    ['🫥','Invisible','Nothing stands out.','low'],
+    ['😴','Boring','It does not engage.','low'],
+    ['📭','Forgettable','It leaves no mark.','low']
+  ];
+  var source = lang==='es' ? es : en;
+  var pool = [];
+  for(var i=0;i<source.length;i++){
+    var item = source[i];
+    var tags;
+    if(item[3]==='elite') tags = lang==='es' ? ['impacto','presencia','convicción'] : ['impact','presence','conviction'];
+    else if(item[3]==='mid') tags = lang==='es' ? ['potencial','ajuste','mejora'] : ['potential','adjustment','improvement'];
+    else tags = lang==='es' ? ['falta fuerza','sin huella','sube nivel'] : ['needs force','no mark','level up'];
+    pool.push({emoji:item[0], title:item[1], desc:item[2], tags:tags, archetype:item[3]});
+  }
+  return pool;
+}
+
+function buildScenePool(lang){
+  var bases = lang==='es'
+    ? [['🎬','Encajas muy bien en esta escena','Tu voz entra con naturalidad en el contexto y la situación se siente creíble.','fit'],['🕯️','La escena tiene atmósfera','No solo se entiende la frase: también se percibe el ambiente que la rodea.','fit'],['⚠️','Funciona, pero falta más intención','La escena está, aunque tu voz aún podría entrar con más peso emocional.','mid'],['🧩','Se entiende el contexto, pero no impacta del todo','La situación se reconoce, aunque la toma todavía no deja huella fuerte.','mid'],['❌','Aún no se siente dentro de la escena','La frase se oye, pero no parece vivida desde dentro del contexto.','weak'],['🌫️','Le falta más emoción concreta','No está mal, pero la escena pide un matiz emocional más claro.','mid'],['🎯','Muy buena presencia contextual','Tu tono se adapta bien a lo que está pasando y eso eleva la escena.','fit'],['💔','Tiene carga emocional','La toma deja sensación de historia, no solo de lectura.','fit'],['🧊','Demasiado neutro para este contexto','La escena pedía algo más marcado en intención o emoción.','weak'],['🔥','Tiene tensión real','La situación se siente viva, como si estuviera ocurriendo de verdad.','fit']]
+    : [['🎬','You fit this scene very well','Your voice enters the context naturally and the situation feels believable.','fit'],['🕯️','The scene has atmosphere','It is not only understandable; the surrounding mood is also felt.','fit'],['⚠️','It works, but it needs more intention','The scene is there, although your voice could enter with more emotional weight.','mid'],['🧩','The context is clear, but it does not fully hit','The situation is recognizable, although the take does not leave a strong mark yet.','mid'],['❌','It does not fully feel inside the scene','The phrase is audible, but it does not feel lived from inside the context.','weak'],['🌫️','It needs a more specific emotion','It is not bad, but the scene asks for a clearer emotional shade.','mid'],['🎯','Very good contextual presence','Your tone adapts well to what is happening and that lifts the scene.','fit'],['💔','It carries emotion','The take leaves a feeling of story, not just reading.','fit'],['🧊','Too neutral for this context','The scene needed a more marked intention or emotion.','weak'],['🔥','It has real tension','The situation feels alive, as if it were really happening.','fit']];
+  var tagsMap = lang==='es'
+    ? {fit:[['contexto','presencia','encaje'],['atmósfera','historia','credibilidad'],['escena','peso','emoción']],mid:[['intención','contexto','ajuste'],['mejora','matiz','escena'],['falta empuje','clima','entrada']],weak:[['neutro','plano','sin clima'],['poco contexto','sin historia','vacío'],['falta emoción','sin escena','sin peso']]}
+    : {fit:[['context','presence','fit'],['atmosphere','story','credibility'],['scene','weight','emotion']],mid:[['intention','context','adjustment'],['improvement','nuance','scene'],['needs push','mood','entry']],weak:[['neutral','flat','no mood'],['low context','no story','empty'],['needs emotion','no scene','no weight']]};
+  var endings = lang==='es' ? ['Eso se nota sobre todo en cómo arrancas la frase.','El final también ayuda a vender la situación.','La toma deja más sensación de escena que de ejercicio.','Con un pequeño ajuste podrías hacerla mucho más cinematográfica.','El contexto aparece, pero aún puede entrar con más fuerza.'] : ['That shows especially in how you start the phrase.','The ending also helps sell the situation.','The take feels more like a scene than an exercise.','With a small adjustment it could feel far more cinematic.','The context appears, but it could enter with more force.'];
+  var pool = [];
+  for (var i=0;i<65;i++){
+    var b=bases[i%bases.length], tags=tagsMap[b[3]][i%tagsMap[b[3]].length];
+    pool.push({emoji:b[0],title:b[1],desc:b[2]+' '+endings[i%endings.length],tags:tags,archetype:b[3]});
+  }
+  return pool;
+}
+
+var results = {personality:{es:buildPersonalityPool('es'), en:buildPersonalityPool('en')},thoughts:{es:buildThoughtsPool('es'), en:buildThoughtsPool('en')},challenge:{es:buildChallengePool('es'), en:buildChallengePool('en')},scene:{es:buildScenePool('es'), en:buildScenePool('en')}};
+
+function updateComparisonAvailability(){
+  var available = !!(state.saved.personality && state.saved.thoughts);
+  $('compareHomeCard').className = available ? 'mode-card' : 'mode-card hidden';
+  $('compareBtn').className = available ? 'btn btn-secondary' : 'btn btn-secondary hidden';
+}
+
+function showComparison(){
+  if(!(state.saved.personality && state.saved.thoughts)) return;
+  $('comparisonTitle').innerHTML = tt().compareMode;
+  $('comparisonSub').innerHTML = tt().compareModeSub;
+  $('compareHomeBtn').innerHTML = tt().homeBtn;
+  $('compareHero').innerHTML = tt().compareHero;
+  $('compareCard1Label').innerHTML = tt().compareCard1;
+  $('compareCard2Label').innerHTML = tt().compareCard2;
+  $('retestPersonalityBtn').innerHTML = tt().retestPersonality;
+  $('retestThoughtsBtn').innerHTML = tt().retestThoughts;
+  $('shareCompareBtn').innerHTML = tt().share;
+  $('comparePersonalityTitle').innerHTML = state.saved.personality.title;
+  $('comparePersonalityDesc').innerHTML = state.saved.personality.desc;
+  $('compareThoughtsTitle').innerHTML = state.saved.thoughts.title;
+  $('compareThoughtsDesc').innerHTML = state.saved.thoughts.desc;
+  $('compareNote').innerHTML = comparisonMessage(state.lang, state.saved.personality, state.saved.thoughts);
+  showScreen('comparison');
+}
+
+function comparisonMessage(lang, p, t){
+  if(!p || !t) return lang==='es' ? 'Todavía faltan datos.' : 'Data is still missing.';
+  var map = {authority:{respect:['Tu identidad vocal proyecta mando y además los demás suelen verte competente. Hay coherencia fuerte entre cómo eres y cómo impactas.','Your vocal identity projects command and people also tend to see you as competent. Strong coherence between who you are and how you land.'],reserve:['Por dentro transmites autoridad, pero por fuera puedes parecer más contenido de lo que realmente eres. Tu voz manda, aunque no siempre lo muestre todo al principio.','Inside you project authority, but outwardly you may seem more restrained than you really are. Your voice leads, although it does not always show everything at first.']},power:{cold:['Tu fuerza interna puede percibirse como dureza o distancia. Impactas mucho, pero no siempre resultas fácil de leer emocionalmente.','Your inner force can be perceived as hardness or distance. You make impact, but you are not always easy to read emotionally.'],mystery:['Tienes intensidad y además dejas intriga. Esa mezcla puede volverte magnético, aunque también un poco imprevisible.','You have intensity and also leave intrigue. That mix can make you magnetic, though somewhat unpredictable.']},mind:{respect:['Tu inteligencia vocal se convierte en credibilidad. Suenas pensado por dentro y competente por fuera.','Your vocal intelligence turns into credibility. You sound deliberate inside and competent outside.'],cold:['Puedes ser más mental que cercano. Por dentro hay cabeza; por fuera algunos pueden percibir más distancia que calidez.','You may feel more mental than warm. Inside there is thought; outside some may perceive more distance than warmth.']},calm:{calm:['Hay coherencia casi total: por dentro y por fuera apareces estable. Tu voz transmite control y poca agitación.','There is near-total coherence: inside and outside you come across as stable. Your voice projects control and low agitation.'],warm:['Tu calma se interpreta como trato fácil. Esa combinación puede hacerte muy agradable sin perder seriedad.','Your calm is interpreted as ease. That combination can make you very pleasant without losing seriousness.']},magnet:{mystery:['Tienes tirón y además dejas curiosidad. Puedes resultar muy interesante porque no lo entregas todo de golpe.','You have pull and also leave curiosity. You can feel very interesting because you do not reveal everything at once.'],warm:['Tu carisma se traduce en cercanía. La gente puede sentirte accesible sin verte débil.','Your charisma turns into closeness. People may feel you are approachable without seeing you as weak.']},mystery:{mystery:['La reserva interna coincide con una percepción enigmática. Tu voz deja huella porque no se descifra rápido.','Your inner reserve matches an enigmatic perception. Your voice leaves a mark because it is not decoded quickly.'],respect:['Tu fondo misterioso no te quita seriedad; al contrario, puede hacer que parezcas más interesante y difícil de subestimar.','Your mysterious depth does not take away seriousness; it can actually make you feel more interesting and harder to underestimate.']}};
+  var pKey = p.archetype || 'mind', tKey = t.archetype || 'mystery';
+  if(map[pKey] && map[pKey][tKey]) return map[pKey][tKey][lang==='es' ? 0 : 1];
+  return lang==='es' ? 'Hay una diferencia interesante entre cómo te organizas por dentro y cómo apareces por fuera. Justo ahí está una de las partes más potentes de tu voz.' : 'There is an interesting difference between how you are organized inside and how you appear outside. That is one of the strongest parts of your voice.';
+}
+
+function $(id){return document.getElementById(id)}
+function tt(){return texts[state.lang]}
+function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function showScreen(id){var screens=document.getElementsByClassName('screen');for(var i=0;i<screens.length;i++)screens[i].className='screen';$(id).className='screen active'}
+
+
+function getHistoryKey(){ return 'vm_history_' + state.lang; }
+function openHistory(){ renderHistory(); showScreen('history'); }
+function openSettings(){ syncSettingsUI(); showScreen('settings'); }
+function saveToHistory(entry){
+  if(!state.settings.saveHistory) return;
+  var key = getHistoryKey();
+  var list = JSON.parse(localStorage.getItem(key) || '[]');
+  list.unshift({mode:entry.mode,title:entry.title,desc:entry.desc,energy:entry.energy,clarity:entry.clarity,confidence:entry.confidence,prompt:entry.prompt,date:new Date().toLocaleString()});
+  localStorage.setItem(key, JSON.stringify(list.slice(0,40)));
+}
+function renderHistory(){
+  var list = JSON.parse(localStorage.getItem(getHistoryKey()) || '[]');
+  var box = $('historyList');
+  if(!list.length){ box.innerHTML = tt().noHistory; return; }
+  var modeNames = {personality:tt().personality, thoughts:tt().thoughts, challenge:tt().challenge, scene:tt().scene};
+  box.innerHTML = list.map(function(item){
+    return '<div class="box" style="margin-top:0;margin-bottom:12px"><div class="box-title">'+(modeNames[item.mode]||item.mode)+'</div><div style="font-weight:700;font-size:22px;margin-bottom:8px">'+item.title+'</div><div class="small">'+item.desc+'</div><div class="small" style="margin-top:8px">'+tt().energy+': '+item.energy+' · '+tt().clarity+': '+item.clarity+' · '+tt().confidence+': '+item.confidence+'</div><div class="small" style="margin-top:8px;opacity:.8">'+item.date+'</div></div>';
+  }).join('');
+}
+function clearHistory(){
+  localStorage.removeItem('vm_history_es');
+  localStorage.removeItem('vm_history_en');
+  renderHistory();
+  alert(tt().historyCleared);
+}
+function syncSettingsUI(){
+  $('toggleHistoryBtn').innerHTML = state.settings.saveHistory ? tt().on : tt().off;
+  $('toggleSoundsBtn').innerHTML = state.settings.sounds ? tt().on : tt().off;
+}
+function toggleSaveHistory(){
+  state.settings.saveHistory = !state.settings.saveHistory;
+  localStorage.setItem('vm_saveHistory', JSON.stringify(state.settings.saveHistory));
+  if(!state.settings.saveHistory){
+    localStorage.removeItem('vm_history_es');
+    localStorage.removeItem('vm_history_en');
+  }
+  syncSettingsUI();
+}
+function toggleSounds(){
+  state.settings.sounds = !state.settings.sounds;
+  localStorage.setItem('vm_sounds', JSON.stringify(state.settings.sounds));
+  syncSettingsUI();
+}
+function checkMicPermission(){
+  if(!navigator.permissions){ alert(state.lang==='es' ? 'Tu navegador no permite comprobarlo desde aquí.' : 'Your browser does not allow checking it from here.'); return; }
+  navigator.permissions.query({name:'microphone'}).then(function(result){
+    if(result.state==='granted') alert(state.lang==='es' ? 'El micrófono ya está permitido para esta web.' : 'Microphone permission is already granted for this site.');
+    else if(result.state==='prompt') alert(state.lang==='es' ? 'El navegador preguntará cuando grabes.' : 'The browser will ask when you record.');
+    else alert(state.lang==='es' ? 'El micrófono está bloqueado para esta web.' : 'Microphone permission is blocked for this site.');
+  }).catch(function(){
+    alert(state.lang==='es' ? 'No se pudo comprobar el permiso.' : 'Could not check the permission.');
+  });
+}
+
+
+
+function getChallengeScore(res){
+  if(!res) return 0;
+  return Math.round(res.energy*0.34 + res.clarity*0.31 + res.confidence*0.35);
+}
+function encodeChallengePayload(){
+  if(state.mode!=='challenge' || !state.lastResult){
+    alert(tt().challengeNeedResult);
+    return null;
+  }
+  var payload = {lang:state.lang,prompt:state.currentPrompt,title:state.lastResult.title,score:getChallengeScore(state.lastResult),energy:state.lastResult.energy,clarity:state.lastResult.clarity,confidence:state.lastResult.confidence};
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
+function challengeFriend(){
+  var encoded = encodeChallengePayload();
+  if(!encoded) return;
+  var payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+  var shareUrl = location.origin + location.pathname + '?vmchallenge=' + encodeURIComponent(encoded) + '#vmchallenge=' + encodeURIComponent(encoded);
+  var text =
+    (tt().challengeShareLead || 'Te reto en VoiceMirror 🔥') + '\n\n' +
+    (tt().challenge || 'Desafíos') + '\n' +
+    payload.prompt + '\n\n' +
+    (tt().shareChallengeResult || 'Mi resultado') + ': ' +
+    payload.title + ' — ' + payload.score + '/100\n' +
+    (tt().challengeYourTurn || 'A ver si me superas.');
+
+  if(navigator.share){
+    navigator.share({title:'VoiceMirror Challenge', text:text, url:shareUrl}).catch(function(){});
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareUrl).then(function(){
+      alert((tt().challengeCopied || 'Reto copiado para compartir.') + '\n\n' + shareUrl);
+    });
+  } else {
+    alert(shareUrl);
+  }
+}
+
+function getIncomingChallengeRaw(){
+  try{
+    var params = new URLSearchParams(window.location.search || '');
+    var raw = params.get('vmchallenge');
+    if(raw) return raw;
+  }catch(e){}
+  try{
+    var hash = window.location.hash || '';
+    var m = hash.match(/vmchallenge=([^&]+)/);
+    if(m && m[1]) return m[1];
+  }catch(e){}
+  return null;
+}
+
+function checkIncomingChallenge(){
+  try{
+    var raw = getIncomingChallengeRaw();
+    if(!raw){
+      state.incomingChallenge = null;
+      state.autoChallengeMode = false;
+      if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel hidden';
+      if(typeof updateDuelButton === 'function') updateDuelButton();
+      return false;
+    }
+
+    try{ raw = decodeURIComponent(raw); }catch(e){}
+    var decoded = atob(raw);
+    var data = JSON.parse(decodeURIComponent(escape(decoded)));
+    if(!data || !data.prompt) return false;
+
+    state.incomingChallenge = data;
+    state.autoChallengeMode = true;
+    state.mode = 'challenge';
+    if(data.lang) state.lang = data.lang;
+
+    if(typeof setLang === 'function') setLang(state.lang);
+    if(typeof updateModeHeader === 'function') updateModeHeader();
+    state.currentPrompt = data.prompt;
+    if($('promptText')) renderPrompt(state.currentPrompt)
+    if(typeof clearResult === 'function') clearResult();
+
+    if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+    if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML = tt().incomingChallengeTitle || 'Reto recibido';
+    if($('incomingChallengeText')){
+      $('incomingChallengeText').innerHTML =
+        (tt().incomingReady || '') +
+        '<br><br><strong>' + data.prompt + '</strong>' +
+        '<br><br>' + (tt().shareChallengeResult || 'Resultado rival') + ': ' +
+        (data.title || '—') + (data.score ? ' — ' + data.score + '/100' : '');
+    }
+
+    if($('challengeFriendBtn')) $('challengeFriendBtn').className = 'btn btn-secondary hidden';
+    if(typeof updateDuelButton === 'function') updateDuelButton();
+    if(typeof showScreen === 'function') showScreen('mode');
+
+    return true;
+  }catch(e){
+    console.error('Incoming challenge error', e);
+    return false;
+  }
+}
+function useIncomingChallenge(){
+  if(!state.incomingChallenge) return;
+  state.autoChallengeMode = true;
+  state.mode='challenge';
+  updateModeHeader();
+  state.currentPrompt = state.incomingChallenge.prompt;
+  renderPrompt(state.currentPrompt)
+  clearResult();
+  if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+  if($('challengeFriendBtn')) $('challengeFriendBtn').className = 'btn btn-secondary hidden';
+  if(typeof updateDuelButton === 'function') updateDuelButton();
+  showScreen('mode');
+}
+function getDuelOutcome(myResult, rivalResult){
+  var rivalConfidence = rivalResult ? (rivalResult.confidence || (rivalResult.result ? rivalResult.result.confidence : 0) || 0) : 0;
+  var rivalClarity = rivalResult ? (rivalResult.clarity || (rivalResult.result ? rivalResult.result.clarity : 0) || 0) : 0;
+  var rivalScore = rivalResult && rivalResult.score ? rivalResult.score : getChallengeScore(rivalResult && rivalResult.result ? rivalResult.result : null);
+  var myScore = getChallengeScore(myResult);
+  var winner = 'tie';
+  if(myScore > rivalScore) winner = 'you';
+  else if(rivalScore > myScore) winner = 'rival';
+
+  var reason = '';
+  if(winner==='you'){
+    if(myResult.confidence >= rivalConfidence + 4) reason = state.lang==='es' ? 'Ganaste por más confianza e intención sostenida.' : 'You won through stronger confidence and sustained intention.';
+    else if(myResult.clarity >= rivalClarity + 4) reason = state.lang==='es' ? 'Ganaste por mayor claridad al ejecutar la frase.' : 'You won through better clarity in delivery.';
+    else reason = state.lang==='es' ? 'Ganaste por una mezcla más fuerte de presencia, control e impacto.' : 'You won through a stronger mix of presence, control and impact.';
+  } else if(winner==='rival'){
+    if(rivalConfidence >= myResult.confidence + 4) reason = state.lang==='es' ? 'Tu rival ganó por más confianza e intención sostenida.' : 'Your rival won through stronger confidence and sustained intention.';
+    else if(rivalClarity >= myResult.clarity + 4) reason = state.lang==='es' ? 'Tu rival ganó por más claridad en la ejecución.' : 'Your rival won through clearer delivery.';
+    else reason = state.lang==='es' ? 'Tu rival ganó por una mezcla más sólida de presencia, control e impacto.' : 'Your rival won through a stronger mix of presence, control and impact.';
+  } else {
+    reason = state.lang==='es' ? 'La puntuación está prácticamente igualada. Repite el reto para desempatar.' : 'The score is essentially tied. Retry the challenge to break the tie.';
+  }
+  return {winner:winner, myScore:myScore, rivalScore:rivalScore, reason:reason};
+}
+function updateDuelButton(){
+  var show = state.mode==='challenge' && !!state.lastResult && state.lastResult.mode==='challenge' && !!state.incomingChallenge;
+  if($('duelBtn')) $('duelBtn').className = show ? 'btn btn-secondary' : 'btn btn-secondary hidden';
+}
+function showDuel(){
+  if(!state.incomingChallenge || !state.lastResult || state.mode!=='challenge'){
+    alert(tt().duelNoIncoming);
+    return;
+  }
+  var outcome = getDuelOutcome(state.lastResult, state.incomingChallenge);
+  $('duelTitle').innerHTML = tt().duelTitle;
+  $('duelSub').innerHTML = tt().duelSub;
+  $('duelHomeBtn').innerHTML = tt().homeBtn;
+  $('duelYouLabel').innerHTML = tt().duelYou;
+  $('duelRivalLabel').innerHTML = tt().duelRival;
+  $('duelReasonLabel').innerHTML = tt().duelReason;
+  $('duelShareBtn').innerHTML = tt().duelShareResult;
+  $('duelRetryBtn').innerHTML = tt().rematch || (state.lang==='es' ? 'Revancha' : 'Rematch');
+  $('duelYouTitle').innerHTML = state.lastResult.title;
+  $('duelYouScore').innerHTML = outcome.myScore + '/100';
+  $('duelRivalTitle').innerHTML = state.incomingChallenge.title || '—';
+  $('duelRivalScore').innerHTML = outcome.rivalScore + '/100';
+
+  if(outcome.winner==='you'){
+    $('duelWinnerLine').innerHTML = (state.lang==='es' ? '🏆 Ganaste el duelo' : '🏆 You won the duel');
+    $('duelTrophy').innerHTML = '🏆';
+  } else if(outcome.winner==='rival'){
+    $('duelWinnerLine').innerHTML = (state.lang==='es' ? '🥈 Ganó tu rival' : '🥈 Your rival won');
+    $('duelTrophy').innerHTML = '🥈';
+  } else {
+    $('duelWinnerLine').innerHTML = tt().duelTie;
+    $('duelTrophy').innerHTML = '⚖️';
+  }
+
+  $('duelReasonText').innerHTML = outcome.reason;
+  $('duelYouBar').style.width = Math.max(6, outcome.myScore) + '%';
+  $('duelRivalBar').style.width = Math.max(6, outcome.rivalScore) + '%';
+
+  showScreen('duel');
+}
+function shareDuel(){
+  if(!state.incomingChallenge || !state.lastResult) return;
+  var outcome = getDuelOutcome(state.lastResult, state.incomingChallenge);
+  var winnerLine = outcome.winner==='you'
+    ? (state.lang==='es' ? '🏆 Gané el duelo' : '🏆 I won the duel')
+    : outcome.winner==='rival'
+      ? (state.lang==='es' ? '🥈 Mi rival ganó el duelo' : '🥈 My rival won the duel')
+      : tt().duelTie;
+  var text = 'VoiceMirror\n\n' + winnerLine + '\n\n' + tt().duelYou + ': ' + state.lastResult.title + ' — ' + outcome.myScore + '/100\n' + tt().duelRival + ': ' + (state.incomingChallenge.title || '—') + ' — ' + outcome.rivalScore + '/100\n\n' + outcome.reason;
+  if(navigator.share){
+    navigator.share({title:'VoiceMirror Duel', text:text, url:location.href}).catch(function(){});
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ alert(text); });
+  } else {
+    alert(text);
+  }
+}
+
+function startRematch(){
+  if(!state.incomingChallenge) return;
+  state.autoChallengeMode = true;
+  state.mode='challenge';
+  updateModeHeader();
+  state.currentPrompt = state.incomingChallenge.prompt;
+  renderPrompt(state.currentPrompt)
+  clearResult();
+  if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+  if($('challengeFriendBtn')) $('challengeFriendBtn').className='btn btn-secondary hidden';
+  if($('duelBtn')) $('duelBtn').className='btn btn-secondary hidden';
+  showScreen('mode');
+}
+
+function setLang(lang){
+  state.lang=lang;
+  $('langEs').className='lang-btn'+(lang==='es'?' active':'');
+  $('langEn').className='lang-btn'+(lang==='en'?' active':'');
+  $('langEs2').className='lang-btn'+(lang==='es'?' active':'');
+  $('langEn2').className='lang-btn'+(lang==='en'?' active':'');
+  $('tagline').innerHTML=tt().tagline;
+  $('homePersonalityTitle').innerHTML=state.lang==='es'?'PERSONALIDAD':'PERSONALITY';
+  $('homePersonalityDesc').innerHTML=tt().homePersonalityDesc;
+  $('homeThoughtsTitle').innerHTML=state.lang==='es'?'¿QUÉ PIENSAN DE TI?':'WHAT DO PEOPLE THINK OF YOU?';
+  $('homeThoughtsDesc').innerHTML=tt().homeThoughtsDesc;
+  $('homeChallengeTitle').innerHTML=state.lang==='es'?'DESAFÍOS':'CHALLENGES';
+  $('homeChallengeDesc').innerHTML=tt().homeChallengeDesc;
+  $('homeSceneTitle').innerHTML=state.lang==='es'?'ESCENARIOS':'SCENARIOS';
+  $('homeSceneDesc').innerHTML=tt().homeSceneDesc;
+  $('homeCompareTitle').innerHTML=state.lang==='es'?'COMPARATIVA':'COMPARISON';
+  $('homeCompareDesc').innerHTML=tt().homeCompareDesc;
+  $('bottomHistory').innerHTML=tt().history;
+  $('bottomSettings').innerHTML=tt().settings;
+  $('bottomCenterText').innerHTML=tt().bottom;
+  updateModeHeader();
+  $('homeBtn').innerHTML=tt().homeBtn;
+  $('promptLabel').innerHTML=tt().promptLabel;
+  $('micBtn').title = state.lang==='es' ? 'Pulsa para grabar / vuelve a pulsar para parar' : 'Tap to record / tap again to stop';
+  $('audioLabel').innerHTML=tt().audioLabel;
+  $('audioHint').innerHTML=tt().audioHint;
+  $('resultLabel').innerHTML=tt().resultLabel;
+  $('metricEnergyLabel').innerHTML=tt().energy;
+  $('metricClarityLabel').innerHTML=tt().clarity;
+  $('metricConfidenceLabel').innerHTML=tt().confidence;
+  $('compareTitle').innerHTML=tt().compare;
+  $('insightTitle').innerHTML=tt().insight;
+  $('retryBtn').innerHTML=tt().retry;
+  $('newBtn').innerHTML=tt().newPhrase;
+  $('shareBtn').innerHTML=tt().share;
+  if($('challengeFriendBtn')) $('challengeFriendBtn').innerHTML=(tt().challengeFriend || (state.lang==='es' ? 'Retar a alguien' : 'Challenge someone'));
+  if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML=(tt().incomingChallengeTitle || (state.lang==='es' ? 'Reto recibido' : 'Incoming challenge'));
+
+  if($('duelBtn')) $('duelBtn').innerHTML=(tt().duelStart || (state.lang==='es' ? 'Ver duelo' : 'View duel'));
+  if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML=tt().incomingChallengeTitle;
+  if($('compareBtn')) $('compareBtn').innerHTML=tt().compareBtn;
+  $('recordStatus').innerHTML=state.isRecording?tt().recordOn:tt().recordIdle;
+  $('scoreLabel').innerHTML=tt().score;
+  if(!state.lastResult) clearResult();
+  updateComparisonAvailability();
+}
+
+function updateModeHeader(){
+  if(state.mode==='personality'){ $('modeTitle').innerHTML=tt().personality; $('modeSub').innerHTML="<span class='mode-sub-strong'>"+tt().personalitySub+"</span>"; }
+  if(state.mode==='thoughts'){ $('modeTitle').innerHTML=tt().thoughts; $('modeSub').innerHTML="<span class='mode-sub-strong'>"+tt().thoughtsSub+"</span>"; }
+  if(state.mode==='challenge'){ $('modeTitle').innerHTML=tt().challenge; $('modeSub').innerHTML="<span class='mode-sub-strong'>"+tt().challengeSub+"</span>"; }
+  if(state.mode==='scene'){ $('modeTitle').innerHTML=tt().scene; $('modeSub').innerHTML="<span class='mode-sub-strong'>"+tt().sceneSub+"</span>"; }
+}
+
+function openMode(mode){
+  state.mode=mode;
+  updateModeHeader();
+
+  if(mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
+    state.currentPrompt = state.incomingChallenge.prompt;
+    renderPrompt(state.currentPrompt)
+    clearResult();
+    if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+    if($('challengeFriendBtn')) $('challengeFriendBtn').className = 'btn btn-secondary hidden';
+    if(typeof updateDuelButton === 'function') updateDuelButton();
+  } else {
+    nextPrompt();
+    if(mode==='challenge'){
+      if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
+      if(state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+      if(typeof updateDuelButton === 'function') updateDuelButton();
+    } else {
+      if($('challengeFriendBtn')) $('challengeFriendBtn').className='btn btn-secondary hidden';
+      if($('duelBtn')) $('duelBtn').className='btn btn-secondary hidden';
+      if($('incomingChallengeBox')) $('incomingChallengeBox').className='panel hidden';
+    }
+  }
+  showScreen('mode');
+}
+
+function clearResult(){
+  $('resultTitle').innerHTML=tt().resultPlaceholderTitle;
+  $('resultDesc').innerHTML=tt().resultPlaceholderDesc;
+  $('resultExtra').innerHTML='';
+  $('metricEnergy').innerHTML='--';
+  $('metricClarity').innerHTML='--';
+  $('metricConfidence').innerHTML='--';
+  $('keywordRow').innerHTML='';
+  $('compareBox').style.display='none';
+  $('insightBox').style.display='none';
+  $('scoreBox').className='score-box hidden';
+}
+
+
+function renderPrompt(raw){
+  if(!raw){ $('promptText').innerHTML=''; return; }
+  var splitToken = state.lang==='es' ? 'Frase: ' : 'Line: ';
+  if((state.mode==='challenge' || state.mode==='scene') && raw.indexOf(splitToken)!==-1){
+    var parts = raw.split(splitToken);
+    var intro = parts[0].trim();
+    var phrase = parts.slice(1).join(splitToken).trim();
+
+    if(state.mode==='challenge'){
+      var cleaned = intro.replace(/^Desafío:\s*/i, '').replace(/^Challenge:\s*/i, '');
+      $('promptText').innerHTML =
+        "<div class='prompt-radical'>" +
+          "<div class='prompt-kicker'>" + cleaned + "</div>" +
+          "<div class='prompt-dialog'>" +
+            "<div class='prompt-dialog-label'>" + (state.lang==='es' ? "Frase a clavar" : "Line to nail") + "</div>" +
+            "<div class='prompt-dialog-text'><span class='mark'>“</span>" + phrase + "<span class='mark'>”</span></div>" +
+          "</div>" +
+        "</div>";
+      return;
+    }
+
+    if(state.mode==='scene'){
+      var cleanedScene = intro.replace(/^Situación:\s*/i, '').replace(/^Situation:\s*/i, '');
+      $('promptText').innerHTML =
+        "<div class='prompt-radical'>" +
+          "<div class='prompt-scene-chip'>" + (state.lang==='es' ? "Escena" : "Scene") + "</div>" +
+          "<div class='prompt-scene-kicker'>" + cleanedScene + "</div>" +
+          "<div class='prompt-dialog'>" +
+            "<div class='prompt-dialog-label'>" + (state.lang==='es' ? "Diálogo" : "Dialogue") + "</div>" +
+            "<div class='prompt-dialog-text'><span class='mark'>“</span>" + phrase + "<span class='mark'>”</span></div>" +
+          "</div>" +
+        "</div>";
+      return;
+    }
+  }
+  $('promptText').innerHTML = "<div class='prompt-dialog'><div class='prompt-dialog-text'>" + raw + "</div></div>";
+}
+
+
+function getPromptFamily(prompt, mode){
+  var p = (prompt || '').toLowerCase();
+  if(mode==='challenge'){
+    if(/líder|leader|controla la sala|owning it|autoridad/.test(p)) return 'authority';
+    if(/calma|quirúrgica|surgical|firmeza|control/.test(p)) return 'control';
+    if(/peligro|escond|danger|hiding|miedo/.test(p)) return 'dark';
+    if(/ganar|won something|magnet|seduc|atraer/.test(p)) return 'magnetic';
+    if(/advertencia|warning|reacción|obvio/.test(p)) return 'pressure';
+    return 'generic';
+  }
+  if(mode==='scene'){
+    if(/entrevista|interview|idea delante/.test(p)) return 'professional';
+    if(/cita|date|conociendo/.test(p)) return 'social';
+    if(/mala noticia|bad news|calmando/.test(p)) return 'emotional';
+    if(/reunión|meeting|equipo|motivar/.test(p)) return 'leadership';
+    if(/película|movie|sala donde nadie cree/.test(p)) return 'cinematic';
+    if(/negociando|negotiating|falló/.test(p)) return 'pressure';
+    return 'generic';
+  }
+  return 'base';
+}
+function rememberPrompt(prompt){
+  if(!state.promptHistory) return;
+  var list = state.promptHistory[state.lang][state.mode];
+  list.push({text:prompt,family:getPromptFamily(prompt,state.mode)});
+  if(list.length > 14) list.shift();
+}
+function getNextPromptFromPool(pool){
+  if(!state.promptHistory){ return randomFrom(pool); }
+  var history = state.promptHistory[state.lang][state.mode] || [];
+  var recentTexts = history.slice(-10).map(function(x){ return x.text; });
+  var recentFamilies = history.slice(-4).map(function(x){ return x.family; });
+  var candidates = pool.filter(function(p){ return recentTexts.indexOf(p)===-1; });
+  if((state.mode==='challenge' || state.mode==='scene') && candidates.length){
+    candidates = candidates.filter(function(p){ return recentFamilies.indexOf(getPromptFamily(p,state.mode))===-1; }) || candidates;
+    if(!candidates.length) candidates = pool.filter(function(p){ return recentTexts.indexOf(p)===-1; });
+  }
+  if(!candidates.length) candidates = pool.slice();
+  var idx = Math.floor(Math.random()*candidates.length);
+  var chosen = candidates[idx];
+  rememberPrompt(chosen);
+  return chosen;
+}
+
+function nextPrompt(){
+  state.pendingCompare=false;
+
+  if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
+    state.currentPrompt = state.incomingChallenge.prompt;
+  } else {
+    state.currentPrompt=getNextPromptFromPool(prompts[state.mode][state.lang]);
+  }
+
+  renderPrompt(state.currentPrompt)
+  clearResult();
+
+  if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.mode==='challenge' && state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
+  if(state.mode==='challenge' && state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
+  if(typeof updateDuelButton === 'function') updateDuelButton();
+}
+
+function retrySamePrompt(){
+  state.pendingCompare=true;
+  $('resultTitle').innerHTML=tt().retryTitle;
+  $('resultDesc').innerHTML=tt().retryDesc;
+}
+
+function formatTags(tags){
+  var html='';
+  for(var i=0;i<tags.length;i++) html+='<div class="pill">• '+tags[i]+'</div>';
+  $('keywordRow').innerHTML=html;
+}
+
+
+function getChallengeIntent(prompt){
+  var p = (prompt || '').toLowerCase();
+  if(p.indexOf('líder')!==-1 || p.indexOf('leader')!==-1 || p.indexOf('controla la sala')!==-1 || p.indexOf('owning the room')!==-1) return 'authority';
+  if(p.indexOf('calma total')!==-1 || p.indexOf('authority')!==-1 || p.indexOf('autoridad real')!==-1) return 'control';
+  if(p.indexOf('intensidad')!==-1 || p.indexOf('intensity')!==-1 || p.indexOf('ganar algo enorme')!==-1 || p.indexOf('won something huge')!==-1) return 'impact';
+  if(p.indexOf('miedo')!==-1 || p.indexOf('intimidating')!==-1 || p.indexOf('escondieras')!==-1 || p.indexOf('dangerous')!==-1) return 'dark';
+  if(p.indexOf('seducción')!==-1 || p.indexOf('seduction')!==-1) return 'magnetic';
+  return 'generic';
+}
+function getSceneIntent(prompt){
+  var p = (prompt || '').toLowerCase();
+  if(p.indexOf('entrevista')!==-1 || p.indexOf('interview')!==-1) return 'professional';
+  if(p.indexOf('cita')!==-1 || p.indexOf('date')!==-1) return 'social';
+  if(p.indexOf('negociando')!==-1 || p.indexOf('negotiating')!==-1) return 'pressure';
+  if(p.indexOf('mala noticia')!==-1 || p.indexOf('bad news')!==-1) return 'emotional';
+  if(p.indexOf('película')!==-1 || p.indexOf('movie')!==-1) return 'cinematic';
+  if(p.indexOf('motivar')!==-1 || p.indexOf('motivate')!==-1) return 'leadership';
+  return 'generic';
+}
+function pickFromBand(pool, band, offset){
+  var filtered = pool.filter(function(x){ return x.archetype === band; });
+  if(!filtered.length) filtered = pool;
+  return filtered[Math.abs(offset) % filtered.length];
+}
+function getBandForPersonality(e,c,conf){
+  if(conf>=86 && e>=76) return 'authority';
+  if(e>=84) return 'power';
+  if(c>=82 && conf>=72) return 'mind';
+  if(conf>=78 && c>=68) return 'calm';
+  if(e>=70 && conf>=70) return 'magnet';
+  return 'mystery';
+}
+function getBandForThoughts(e,c,conf){
+  if(conf>=84 && c>=74) return 'respect';
+  if(c>=76 && e<72) return 'reserve';
+  if(e<62 && conf<64) return 'cold';
+  if(e>=72 && conf>=70) return 'warm';
+  if(c>=70) return 'calm';
+  return 'mystery';
+}
+function getBandForChallenge(e,c,conf,intent){
+  var score = Math.round(e*0.34 + c*0.31 + conf*0.35);
+  if(score>=86){
+    if(intent==='authority' || intent==='control') return 'elite';
+    if(intent==='impact') return 'elite';
+    if(intent==='dark' && conf>=78) return 'elite';
+    return 'elite';
+  }
+  if(score>=66) return 'mid';
+  return 'low';
+}
+function getBandForScene(e,c,conf,intent){
+  var score = Math.round(e*0.28 + c*0.37 + conf*0.35);
+  if(score>=84) return 'fit';
+  if(score>=66) return 'mid';
+  return 'weak';
+}
+
+
+function rememberResult(result){
+  if(!result || !result.title) return;
+  if(!state.lastResults) state.lastResults = [];
+  state.lastResults.push(result.title);
+  if(state.lastResults.length > 6) state.lastResults.shift();
+}
+function filterRepeated(pool){
+  var filtered = pool.filter(function(r){ return state.lastResults.indexOf(r.title)===-1; });
+  return filtered.length ? filtered : pool;
+}
+function getSubProfileForChallenge(e,c,conf,intent){
+  if(e>=84 && conf>=84) return 'dominant_aggressive';
+  if(e>=76 && c>=76) return 'impact_controlled';
+  if(conf>=82 && c>=72) return 'secure_cold';
+  if(e>=74 && conf<64) return 'unstable_energy';
+  if(c>=78 && e<64) return 'controlled_but_weak';
+  if(e<58 && conf<58) return 'insecure_total';
+  if(intent==='dark') return 'dark_tone';
+  if(intent==='magnetic') return 'magnetic';
+  return 'neutral';
+}
+function getSubProfileForScene(e,c,conf,intent){
+  if(conf>=82 && c>=78) return 'credible_strong';
+  if(c>=80 && e<70) return 'contained_credible';
+  if(e>=80 && conf>=72) return 'cinematic_impact';
+  if(conf<60 && c<64) return 'social_insecure';
+  if(e<62 && c<66) return 'flat_context';
+  if(intent==='emotional') return 'emotional_weight';
+  if(intent==='social') return 'social_presence';
+  return 'neutral';
+}
+function filterByChallengeSubProfile(pool, sub){
+  var map = {
+    dominant_aggressive: /domin|lider|leader|autor|brutal|contund|seguridad dominante|absolute dominator|clear leadership/i,
+    impact_controlled: /impact|control|precisi|golpe|vibration|voice strike|total control|precisión emocional/i,
+    secure_cold: /segur|calma|fr[ií]o|controlado|security|rational|measured/i,
+    unstable_energy: /inestable|irregular|falta empuje|unstable|energy|falta intensidad/i,
+    controlled_but_weak: /correct|medido|light|ligero|correcto técnico|pleasant but weak/i,
+    insecure_total: /inseguro|plano|débil|sin impacto|very weak|invisible|boring|monotone/i,
+    dark_tone: /fr[ií]o|tenso|desconectado|dark|cold|tense|disconnect/i,
+    magnetic: /magnet|convinc|agradable|interesting|pleasant|magnetism/i,
+    neutral: /.*/
+  };
+  var rx = map[sub] || /.*/;
+  var filtered = pool.filter(function(r){ return rx.test((r.title||'') + ' ' + (r.desc||'')); });
+  return filtered.length ? filtered : pool;
+}
+function filterBySceneSubProfile(pool, sub){
+  var map = {
+    credible_strong: /encaja|presencia|atm[oó]sfera|credib|fit|presence|atmosphere|real tension/i,
+    contained_credible: /context|claro|contexto|atm[oó]sfera|scene has atmosphere|very good contextual presence/i,
+    cinematic_impact: /tensi[oó]n|cinem|scene|historia|story|real tension|carries emotion/i,
+    social_insecure: /weak|neutral|does not fully|a[uú]n no|demasiado neutro|not fully/i,
+    flat_context: /no impacta|too neutral|does not fully|flat|weak/i,
+    emotional_weight: /emoc|carga|story|historia|atm[oó]sfera|emotion/i,
+    social_presence: /encaja|presencia|fit|presence|contextual/i,
+    neutral: /.*/
+  };
+  var rx = map[sub] || /.*/;
+  var filtered = pool.filter(function(r){ return rx.test((r.title||'') + ' ' + (r.desc||'')); });
+  return filtered.length ? filtered : pool;
+}
+
+function chooseResult(energy,clarity,confidence){
+  var pool = results[state.mode][state.lang];
+  var offset = Math.floor((energy*3 + clarity*5 + confidence*7 + (state.currentPrompt||'').length) % 997);
+
+  if(state.mode==='personality'){
+    var bandP = getBandForPersonality(energy,clarity,confidence);
+    var candidatesP = pool.filter(function(x){ return x.archetype===bandP; });
+    if(!candidatesP.length) candidatesP = pool.slice();
+    candidatesP = filterRepeated(candidatesP);
+    return candidatesP[offset % candidatesP.length];
+  }
+
+  if(state.mode==='thoughts'){
+    var bandT = getBandForThoughts(energy,clarity,confidence);
+    var candidatesT = pool.filter(function(x){ return x.archetype===bandT; });
+    if(!candidatesT.length) candidatesT = pool.slice();
+    candidatesT = filterRepeated(candidatesT);
+    return candidatesT[offset % candidatesT.length];
+  }
+
+  if(state.mode==='challenge'){
+    var intent = getChallengeIntent(state.currentPrompt);
+    var bandC = getBandForChallenge(energy,clarity,confidence,intent);
+    var candidatesC = pool.filter(function(x){ return x.archetype===bandC; });
+    if(!candidatesC.length) candidatesC = pool.slice();
+    var subC = getSubProfileForChallenge(energy,clarity,confidence,intent);
+    candidatesC = filterByChallengeSubProfile(candidatesC, subC);
+    candidatesC = filterRepeated(candidatesC);
+    return candidatesC[offset % candidatesC.length];
+  }
+
+  if(state.mode==='scene'){
+    var sceneIntent = getSceneIntent(state.currentPrompt);
+    var bandS = getBandForScene(energy,clarity,confidence,sceneIntent);
+    var candidatesS = pool.filter(function(x){ return x.archetype===bandS; });
+    if(!candidatesS.length) candidatesS = pool.slice();
+    var subS = getSubProfileForScene(energy,clarity,confidence,sceneIntent);
+    candidatesS = filterBySceneSubProfile(candidatesS, subS);
+    candidatesS = filterRepeated(candidatesS);
+    return candidatesS[offset % candidatesS.length];
+  }
+
+  var fallback = filterRepeated(pool.slice());
+  return fallback[offset % fallback.length];
+}
+
+function renderComparison(current){
+  if(!state.previousResult){ $('compareBox').style.display='none'; return; }
+  function diff(a,b){ var d=b-a; return (d>0?'+':'')+d; }
+  $('compareBox').style.display='block';
+  $('compareGrid').innerHTML=tt().energy+': '+diff(state.previousResult.energy,current.energy)+'<br>'+tt().clarity+': '+diff(state.previousResult.clarity,current.clarity)+'<br>'+tt().confidence+': '+diff(state.previousResult.confidence,current.confidence);
+  var summary=[];
+  if(current.confidence>state.previousResult.confidence) summary.push(state.lang==='es'?'ahora suenas más firme':'you sound firmer now');
+  if(current.clarity>state.previousResult.clarity) summary.push(state.lang==='es'?'se entiende mejor la intención':'the intention feels clearer');
+  if(current.energy>state.previousResult.energy) summary.push(state.lang==='es'?'la toma tiene más fuerza':'the take has more force');
+  if(summary.length===0) summary.push(state.lang==='es'?'la diferencia es sutil':'the difference is subtle');
+  $('compareSummary').innerHTML=(state.lang==='es'?'Comparación: ':'Comparison: ')+summary.join(', ')+'.';
+}
+
+function renderInsight(){
+  var txt='';
+  if(state.mode==='personality') txt=state.lang==='es'
+    ? 'Aquí no se evalúa una actuación: se intenta leer cómo cae tu voz cuando suena como tú.'
+    : 'This is not about acting: it tries to read how your voice lands when it sounds like you.';
+  if(state.mode==='thoughts') txt=state.lang==='es'
+    ? 'Aquí importa la primera impresión social: si tu voz suena cercana, fría, segura, reservada o difícil de leer.'
+    : 'This mode focuses on first social impression: whether your voice feels close, cold, secure, reserved or hard to read.';
+  if(state.mode==='challenge') txt=state.lang==='es'
+    ? 'Desafíos mide rendimiento vocal: compromiso, control, credibilidad e impacto dentro de una intención concreta.'
+    : 'Challenges measure vocal performance: commitment, control, credibility and impact inside a specific intention.';
+  if(state.mode==='scene') txt=state.lang==='es'
+    ? 'Escenarios mide encaje contextual: si la frase parece vivida dentro de una situación real y no solo leída.'
+    : 'Scenarios measure contextual fit: whether the line feels lived inside a real situation instead of merely read.';
+  $('insightText').innerHTML=txt;
+  $('insightBox').style.display='block';
+}
+
+function renderScore(energy,clarity,confidence){
+  if(state.mode==='challenge'){
+    var score=Math.round(energy*0.34+clarity*0.31+confidence*0.35);
+    $('scoreBox').className='score-box';
+    $('scoreBig').innerHTML=score+'/100';
+    var label=score>=86?tt().challengePassed:score>=72?tt().challengeImpact:score>=58?tt().challengeAlmost:tt().challengeFail;
+    $('scoreNote').innerHTML=label+' · '+tt().challengeLead; return;
+  }
+  if(state.mode==='scene'){
+    var score2=Math.round(energy*0.28+clarity*0.37+confidence*0.35);
+    $('scoreBox').className='score-box';
+    $('scoreBig').innerHTML=score2+'/100';
+    var label2=score2>=84?tt().sceneGood:score2>=66?tt().sceneMid:tt().sceneWeak;
+    $('scoreNote').innerHTML=label2+' · '+tt().sceneLead; return;
+  }
+  $('scoreBox').className='score-box hidden';
+}
+
+function shareCurrent(){
+  if(!state.lastResult){ alert(state.lang==='es'?'Haz una grabación primero.':'Record something first.'); return; }
+  var modeName = state.mode==='personality'?tt().personality:state.mode==='thoughts'?tt().thoughts:state.mode==='challenge'?tt().challenge:tt().scene;
+  var text = 'VoiceMirror\n\n' + modeName + '\n' + state.lastResult.title + '\n' + state.lastResult.desc + '\n\n' + tt().energy + ': ' + state.lastResult.energy + ' · ' + tt().clarity + ': ' + state.lastResult.clarity + ' · ' + tt().confidence + ': ' + state.lastResult.confidence + '\n\n' + $('promptText').innerText;
+  if(navigator.share){ navigator.share({title:'VoiceMirror', text:text, url:location.href}).catch(function(){}); }
+  else{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ alert((state.lang==='es'?'Copiado para compartir:\n\n':'Copied to share:\n\n') + text); });
+    } else alert(text);
+  }
+}
+
+function shareComparison(){
+  if(!(state.saved.personality && state.saved.thoughts)) return;
+  var text = 'VoiceMirror\n\n' + tt().compareMode + '\n\n' + tt().compareCard1 + ': ' + state.saved.personality.title + '\n' + tt().compareCard2 + ': ' + state.saved.thoughts.title + '\n\n' + comparisonMessage(state.lang, state.saved.personality, state.saved.thoughts);
+  if(navigator.share){ navigator.share({title:'VoiceMirror', text:text, url:location.href}).catch(function(){}); }
+  else{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ alert((state.lang==='es'?'Copiado para compartir:\n\n':'Copied to share:\n\n') + text); });
+    } else alert(text);
+  }
+}
+
+function startBar(){ state.barProgress=0; $('recordBar').style.width='0%'; if(state.barTimer) clearInterval(state.barTimer); state.barTimer=setInterval(function(){ state.barProgress+=1.2; if(state.barProgress>100) state.barProgress=100; $('recordBar').style.width=state.barProgress+'%'; },150); }
+function stopBar(){ if(state.barTimer) clearInterval(state.barTimer); }
+function animateViz(off){
+  var bars=$('visualizer').getElementsByTagName('span');
+  if(off){ for(var i=0;i<bars.length;i++){ bars[i].style.height='8px'; bars[i].style.opacity='.45'; } return; }
+  var c=0; var id=setInterval(function(){ if(!state.isRecording){ clearInterval(id); animateViz(true); return; } c++; for(var i=0;i<bars.length;i++){ var h=8+((c+i*6)%16); bars[i].style.height=h+'px'; bars[i].style.opacity='.95'; } },80);
+}
+
+function playTone(type){
+  if(!state.settings.sounds) return;
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    var osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    var map={start:[500,620,.16,'triangle'],leader:[300,480,.26,'triangle'],dominant:[350,620,.22,'sawtooth'],intense:[520,700,.18,'triangle'],secure:[420,520,.18,'sine'],social:[390,540,.21,'triangle'],mystery:[280,220,.22,'sine'],challenge:[460,760,.20,'triangle'],fail:[260,180,.22,'square'],scene:[330,540,.24,'triangle'],cinema:[240,420,.26,'sine']};
+    var c=map[type]||map.secure;
+    osc.frequency.value=c[0]; gain.gain.value=.06; osc.type=c[3]; osc.start();
+    osc.frequency.exponentialRampToValueAtTime(c[1],ctx.currentTime+c[2]);
+    gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+c[2]);
+    osc.stop(ctx.currentTime+c[2]); setTimeout(function(){ try{ctx.close()}catch(e){} },300);
+  }catch(e){}
+}
+
+function finishRecording(){
+  stopBar(); animateViz(true);
+  var blob=new Blob(state.chunks,{type:'audio/webm'});
+  if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
+  state.audioUrl=URL.createObjectURL(blob);
+  $('audioPlayer').src=state.audioUrl; $('audioPlayer').style.display='block';
+
+  var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
+  if(confidence>98) confidence=98;
+  if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
+
+  var chosen=chooseResult(energy,clarity,confidence);
+  if(!chosen){ chosen = results[state.mode][state.lang][0]; }
+  var result={mode:state.mode,prompt:state.currentPrompt,energy:energy,clarity:clarity,confidence:confidence,title:chosen.emoji+' '+chosen.title,desc:chosen.desc,tags:chosen.tags,archetype:chosen.archetype};
+  state.lastResult=result;
+  rememberResult(result);
+  if(state.mode==='personality' || state.mode==='thoughts') state.saved[state.mode]=result;
+  if(state.mode==='challenge'){ state.lastChallengeScore=getChallengeScore(result); state.lastChallengeResult=result; if($('challengeFriendBtn')) $('challengeFriendBtn').className = state.autoChallengeMode ? 'btn btn-secondary hidden' : 'btn btn-secondary'; }
+  saveToHistory(result);
+  updateComparisonAvailability();
+  updateDuelButton();
+
+  $('resultTitle').innerHTML=result.title;
+  $('resultDesc').innerHTML=result.desc;
+  $('resultExtra').innerHTML=state.lang==='es'?'Toma registrada. El sistema ajusta resultado, intención y rotación para evitar repetir frases y lecturas recientes.':'Take recorded. The system adapts result, intent and rotation to avoid repeating recent prompts and readings.';
+  $('metricEnergy').innerHTML=energy; $('metricClarity').innerHTML=clarity; $('metricConfidence').innerHTML=confidence;
+  formatTags(result.tags); renderScore(energy,clarity,confidence); renderComparison(result); renderInsight();
+
+  if(state.mode==='personality'){
+    if(result.title.indexOf('Líder')!==-1||result.title.indexOf('Leader')!==-1) playTone('leader'); else if(result.title.indexOf('Domin')!==-1) playTone('dominant'); else if(result.title.indexOf('Indomable')!==-1||result.title.indexOf('Indomitable')!==-1) playTone('intense'); else playTone('secure');
+  }
+  if(state.mode==='thoughts'){ if(result.archetype==='mystery') playTone('mystery'); else playTone('social'); }
+  if(state.mode==='challenge'){ if(result.archetype==='fail') playTone('fail'); else playTone('challenge'); }
+  if(state.mode==='scene'){ if(result.archetype==='fit') playTone('cinema'); else if(result.archetype==='weak') playTone('fail'); else playTone('scene'); }
+
+  if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
+    updateDuelButton();
+    setTimeout(function(){ showDuel(); }, 300);
+  }
+
+  state.pendingCompare=false;
+}
+
+function toggleRecording(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.'); return; }
+  if(state.isRecording){
+    try{ state.mediaRecorder.stop(); }catch(e){}
+    state.isRecording=false; $('micBtn').className='mic-btn'; $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...'; return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    state.stream=stream; state.mediaRecorder=new MediaRecorder(stream); state.chunks=[];
+    state.mediaRecorder.ondataavailable=function(e){ state.chunks.push(e.data); };
+    state.mediaRecorder.onstop=function(){ $('recordStatus').innerHTML=tt().recordIdle; finishRecording(); };
+    state.mediaRecorder.start(); state.isRecording=true; $('micBtn').className='mic-btn recording'; $('recordStatus').innerHTML=tt().recordOn; startBar(); animateViz(false); playTone('start');
+  }).catch(function(){ alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.'); });
+}
+
+setLang('es');
+syncSettingsUI();
+var __hasIncoming = false;
+try{
+  __hasIncoming = !!getIncomingChallengeRaw() && checkIncomingChallenge();
+}catch(e){
+  console.error('Initial incoming challenge check failed', e);
+}
+if(!__hasIncoming){
+  openMode('personality');
+  showScreen('home');
+}
+
+window.addEventListener('load', function(){
+  try{
+    if(getIncomingChallengeRaw()){
+      checkIncomingChallenge();
+      setTimeout(checkIncomingChallenge, 150);
+      setTimeout(checkIncomingChallenge, 500);
+      setTimeout(checkIncomingChallenge, 1000);
+    }
+  }catch(e){}
+});
+window.addEventListener('pageshow', function(){
+  try{
+    if(getIncomingChallengeRaw()){
+      checkIncomingChallenge();
+    }
+  }catch(e){}
+});
+window.addEventListener('hashchange', function(){
+  try{
+    if(getIncomingChallengeRaw()){
+      checkIncomingChallenge();
+    }
+  }catch(e){}
+});
+document.addEventListener('visibilitychange', function(){
+  try{
+    if(!document.hidden && getIncomingChallengeRaw()){
+      checkIncomingChallenge();
+    }
+  }catch(e){}
+});
+</script>
+</body>
+</html>
