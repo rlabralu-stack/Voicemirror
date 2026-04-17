@@ -1934,6 +1934,21 @@ function finishRecording(){
   $('audioPlayer').src=state.audioUrl; $('audioPlayer').style.display='block';
 
   var duration = Math.max(0.8, state.recordSeconds || 0);
+  $('audioPlayer').onloadedmetadata = function(){
+    try{
+      if(isFinite($('audioPlayer').duration) && $('audioPlayer').duration > 0){
+        state.recordSeconds = $('audioPlayer').duration;
+        duration = state.recordSeconds;
+        if($('recordTime')) $('recordTime').innerHTML = duration.toFixed(1) + ' s';
+        if($('resultExtra') && state.lastResult){
+          $('resultExtra').innerHTML = state.lang==='es'
+            ? ('Toma registrada ('+duration.toFixed(1)+' s). El sistema ajusta resultado, intención y rotación para evitar repetir frases y lecturas recientes.')
+            : ('Take recorded ('+duration.toFixed(1)+' s). The system adapts result, intent and rotation to avoid repeating recent prompts and readings.');
+        }
+      }
+    }catch(e){}
+  };
+
   var durationBoost = Math.min(8, Math.round(duration * 1.2));
   var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
   clarity = Math.min(98, clarity + (duration > 2.6 ? 2 : 0));
@@ -1951,7 +1966,6 @@ function finishRecording(){
   if(state.mode==='challenge'){ state.lastChallengeScore=getChallengeScore(result); state.lastChallengeResult=result; if($('challengeFriendBtn')) $('challengeFriendBtn').className = state.autoChallengeMode ? 'btn btn-secondary hidden' : 'btn btn-secondary'; }
   saveToHistory(result);
   updateComparisonAvailability();
-  if($('profile') && $('profile').classList.contains('active')) renderProfile();
   updateDuelButton();
 
   $('resultTitle').innerHTML=result.title;
