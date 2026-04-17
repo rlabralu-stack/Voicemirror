@@ -308,6 +308,22 @@ text-align:center
 .mini-stat .l{font-size:12px;color:#cfd8f4;margin-top:4px}
 @media(max-width:700px){.profile-grid,.mini-grid{grid-template-columns:1fr}}
 
+
+.duel-mobile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:16px}
+.duel-mobile-card{background:#111b31;border:1px solid #2f477d;border-radius:20px;padding:14px;min-height:220px}
+.duel-mobile-label{font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:#d6ddf2;opacity:.88;margin-bottom:10px;text-align:center}
+.duel-mobile-emoji{font-size:40px;line-height:1;text-align:center;margin-bottom:10px}
+.duel-mobile-title{font-size:clamp(24px,5vw,34px);font-weight:800;line-height:1.08;text-align:center;word-break:break-word}
+.duel-mobile-score{font-size:26px;font-weight:800;text-align:center;margin-top:10px}
+.duel-mobile-desc{font-size:14px;line-height:1.4;color:#d1d8eb;margin-top:10px;text-align:center}
+.duel-vs-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:8px 14px;background:linear-gradient(180deg,rgba(255,84,84,.16),rgba(255,84,84,.05));border:1px solid rgba(255,110,110,.20);font-weight:800;letter-spacing:1px}
+.duel-winner-banner{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:24px;padding:18px;background:linear-gradient(180deg,rgba(255,70,70,.16),rgba(255,70,70,.05));border:1px solid rgba(255,110,110,.22)}
+.duel-winner-big{font-size:clamp(34px,7vw,54px);font-weight:900;line-height:1.05;margin-top:8px}
+@media(max-width:640px){
+  .duel-mobile-grid{grid-template-columns:1fr;gap:12px}
+  .duel-mobile-card{min-height:auto}
+}
+
 </style>
 </head>
 <body>
@@ -430,24 +446,29 @@ text-align:center
 <section id="duel" class="screen">
 <div class="topbar"><div><h2 id="duelTitle" style="margin:0">⚔️ Duelo</h2><div id="duelSub" class="small" style="margin-top:6px">Comparación automática de desafío</div></div><div class="langs"><button class="btn btn-secondary" id="duelHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
 <div class="panel">
-  <div class="duel-banner">
+  <div class="duel-winner-banner">
     <div class="duel-trophy" id="duelTrophy">🏆</div>
-    <div class="compare-hero" id="duelWinnerLine">—</div>
+    <div class="duel-winner-big" id="duelWinnerLine">—</div>
   </div>
 
-  <div class="duel-scoreline">
-    <div class="duel-side">
-      <div id="duelYouLabel" class="box-title">Tu resultado</div>
-      <div id="duelYouTitle" class="big">—</div>
-      <div id="duelYouScore" class="sub">—</div>
-      <div class="duel-bar-wrap"><div id="duelYouBar" class="duel-bar"></div></div>
+  <div style="text-align:center;margin-top:14px"><span id="duelVs" class="duel-vs-badge">VS</span></div>
+
+  <div class="duel-mobile-grid">
+    <div class="duel-mobile-card">
+      <div id="duelYouLabel" class="duel-mobile-label">Tu resultado</div>
+      <div id="duelYouEmoji" class="duel-mobile-emoji">🎯</div>
+      <div id="duelYouTitle" class="duel-mobile-title">—</div>
+      <div id="duelYouScore" class="duel-mobile-score">—</div>
+      <div class="duel-bar-wrap" style="margin-top:12px"><div id="duelYouBar" class="duel-bar"></div></div>
+      <div id="duelYouDesc" class="duel-mobile-desc">—</div>
     </div>
-    <div id="duelVs" class="duel-vs">VS</div>
-    <div class="duel-side">
-      <div id="duelRivalLabel" class="box-title">Resultado rival</div>
-      <div id="duelRivalTitle" class="big">—</div>
-      <div id="duelRivalScore" class="sub">—</div>
-      <div class="duel-bar-wrap"><div id="duelRivalBar" class="duel-bar"></div></div>
+    <div class="duel-mobile-card">
+      <div id="duelRivalLabel" class="duel-mobile-label">Resultado rival</div>
+      <div id="duelRivalEmoji" class="duel-mobile-emoji">🎭</div>
+      <div id="duelRivalTitle" class="duel-mobile-title">—</div>
+      <div id="duelRivalScore" class="duel-mobile-score">—</div>
+      <div class="duel-bar-wrap" style="margin-top:12px"><div id="duelRivalBar" class="duel-bar"></div></div>
+      <div id="duelRivalDesc" class="duel-mobile-desc">—</div>
     </div>
   </div>
 
@@ -969,26 +990,27 @@ function showDuel(){
   $('duelReasonLabel').innerHTML = tt().duelReason;
   $('duelShareBtn').innerHTML = tt().duelShareResult;
   $('duelRetryBtn').innerHTML = tt().rematch || (state.lang==='es' ? 'Revancha' : 'Rematch');
-  $('duelYouTitle').innerHTML = state.lastResult.title;
+  $('duelYouEmoji').innerHTML = getLeadingEmoji(state.lastResult.title);
+  $('duelRivalEmoji').innerHTML = getLeadingEmoji(state.incomingChallenge.title || '');
+  $('duelYouTitle').innerHTML = shortDuelTitle(state.lastResult.title);
   $('duelYouScore').innerHTML = outcome.myScore + '/100';
-  $('duelRivalTitle').innerHTML = state.incomingChallenge.title || '—';
+  $('duelYouDesc').innerHTML = state.lastResult.desc || '—';
+  $('duelRivalTitle').innerHTML = shortDuelTitle(state.incomingChallenge.title || '—');
   $('duelRivalScore').innerHTML = outcome.rivalScore + '/100';
-
+  $('duelRivalDesc').innerHTML = state.incomingChallenge.result && state.incomingChallenge.result.desc ? state.incomingChallenge.result.desc : (state.lang==='es' ? 'Resultado del reto recibido.' : 'Received challenge result.');
   if(outcome.winner==='you'){
-    $('duelWinnerLine').innerHTML = (state.lang==='es' ? '🏆 Ganaste el duelo' : '🏆 You won the duel');
+    $('duelWinnerLine').innerHTML = (state.lang==='es' ? 'Ganaste el duelo' : 'You won the duel');
     $('duelTrophy').innerHTML = '🏆';
   } else if(outcome.winner==='rival'){
-    $('duelWinnerLine').innerHTML = (state.lang==='es' ? '🥈 Ganó tu rival' : '🥈 Your rival won');
+    $('duelWinnerLine').innerHTML = (state.lang==='es' ? 'Ganó tu rival' : 'Your rival won');
     $('duelTrophy').innerHTML = '🥈';
   } else {
     $('duelWinnerLine').innerHTML = tt().duelTie;
     $('duelTrophy').innerHTML = '⚖️';
   }
-
   $('duelReasonText').innerHTML = outcome.reason;
-  $('duelYouBar').style.width = Math.max(6, outcome.myScore) + '%';
-  $('duelRivalBar').style.width = Math.max(6, outcome.rivalScore) + '%';
-
+  $('duelYouBar').style.width = Math.max(8, outcome.myScore) + '%';
+  $('duelRivalBar').style.width = Math.max(8, outcome.rivalScore) + '%';
   showScreen('duel');
 }
 function shareDuel(){
@@ -1143,6 +1165,64 @@ function renderProfile(){
   $('profileAdvice').innerHTML = profileAdviceText(summary);
 }
 
+
+function updateRecordTime(forceValue){
+  var el = $('recordTime');
+  if(!el) return;
+  if(typeof forceValue === 'number'){
+    el.innerHTML = forceValue.toFixed(1) + ' s';
+    return;
+  }
+  if(!state.isRecording || !state.recordStartTs){
+    el.innerHTML = (state.recordSeconds || 0).toFixed(1) + ' s';
+    return;
+  }
+  var secs = (Date.now() - state.recordStartTs) / 1000;
+  state.recordSeconds = secs;
+  el.innerHTML = secs.toFixed(1) + ' s';
+}
+function startRecordTimer(){
+  if(state.recordTimer) clearInterval(state.recordTimer);
+  state.recordStartTs = Date.now();
+  state.recordSeconds = 0;
+  updateRecordTime(0);
+  state.recordTimer = setInterval(function(){ updateRecordTime(); }, 100);
+}
+function stopRecordTimer(){
+  if(state.recordTimer){ clearInterval(state.recordTimer); state.recordTimer = null; }
+  if(state.recordStartTs){
+    state.recordSeconds = (Date.now() - state.recordStartTs) / 1000;
+  }
+  state.recordStartTs = null;
+  updateRecordTime(state.recordSeconds || 0);
+}
+function shortDuelTitle(title){
+  if(!title) return '—';
+  var plain = String(title).replace(/^[^\s]+\s/, '');
+  var map = {
+    'Convincente pero irregular':'Convincente',
+    'Falta intención real':'Sin intención',
+    'Bien, pero no impacta':'Correcto',
+    'Seguridad dominante':'Dominante',
+    'Dominante absoluto':'Dominante',
+    'Presencia brutal':'Brutal',
+    'Imposible ignorarte':'Imparable',
+    'Intensidad real':'Intenso',
+    'Plano controlado':'Plano',
+    'No entra en el reto':'Fuera del reto',
+    'Muy buena presencia contextual':'Gran encaje',
+    'Encajas muy bien en esta escena':'Encaja muy bien',
+    'Se entiende el contexto, pero no impacta del todo':'Contexto claro',
+    'Aún no se siente dentro de la escena':'No entra en escena'
+  };
+  return map[plain] || plain;
+}
+function getLeadingEmoji(title){
+  if(!title) return '🎯';
+  var m = String(title).match(/^([^\s]+)/);
+  return m ? m[1] : '🎯';
+}
+
 function setLang(lang){
   state.lang=lang;
   $('langEs').className='lang-btn'+(lang==='es'?' active':'');
@@ -1187,6 +1267,7 @@ function setLang(lang){
   if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML=tt().incomingChallengeTitle;
   if($('compareBtn')) $('compareBtn').innerHTML=tt().compareBtn;
   $('recordStatus').innerHTML=state.isRecording?tt().recordOn:tt().recordIdle;
+  if($('recordTime')) $('recordTime').innerHTML = ((state.recordSeconds||0).toFixed(1) + ' s');
   if($('profileTitle')) $('profileTitle').innerHTML = state.lang==='es' ? '📈 Perfil de voz' : '📈 Voice profile';
   if($('profileSub')) $('profileSub').innerHTML = state.lang==='es' ? 'Evolución acumulada y fortalezas' : 'Accumulated evolution and strengths';
   if($('profileHomeBtn')) $('profileHomeBtn').innerHTML = tt().homeBtn;
@@ -1240,6 +1321,8 @@ function openMode(mode){
 }
 
 function clearResult(){
+  state.recordSeconds = 0;
+  if($('recordTime')) $('recordTime').innerHTML = '0.0 s';
   $('resultTitle').innerHTML=tt().resultPlaceholderTitle;
   $('resultDesc').innerHTML=tt().resultPlaceholderDesc;
   $('resultExtra').innerHTML='';
@@ -1602,7 +1685,11 @@ function finishRecording(){
   state.audioUrl=URL.createObjectURL(blob);
   $('audioPlayer').src=state.audioUrl; $('audioPlayer').style.display='block';
 
+  var duration = Math.max(0.8, state.recordSeconds || 0);
+  var durationBoost = Math.min(8, Math.round(duration * 1.2));
   var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
+  clarity = Math.min(98, clarity + (duration > 2.6 ? 2 : 0));
+  confidence = Math.min(98, confidence + durationBoost);
   if(confidence>98) confidence=98;
   if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
 
