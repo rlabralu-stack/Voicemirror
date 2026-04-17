@@ -324,6 +324,15 @@ text-align:center
   .duel-mobile-card{min-height:auto}
 }
 
+
+.level-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.level-badge{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:linear-gradient(180deg,rgba(255,84,84,.18),rgba(255,84,84,.06));border:1px solid rgba(255,110,110,.22);font-weight:800}
+.level-dot{width:12px;height:12px;border-radius:50%;background:#ff8a57;box-shadow:0 0 16px rgba(255,120,80,.65)}
+.goal-card{margin-top:14px;background:#111b31;border:1px solid #2f477d;border-radius:20px;padding:16px}
+.goal-main{font-size:clamp(20px,4vw,28px);font-weight:800;line-height:1.2}
+.goal-sub{margin-top:8px;color:#d1d8eb;line-height:1.45}
+.goal-mini{margin-top:10px;font-size:14px;color:#c9d4f0}
+
 </style>
 </head>
 <body>
@@ -359,6 +368,8 @@ text-align:center
 <section id="profile" class="screen">
 <div class="topbar"><div><h2 id="profileTitle" style="margin:0">📈 Perfil de voz</h2><div id="profileSub" class="small" style="margin-top:6px">Evolución acumulada y fortalezas</div></div><div class="langs"><button class="btn btn-secondary" id="profileHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
 <div class="panel">
+  <div class="level-hero"><div id="currentLevelBadge" class="level-badge"><span class="level-dot"></span><span>Nivel 1 · Despiertas</span></div><div id="levelProgressMini" class="small">—</div></div>
+  <div class="goal-card"><div id="goalMain" class="goal-main">—</div><div id="goalSub" class="goal-sub">—</div><div id="goalMini" class="goal-mini">—</div></div>
   <div class="profile-grid">
     <div class="profile-card">
       <h3 id="profileArchetypeLabel">Lectura global</h3>
@@ -1130,8 +1141,10 @@ function profileAdviceText(summary){
   return state.lang==='es' ? 'Haz 5–10 tomas más mezclando Desafíos y Escenarios. Ahí empezará a verse un perfil mucho más preciso.' : 'Do 5–10 more takes mixing Challenges and Scenarios. That is where a much more precise profile starts to appear.';
 }
 function renderProfile(){
-  var p = state.progress || {};
+  var p = state.progress;
   var summary = getProfileSummary();
+  var levelData = getCurrentLevelData();
+  var goal = getDynamicGoal();
   var takes = p.takes || 0;
   var levels = {
     presence: Math.min(100, Math.round(summary.energy*0.45 + summary.confidence*0.55)),
@@ -1141,11 +1154,17 @@ function renderProfile(){
   var modes = p.modes || {};
   var modeNames = {personality: tt().personality, thoughts: tt().thoughts, challenge: tt().challenge, scene: tt().scene};
 
+  $('currentLevelBadge').innerHTML = '<span class="level-dot"></span><span>' + (state.lang==='es' ? 'Nivel ' : 'Level ') + levelData.current.n + ' · ' + levelData.current.name + '</span>';
+  $('levelProgressMini').innerHTML = (state.lang==='es' ? 'Media actual: ' : 'Current average: ') + levelData.avgScore + '/100';
+  $('goalMain').innerHTML = goal.main;
+  $('goalSub').innerHTML = goal.sub;
+  $('goalMini').innerHTML = goal.mini;
+
   $('profileArchetype').innerHTML = summary.title;
   $('profileArchetypeDesc').innerHTML = summary.desc;
   $('profileTakes').innerHTML = takes;
   $('profileBest').innerHTML = p.bestScore || 0;
-  $('profileWins').innerHTML = p.wins || 0;
+  $('profileStreak').innerHTML = p.streak || 0;
   $('profileFavorite').innerHTML = favoriteModeText();
 
   $('presenceValue').innerHTML = levels.presence;
@@ -1223,6 +1242,103 @@ function getLeadingEmoji(title){
   return m ? m[1] : '🎯';
 }
 
+
+function getCurrentLevelData(){
+  var p = state.progress || {};
+  var takes = p.takes || 0;
+  var avgScore = 0;
+  var denom = 0;
+  ['personality','thoughts','challenge','scene'].forEach(function(m){
+    var t = p.modes && p.modes[m] ? p.modes[m].takes : 0;
+    var s = p.modes && p.modes[m] ? p.modes[m].score : 0;
+    if(t){ avgScore += Math.round(s/t); denom += 1; }
+  });
+  avgScore = denom ? Math.round(avgScore/denom) : 0;
+  var levels = state.lang==='es'
+    ? [
+      {n:1,name:'Despiertas', needTakes:0, needAvg:0},
+      {n:2,name:'Presencia', needTakes:6, needAvg:68},
+      {n:3,name:'Control', needTakes:12, needAvg:72},
+      {n:4,name:'Impacto', needTakes:20, needAvg:77},
+      {n:5,name:'Dominio', needTakes:32, needAvg:83}
+    ]
+    : [
+      {n:1,name:'Awakening', needTakes:0, needAvg:0},
+      {n:2,name:'Presence', needTakes:6, needAvg:68},
+      {n:3,name:'Control', needTakes:12, needAvg:72},
+      {n:4,name:'Impact', needTakes:20, needAvg:77},
+      {n:5,name:'Mastery', needTakes:32, needAvg:83}
+    ];
+  var current = levels[0];
+  for(var i=0;i<levels.length;i++){
+    if(takes >= levels[i].needTakes && avgScore >= levels[i].needAvg) current = levels[i];
+  }
+  var next = levels[Math.min(levels.length-1, current.n)];
+  if(current.n === levels.length) next = null;
+  return {current:current,next:next,takes:takes,avgScore:avgScore};
+}
+function getDynamicGoal(){
+  var data = getCurrentLevelData();
+  var p = state.progress || {};
+  var takes = data.takes;
+  var avgScore = data.avgScore;
+  if(!data.next){
+    return state.lang==='es'
+      ? {main:'Has alcanzado Dominio.', sub:'Ahora el objetivo es mantener tu media alta y ampliar matices entre modos.', mini:'Siguiente reto recomendado: mezcla Desafíos y Escenarios para afinar tu perfil.'}
+      : {main:'You reached Mastery.', sub:'Now the goal is to sustain your high average and widen nuance across modes.', mini:'Recommended next step: mix Challenges and Scenarios to refine your profile.'};
+  }
+  var missingTakes = Math.max(0, data.next.needTakes - takes);
+  var missingAvg = Math.max(0, data.next.needAvg - avgScore);
+
+  var modes = p.modes || {};
+  var modeNames = {personality: tt().personality, thoughts: tt().thoughts, challenge: tt().challenge, scene: tt().scene};
+  var weakest = 'challenge'; var weakestAvg = 999;
+  ['personality','thoughts','challenge','scene'].forEach(function(m){
+    var t = modes[m] ? modes[m].takes : 0;
+    var s = modes[m] ? modes[m].score : 0;
+    var a = t ? Math.round(s/t) : 0;
+    if(a < weakestAvg){ weakestAvg = a; weakest = m; }
+  });
+
+  if(missingTakes > 0 && missingAvg > 0){
+    return state.lang==='es'
+      ? {
+          main:'Te faltan ' + missingTakes + ' tomas para subir a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
+          sub:'Además necesitas subir tu media unos ' + missingAvg + ' puntos para entrar en ese nivel.',
+          mini:'Ahora mismo tu modo más débil es ' + (modeNames[weakest] || weakest) + '.'
+        }
+      : {
+          main:'You need ' + missingTakes + ' more takes to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
+          sub:'You also need to raise your average by about ' + missingAvg + ' points to enter that level.',
+          mini:'Right now your weakest mode is ' + (modeNames[weakest] || weakest) + '.'
+        };
+  }
+  if(missingTakes > 0){
+    return state.lang==='es'
+      ? {
+          main:'Te faltan ' + missingTakes + ' tomas para subir a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
+          sub:'La media ya está cerca o dentro del rango. Ahora necesitas volumen real de práctica.',
+          mini:'Consejo: alterna 2 Desafíos y 2 Escenarios para subir más sólido.'
+        }
+      : {
+          main:'You need ' + missingTakes + ' more takes to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
+          sub:'Your average is already close enough. Now you need real practice volume.',
+          mini:'Tip: alternate 2 Challenges and 2 Scenarios for a stronger climb.'
+        };
+  }
+  return state.lang==='es'
+    ? {
+        main:'Te falta subir tu media ' + missingAvg + ' puntos para llegar a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
+        sub:'Ya tienes suficiente actividad. El salto ahora depende de afinar control, presencia y credibilidad.',
+        mini:'Consejo: insiste en ' + (modeNames[weakest] || weakest) + ', que es donde más margen tienes.'
+      }
+    : {
+        main:'You need to raise your average by ' + missingAvg + ' points to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
+        sub:'You already have enough activity. The jump now depends on refining control, presence and credibility.',
+        mini:'Tip: focus on ' + (modeNames[weakest] || weakest) + ', which is where you still have the most room.'
+      };
+}
+
 function setLang(lang){
   state.lang=lang;
   $('langEs').className='lang-btn'+(lang==='es'?' active':'');
@@ -1269,6 +1385,7 @@ function setLang(lang){
   $('recordStatus').innerHTML=state.isRecording?tt().recordOn:tt().recordIdle;
   if($('recordTime')) $('recordTime').innerHTML = ((state.recordSeconds||0).toFixed(1) + ' s');
   if($('profileTitle')) $('profileTitle').innerHTML = state.lang==='es' ? '📈 Perfil de voz' : '📈 Voice profile';
+  if($('goalMain') && $('profile').classList && !$('profile').classList.contains('hidden')){ try{ renderProfile(); }catch(e){} }
   if($('profileSub')) $('profileSub').innerHTML = state.lang==='es' ? 'Evolución acumulada y fortalezas' : 'Accumulated evolution and strengths';
   if($('profileHomeBtn')) $('profileHomeBtn').innerHTML = tt().homeBtn;
   if($('profileArchetypeLabel')) $('profileArchetypeLabel').innerHTML = state.lang==='es' ? 'Lectura global' : 'Global reading';
