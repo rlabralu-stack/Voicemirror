@@ -1726,6 +1726,7 @@ function nextPrompt(){
   }
   renderPrompt(state.currentPrompt);
   clearResult();
+  scrollTopApp();
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.mode==='challenge' && state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
   if(state.mode==='challenge' && state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
   if(typeof updateDuelButton === 'function') updateDuelButton();
