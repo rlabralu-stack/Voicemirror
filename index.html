@@ -525,7 +525,18 @@ text-align:center
 
 <script>
 function scrollTopApp(){
-  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  function doScroll(){
+    try{ window.scrollTo(0,0); }catch(e){}
+    try{ document.documentElement.scrollTop = 0; }catch(e){}
+    try{ document.body.scrollTop = 0; }catch(e){}
+    try{
+      var app = document.querySelector('.app');
+      if(app) app.scrollTop = 0;
+    }catch(e){}
+  }
+  doScroll();
+  setTimeout(doScroll, 0);
+  requestAnimationFrame(doScroll);
 }
 
 var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}}};
@@ -1727,6 +1738,7 @@ function nextPrompt(){
   renderPrompt(state.currentPrompt);
   clearResult();
   scrollTopApp();
+  setTimeout(scrollTopApp, 30);
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.mode==='challenge' && state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
   if(state.mode==='challenge' && state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
   if(typeof updateDuelButton === 'function') updateDuelButton();
