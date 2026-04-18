@@ -333,6 +333,13 @@ text-align:center
 .player-track{height:12px;border-radius:999px;background:#24365f;overflow:hidden}
 .player-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff5a57,#ffb14e)}
 
+
+#audioPlayer{
+  display:none !important;
+  height:0 !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
 </style>
 </head>
 <body>
@@ -359,7 +366,7 @@ text-align:center
 <div class="topbar"><div><h2 id="modeTitle" style="margin:0">🧠 Personalidad</h2><div id="modeSub" class="small" style="margin-top:6px">Descubre qué rasgo transmite tu voz</div></div><div class="langs"><button id="langEs2" class="lang-btn active" onclick="setLang('es')">ES</button><button id="langEn2" class="lang-btn" onclick="setLang('en')">EN</button><button id="homeBtn" class="btn btn-secondary" onclick="showScreen('home')">← Inicio</button></div></div>
 <div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
 <div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div id="recordTime" class="status" style="font-size:18px;opacity:.95;margin-top:6px;">0.0 s</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
-<div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" controls style="display:none"></audio></div>
+<div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" preload="metadata" playsinline style="display:none"  style="display:none"></audio></div>
 <div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
 
 </section>
