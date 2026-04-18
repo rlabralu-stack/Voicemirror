@@ -508,7 +508,11 @@ text-align:center
 </div>
 
 <script>
-var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}')};
+function scrollTopApp(){
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+}
+
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null};
 
 var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
 en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
@@ -1203,6 +1207,7 @@ function useIncomingChallenge(){
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = 'btn btn-secondary hidden';
   if(typeof updateDuelButton === 'function') updateDuelButton();
   showScreen('mode');
+  scrollTopApp();
 }
 function getDuelOutcome(myResult, rivalResult){
   var rivalConfidence = rivalResult ? (rivalResult.confidence || (rivalResult.result ? rivalResult.result.confidence : 0) || 0) : 0;
@@ -1298,6 +1303,7 @@ function startRematch(){
   if($('challengeFriendBtn')) $('challengeFriendBtn').className='btn btn-secondary hidden';
   if($('duelBtn')) $('duelBtn').className='btn btn-secondary hidden';
   showScreen('mode');
+  scrollTopApp();
 }
 
 
@@ -1522,6 +1528,7 @@ function setLang(lang){
   if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML=tt().incomingChallengeTitle;
   if($('compareBtn')) $('compareBtn').innerHTML=tt().compareBtn;
   $('recordStatus').innerHTML=state.isRecording?tt().recordOn:tt().recordIdle;
+  if($('recordTime')) $('recordTime').innerHTML=((state.recordSeconds||0).toFixed(1)+' s');
   if($('recordTime')) $('recordTime').innerHTML = ((state.recordSeconds||0).toFixed(1) + ' s');
   if($('profileTitle')) $('profileTitle').innerHTML = state.lang==='es' ? '📈 Perfil de voz' : '📈 Voice profile';
   if($('profileSub')) $('profileSub').innerHTML = state.lang==='es' ? 'Evolución acumulada y fortalezas' : 'Accumulated evolution and strengths';
@@ -1573,6 +1580,7 @@ function openMode(mode){
     }
   }
   showScreen('mode');
+  scrollTopApp();
 }
 
 function clearResult(){
@@ -1629,7 +1637,7 @@ function renderPrompt(raw){
   $('promptText').innerHTML = "<div class='prompt-dialog'><div class='prompt-dialog-text'>" + raw + "</div></div>";
 }
 
-function nextPrompt(){
+function nextPrompt(){ scrollTopApp();
   state.pendingCompare=false;
 
   if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
@@ -1646,7 +1654,7 @@ function nextPrompt(){
   if(typeof updateDuelButton === 'function') updateDuelButton();
 }
 
-function retrySamePrompt(){
+function retrySamePrompt(){ scrollTopApp();
   state.pendingCompare=true;
   $('resultTitle').innerHTML=tt().retryTitle;
   $('resultDesc').innerHTML=tt().retryDesc;
@@ -1934,17 +1942,32 @@ function playTone(type){
 }
 
 function finishRecording(){
-  stopBar(); animateViz(true);
+  stopBar();
+  animateViz(true);
+  stopRecordTimer();
   var blob=new Blob(state.chunks,{type:'audio/webm'});
   if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
   state.audioUrl=URL.createObjectURL(blob);
-  $('audioPlayer').src=state.audioUrl; $('audioPlayer').style.display='block';
+  $('audioPlayer').src=state.audioUrl;
+  $('audioPlayer').style.display='block';
 
   var duration = Math.max(0.8, state.recordSeconds || 0);
-  var durationBoost = Math.min(8, Math.round(duration * 1.2));
+  $('audioPlayer').onloadedmetadata = function(){
+    try{
+      if(isFinite($('audioPlayer').duration) && $('audioPlayer').duration > 0){
+        state.recordSeconds = $('audioPlayer').duration;
+        duration = state.recordSeconds;
+        updateRecordTime(duration);
+        if($('resultExtra') && $('resultExtra').innerHTML){
+          $('resultExtra').innerHTML = state.lang==='es'
+            ? ('Toma registrada (' + duration.toFixed(1) + ' s).')
+            : ('Take recorded (' + duration.toFixed(1) + ' s).');
+        }
+      }
+    }catch(e){}
+  };
+
   var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
-  clarity = Math.min(98, clarity + (duration > 2.6 ? 2 : 0));
-  confidence = Math.min(98, confidence + durationBoost);
   if(confidence>98) confidence=98;
   if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
 
@@ -1953,7 +1976,6 @@ function finishRecording(){
   var result={mode:state.mode,prompt:state.currentPrompt,energy:energy,clarity:clarity,confidence:confidence,title:chosen.emoji+' '+chosen.title,desc:chosen.desc,tags:chosen.tags,archetype:chosen.archetype};
   state.lastResult=result;
   rememberResult(result);
-  updateProgress(result);
   if(state.mode==='personality' || state.mode==='thoughts') state.saved[state.mode]=result;
   if(state.mode==='challenge'){ state.lastChallengeScore=getChallengeScore(result); state.lastChallengeResult=result; if($('challengeFriendBtn')) $('challengeFriendBtn').className = state.autoChallengeMode ? 'btn btn-secondary hidden' : 'btn btn-secondary'; }
   saveToHistory(result);
@@ -1962,7 +1984,7 @@ function finishRecording(){
 
   $('resultTitle').innerHTML=result.title;
   $('resultDesc').innerHTML=result.desc;
-  $('resultExtra').innerHTML=state.lang==='es'?'Toma registrada. El resultado se ajusta a tu energía, claridad, confianza y evita repetir lecturas recientes.':'Take recorded. The result adapts to your energy, clarity, confidence, and avoids repeating recent readings.';
+  $('resultExtra').innerHTML=state.lang==='es'?('Toma registrada ('+duration.toFixed(1)+' s).'):('Take recorded ('+duration.toFixed(1)+' s).');
   $('metricEnergy').innerHTML=energy; $('metricClarity').innerHTML=clarity; $('metricConfidence').innerHTML=confidence;
   formatTags(result.tags); renderScore(energy,clarity,confidence); renderComparison(result); renderInsight();
 
@@ -1977,22 +1999,43 @@ function finishRecording(){
     updateDuelButton();
     setTimeout(function(){ showDuel(); }, 300);
   }
-
   state.pendingCompare=false;
 }
 
 function toggleRecording(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.'); return; }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.');
+    return;
+  }
   if(state.isRecording){
     try{ state.mediaRecorder.stop(); }catch(e){}
-    state.isRecording=false; $('micBtn').className='mic-btn'; $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...'; return;
+    state.isRecording=false;
+    stopRecordTimer();
+    $('micBtn').className='mic-btn';
+    $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...';
+    return;
   }
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    state.stream=stream; state.mediaRecorder=new MediaRecorder(stream); state.chunks=[];
-    state.mediaRecorder.ondataavailable=function(e){ state.chunks.push(e.data); };
-    state.mediaRecorder.onstop=function(){ $('recordStatus').innerHTML=tt().recordIdle; finishRecording(); };
-    state.mediaRecorder.start(); state.isRecording=true; $('micBtn').className='mic-btn recording'; $('recordStatus').innerHTML=tt().recordOn; startBar(); animateViz(false); playTone('start');
-  }).catch(function(){ alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.'); });
+    state.stream=stream;
+    state.mediaRecorder=new MediaRecorder(stream);
+    state.chunks=[];
+    state.mediaRecorder.ondataavailable=function(e){ if(e.data && e.data.size>0) state.chunks.push(e.data); };
+    state.mediaRecorder.onstop=function(){
+      if(state.stream){ try{ state.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} }
+      $('recordStatus').innerHTML=tt().recordIdle;
+      finishRecording();
+    };
+    state.mediaRecorder.start();
+    state.isRecording=true;
+    $('micBtn').className='mic-btn recording';
+    $('recordStatus').innerHTML=tt().recordOn;
+    startBar();
+    animateViz(false);
+    startRecordTimer();
+    playTone('start');
+  }).catch(function(){
+    alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.');
+  });
 }
 
 setLang('es');
