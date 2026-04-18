@@ -528,7 +528,7 @@ function scrollTopApp(){
   try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
 }
 
-var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null};
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}}};
 
 var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
 en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
@@ -565,7 +565,27 @@ es:[
 'No necesito sonar agresivo para que se note decisión.',
 'Cuando estoy centrado, mi voz suele ordenar mejor lo que siento.',
 'Puedo sonar muy distinto según cuánto crea en lo que digo.',
-'Mi presencia al hablar depende menos de las palabras y más del peso con el que entran.'
+'Mi presencia al hablar depende menos de las palabras y más del peso con el que entran.',
+'Hay días en los que mi tono entra suave, pero deja claro que no voy a retroceder.',
+'Cuando quiero sonar seguro, intento que la frase caiga sin pedir permiso.',
+'No todo el mundo entiende lo que transmite una voz tranquila con intención real.',
+'Mi voz puede sonar cálida sin perder borde ni carácter.',
+'Hay una diferencia enorme entre decir algo y sostenerlo con el tono adecuado.',
+'No necesito demasiados gestos para que se note que estoy dentro de lo que digo.',
+'Mi seguridad se nota más cuando la frase entra limpia y sin prisa.',
+'Puedo sonar reservado y aun así dejar bastante presencia.',
+'Una frase simple puede volverse poderosa si entra con convicción.',
+'Cuando estoy bien colocado, mi voz tiene más centro y menos ruido.',
+'No necesito parecer perfecto; me basta con sonar creíble y firme.',
+'Mi tono puede ser más persuasivo cuando bajo el ritmo en lugar de acelerarlo.',
+'Hay voces que mandan por volumen y otras por peso; intento acercarme a lo segundo.',
+'Cuando una frase me representa de verdad, se nota en cómo la sujeto.',
+'La seguridad no siempre suena grande; a veces suena precisa.',
+'Mi voz cambia mucho cuando dejo de buscar aprobación.',
+'Puedo sonar estable incluso cuando la frase tiene tensión por dentro.',
+'Una voz con intención real se percibe aunque las palabras sean sencillas.',
+'Cuando entro bien en una frase, la presencia sale casi sola.',
+'No necesito llenar todos los huecos para que se note carácter.'
 ],
 en:[
 'When I speak with confidence, people usually notice it before I finish the sentence.',
@@ -587,7 +607,17 @@ en:[
 'Some sentences change completely depending on the weight behind them.',
 'Even a brief comment can sound final if the tone supports it.',
 'I do not always talk much, but when I enter a conversation I want to leave presence.',
-'My voice can sound contained without losing intensity.'
+'My voice can sound contained without losing intensity.',
+'There are moments when a steady voice matters more than a long explanation.',
+'I do not need to sound aggressive for decision to be felt.',
+'When I am centered, my voice usually organizes what I feel more clearly.',
+'My presence depends less on the words and more on the weight with which they land.',
+'A simple line can become powerful if it arrives with conviction.',
+'Confidence does not always sound big; sometimes it sounds precise.',
+'My voice changes when I stop looking for approval.',
+'A voice with real intention can be felt even when the words are simple.',
+'When I enter a line well, presence almost appears on its own.',
+'I do not need to fill every silence for character to be noticed.'
 ]
 },
 thoughts:{
@@ -621,7 +651,27 @@ es:[
 'Hay tonos que invitan a seguir hablando y otros que cierran la distancia.',
 'No necesito hablar demasiado para que alguien note si me siento cómodo o no.',
 'Una primera impresión puede abrir una puerta o levantar una barrera en segundos.',
-'Mi voz puede sonar amable, seria o difícil de leer según cómo entre en la frase.'
+'Mi voz puede sonar amable, seria o difícil de leer según cómo entre en la frase.',
+'No siempre se trata de gustar, a veces se trata de transmitir bien quién eres.',
+'Hay voces que parecen honestas desde el primer segundo y otras que generan distancia.',
+'Lo que alguien piensa de ti muchas veces empieza en el tono, no en el contenido.',
+'Puedo sonar confiable sin sonar blando.',
+'Una voz demasiado tensa puede hacerte parecer menos cercano de lo que eres.',
+'La seguridad también influye en si alguien te percibe interesante o plano.',
+'Hay una línea fina entre sonar misterioso y sonar distante.',
+'La cercanía muchas veces depende de cuánto dejas respirar la frase.',
+'No hace falta sonreír para sonar humano, pero sí conviene sonar presente.',
+'La gente decide muy rápido si tu voz les invita a seguir escuchando.',
+'Puedo dejar una impresión más cálida o más fría solo cambiando el ritmo.',
+'No siempre se recuerda lo que dices, pero sí cómo haces sentir al escuchar.',
+'Una voz creíble suele pesar más que una voz demasiado preparada.',
+'Si la frase entra natural, la percepción mejora mucho.',
+'Lo social en la voz no siempre es energía; a veces es comodidad.',
+'Una primera escucha ya deja pistas sobre confianza, interés y apertura.',
+'La forma de empezar una frase puede acercar mucho o levantar distancia.',
+'Hay tonos que hacen pensar “confío” y otros que hacen pensar “me cierro”.',
+'No necesito esforzarme demasiado para sonar real; necesito sonar colocado.',
+'La impresión que dejo cambia mucho si entro más cálido o más serio.'
 ],
 en:[
 'Speak naturally, as if someone had just met you and was forming a first impression.',
@@ -643,7 +693,17 @@ en:[
 'The way you speak says a lot about how you position yourself around other people.',
 'I can sound serious without sounding distant.',
 'When I want to connect, I prefer sounding natural over sounding impressive.',
-'People interpret confidence, coldness or interest long before they think about the words.'
+'People interpret confidence, coldness or interest long before they think about the words.',
+'A voice can sound open, reserved, warm or sharp within seconds.',
+'Trust often starts in tone, not in content.',
+'I can sound reliable without sounding soft.',
+'There is a thin line between sounding mysterious and sounding distant.',
+'The way a line begins can either open people up or create distance.',
+'Some tones make people think “I trust this,” while others make them pull back.',
+'I do not need to try too hard to sound real; I need to sound placed.',
+'The impression I leave changes a lot if I enter warmer or more serious.',
+'People decide quickly whether your voice makes them want to keep listening.',
+'Sometimes what feels social in a voice is not energy, but comfort.'
 ]
 },
 challenge:{es:[],en:[]},
@@ -651,7 +711,7 @@ scene:{es:[],en:[]}
 };
 
 (function buildPromptPools(){
-  var esIntents=[
+  var esChallengeIntents=[
     'Desafío: dilo como un líder que entra y ya controla la sala. Frase: ',
     'Desafío: dilo con calma total pero autoridad real. Frase: ',
     'Desafío: dilo con intensidad, sin perder claridad. Frase: ',
@@ -665,32 +725,14 @@ scene:{es:[],en:[]}
     'Desafío: dilo como una última advertencia elegante. Frase: ',
     'Desafío: dilo como si el peso estuviera en el tono, no en el volumen. Frase: '
   ];
-  var esBasesShort=[
+  var esChallengeBases=[
     'Sé perfectamente lo que estoy haciendo.','No hace falta gritar para imponer presencia.','Ya he tenido suficiente y no voy a repetirlo.','No tengo ninguna duda de lo que voy a hacer ahora.','No necesito demostrar nada para estar por encima.','Hoy sí que se ha notado quién estaba preparado.','No necesito insistir para que me prestes atención.','No deberías subestimarme tan rápido.','Lo que viene ahora lo decides conmigo, no sin mí.','No pasa nada, aún estamos a tiempo de hacerlo bien.','Todo estaba previsto mucho antes de que llegaras.','Esta vez no pienso dar ni un paso atrás.','Hoy empieza algo que no vais a olvidar fácilmente.','No todo el mundo está preparado para saberlo.','Después de esto, nada vuelve a ser lo mismo.','No estoy preguntando, estoy decidiendo.',
-    'No necesito convencerte a gritos.','A estas alturas ya deberías haberlo entendido.','No vine hasta aquí para dudar ahora.','Lo importante no es lo que parece, sino lo que viene.'
+    'No necesito convencerte a gritos.','A estas alturas ya deberías haberlo entendido.','No vine hasta aquí para dudar ahora.','Lo importante no es lo que parece, sino lo que viene.','No necesito alargar esta conversación para que entiendas perfectamente dónde estoy y hasta dónde pienso llegar.','A veces una frase bien dicha pesa más que cualquier discurso largo, y este es uno de esos momentos.','No voy a explicarlo diez veces para que parezca más verdad; basta con decirlo una sola vez con el tono correcto.','Hay decisiones que no se anuncian con ruido, sino con una calma que deja claro quién manda.','No me interesa parecer más grande de lo que soy; me basta con sonar imposible de ignorar.','Si has llegado hasta aquí pensando que ibas a decidirlo todo, creo que vas a tener que recalcular bastante rápido.','Lo que más debería preocuparte no es esta frase, sino la tranquilidad con la que la estoy diciendo.','No estoy intentando impresionarte; solo quiero que se note que ya no hay espacio para la duda.',
+    'No hace falta montar una escena ni buscar palabras enormes cuando el tono ya deja claro que aquí se ha terminado la negociación.','No estoy intentando sonar peligroso; simplemente quiero que se note que he dejado de ceder y que esta vez no pienso retroceder.','A veces la diferencia entre una frase cualquiera y una frase inolvidable está en decirla como si ya supieras el desenlace de todo.','No necesito que estés de acuerdo conmigo ahora mismo; solo necesito que escuches el peso con el que lo estoy diciendo.','Hay momentos en los que hablar más bajo, más lento y con menos gesto genera mucho más impacto que cualquier explosión innecesaria.','No quiero sonar teatral ni exagerado; quiero sonar como alguien que ya ha tomado una decisión y no necesita adornarla.','Esta frase no necesita más volumen; necesita verdad y una intención que entre sin pedir permiso.','No se trata de sonar enfadado, sino de sonar imposible de mover.','Quiero que esta frase se escuche como un límite, no como una opinión.','A veces el verdadero poder está en sonar estable cuando cualquiera se alteraría.'
   ];
-  var esBasesMedium=[
-    'No necesito alargar esta conversación para que entiendas perfectamente dónde estoy y hasta dónde pienso llegar.',
-    'A veces una frase bien dicha pesa más que cualquier discurso largo, y este es uno de esos momentos.',
-    'No voy a explicarlo diez veces para que parezca más verdad; basta con decirlo una sola vez con el tono correcto.',
-    'Hay decisiones que no se anuncian con ruido, sino con una calma que deja claro quién manda.',
-    'No me interesa parecer más grande de lo que soy; me basta con sonar imposible de ignorar.',
-    'Si has llegado hasta aquí pensando que ibas a decidirlo todo, creo que vas a tener que recalcular bastante rápido.',
-    'Lo que más debería preocuparte no es esta frase, sino la tranquilidad con la que la estoy diciendo.',
-    'No estoy intentando impresionarte; solo quiero que se note que ya no hay espacio para la duda.'
-  ];
-  var esBasesLong=[
-    'No hace falta montar una escena ni buscar palabras enormes cuando el tono ya deja claro que aquí se ha terminado la negociación.',
-    'No estoy intentando sonar peligroso; simplemente quiero que se note que he dejado de ceder y que esta vez no pienso retroceder.',
-    'A veces la diferencia entre una frase cualquiera y una frase inolvidable está en decirla como si ya supieras el desenlace de todo.',
-    'No necesito que estés de acuerdo conmigo ahora mismo; solo necesito que escuches el peso con el que lo estoy diciendo.',
-    'Hay momentos en los que hablar más bajo, más lento y con menos gesto genera mucho más impacto que cualquier explosión innecesaria.',
-    'No quiero sonar teatral ni exagerado; quiero sonar como alguien que ya ha tomado una decisión y no necesita adornarla.'
-  ];
-  var esAllBases = esBasesShort.concat(esBasesMedium, esBasesLong);
-  for(var i=0;i<140;i++) prompts.challenge.es.push(esIntents[i%esIntents.length]+esAllBases[i%esAllBases.length]);
+  for(var i=0;i<220;i++) prompts.challenge.es.push(esChallengeIntents[i%esChallengeIntents.length] + esChallengeBases[i%esChallengeBases.length]);
 
-  var enIntents=[
+  var enChallengeIntents=[
     'Challenge: say it like a leader entering and owning the room. Line: ',
     'Challenge: say it with total calm but real authority. Line: ',
     'Challenge: say it with intensity without losing clarity. Line: ',
@@ -704,30 +746,12 @@ scene:{es:[],en:[]}
     'Challenge: say it as an elegant final warning. Line: ',
     'Challenge: say it like the weight is in the tone, not the volume. Line: '
   ];
-  var enBasesShort=[
+  var enChallengeBases=[
     'I know exactly what I am doing.','You do not need to shout to impose presence.','I have had enough and I am not repeating myself.','I have no doubt about what I am about to do.','I do not need to prove anything to be above this.','Today it really showed who was prepared.','I do not need to insist for you to pay attention.','You should not underestimate me that quickly.','What happens next is decided with me, not without me.','It is fine, we still have time to do this right.','Everything was decided long before you arrived.','This time I am not taking a single step back.','Today begins something you will not easily forget.','Not everyone is ready to know that.','After this, nothing is ever the same again.','I am not asking, I am deciding.',
-    'I do not need to convince you by force.','You should have understood this by now.','I did not come this far to doubt now.','What matters is not what it looks like, but what comes next.'
+    'I do not need to convince you by force.','You should have understood this by now.','I did not come this far to doubt now.','What matters is not what it looks like, but what comes next.','I do not need to stretch this conversation for you to understand exactly where I stand and how far I am willing to go.','Sometimes one sentence delivered the right way weighs more than any long speech, and this is one of those moments.','I am not going to explain it ten times just to make it sound more true; once with the right tone is enough.','Some decisions are not announced with noise, but with a calm that makes it obvious who is in command.','I am not trying to sound bigger than I am; it is enough for me to sound impossible to ignore.','If you came this far thinking you would decide everything, I think you may need to recalculate very quickly.','What should worry you is not this sentence, but the calm with which I am saying it.','I am not trying to impress you; I just want it to be clear that doubt is no longer welcome.',
+    'There is no need for a dramatic scene or oversized words when the tone already makes it clear that the negotiation is over.','I am not trying to sound dangerous; I simply want it to be obvious that I have stopped yielding and I am not stepping back now.','Sometimes the difference between an ordinary sentence and an unforgettable one is saying it like you already know how everything ends.','I do not need you to agree with me right now; I only need you to hear the weight behind the way I am saying it.','There are moments when speaking lower, slower and with less gesture creates far more impact than any unnecessary explosion.','I do not want to sound theatrical or exaggerated; I want to sound like someone who already made a decision and does not need to decorate it.','This line does not need more volume; it needs truth and an intention that lands without asking permission.','It is not about sounding angry, but about sounding impossible to move.','I want this line to be heard as a limit, not as an opinion.','Sometimes real power is sounding stable when anyone else would lose control.'
   ];
-  var enBasesMedium=[
-    'I do not need to stretch this conversation for you to understand exactly where I stand and how far I am willing to go.',
-    'Sometimes one sentence delivered the right way weighs more than any long speech, and this is one of those moments.',
-    'I am not going to explain it ten times just to make it sound more true; once with the right tone is enough.',
-    'Some decisions are not announced with noise, but with a calm that makes it obvious who is in command.',
-    'I am not trying to sound bigger than I am; it is enough for me to sound impossible to ignore.',
-    'If you came this far thinking you would decide everything, I think you may need to recalculate very quickly.',
-    'What should worry you is not this sentence, but the calm with which I am saying it.',
-    'I am not trying to impress you; I just want it to be clear that doubt is no longer welcome.'
-  ];
-  var enBasesLong=[
-    'There is no need for a dramatic scene or oversized words when the tone already makes it clear that the negotiation is over.',
-    'I am not trying to sound dangerous; I simply want it to be obvious that I have stopped yielding and I am not stepping back now.',
-    'Sometimes the difference between an ordinary sentence and an unforgettable one is saying it like you already know how everything ends.',
-    'I do not need you to agree with me right now; I only need you to hear the weight behind the way I am saying it.',
-    'There are moments when speaking lower, slower and with less gesture creates far more impact than any unnecessary explosion.',
-    'I do not want to sound theatrical or exaggerated; I want to sound like someone who already made a decision and does not need to decorate it.'
-  ];
-  var enAllBases = enBasesShort.concat(enBasesMedium, enBasesLong);
-  for(var j=0;j<140;j++) prompts.challenge.en.push(enIntents[j%enIntents.length]+enAllBases[j%enAllBases.length]);
+  for(var j=0;j<220;j++) prompts.challenge.en.push(enChallengeIntents[j%enChallengeIntents.length] + enChallengeBases[j%enChallengeBases.length]);
 
   var esSceneSetups=[
     'Situación: estás en una entrevista importante y quieres sonar seguro sin parecer artificial. Frase: ',
@@ -743,30 +767,12 @@ scene:{es:[],en:[]}
     'Situación: estás defendiendo una idea delante de gente que duda de ti. Frase: ',
     'Situación: estás conociendo a alguien y quieres generar intriga sin parecer calculado. Frase: '
   ];
-  var esSceneLinesShort=[
+  var esSceneLines=[
     'Cuéntame por qué debería confiar en ti.','No suelo hablar demasiado al principio, pero me fijo en todo.','Ahora mismo lo más importante es que mantengamos la calma.','Vamos a ir al grano porque no hemos venido a perder el tiempo.','Estoy dispuesto a escuchar, pero no voy a aceptar cualquier cosa.','No necesito que me creáis ahora; lo entenderéis después.','Todavía no hemos llegado hasta aquí para rendirnos justo ahora.','No es fácil decir esto, pero prefiero que lo escuches claro.','No necesito demasiado tiempo para saber cuándo alguien merece la pena.','Después de todo lo que pasó, sigo aquí y eso ya lo dice todo.',
-    'Esto no va solo de lo que dices, sino de cómo llegas.','No vine a perderme en rodeos.','Quiero que entiendas lo que significa esto antes de responder.'
+    'Esto no va solo de lo que dices, sino de cómo llegas.','No vine a perderme en rodeos.','Quiero que entiendas lo que significa esto antes de responder.','No voy a venderte una imagen perfecta, pero sí quiero que tengas claro que sé exactamente lo que puedo aportar aquí.','No estoy buscando sonar impresionante porque sí; estoy intentando que entiendas por qué esta decisión también te afecta a ti.','Antes de seguir discutiendo, necesito que escuches la intención con la que estoy diciendo esto y no solo las palabras.','No quiero que esto suene frío, pero tampoco quiero endulzarlo hasta hacerlo irreconocible.','No hace falta dramatizar más de la cuenta para que notes que esto es serio y que no pienso esquivarlo.','Si me vas a juzgar por esta frase, prefiero que al menos la escuches con el peso con el que la estoy diciendo.','No necesito parecer espectacular; necesito sonar creíble dentro de este momento.',
+    'Lo importante aquí no es impresionar, sino hacer que la situación se sienta real.','No quiero darte una respuesta diseñada para gustarte; prefiero que suene real, aunque eso signifique que el tono tenga más verdad que comodidad.','Hay situaciones en las que una sola frase tiene que sostener contexto, emoción y credibilidad al mismo tiempo, y esta es una de ellas.','No hace falta que esta escena suene enorme; basta con que se sienta viva, concreta y honestamente metida dentro del momento.','Si esta frase no entra en la situación con naturalidad, todo se cae, así que necesito que suene dicha desde dentro y no desde fuera.','Hay veces en las que una escena no necesita más volumen ni más gesto, sino una voz que parezca realmente afectada por lo que está pasando.','No quiero que esta frase suene leída; quiero que parezca dicha por alguien que está viviendo exactamente esta situación.','La escena cambia por completo si esta línea entra con verdad en lugar de sonar ensayada.','No necesito sobreactuar esta situación; necesito que parezca habitada por dentro.','Quiero que esta frase parezca inevitable dentro del contexto, no puesta encima.'
   ];
-  var esSceneLinesMedium=[
-    'No voy a venderte una imagen perfecta, pero sí quiero que tengas claro que sé exactamente lo que puedo aportar aquí.',
-    'No estoy buscando sonar impresionante porque sí; estoy intentando que entiendas por qué esta decisión también te afecta a ti.',
-    'Antes de seguir discutiendo, necesito que escuches la intención con la que estoy diciendo esto y no solo las palabras.',
-    'No quiero que esto suene frío, pero tampoco quiero endulzarlo hasta hacerlo irreconocible.',
-    'No hace falta dramatizar más de la cuenta para que notes que esto es serio y que no pienso esquivarlo.',
-    'Si me vas a juzgar por esta frase, prefiero que al menos la escuches con el peso con el que la estoy diciendo.',
-    'No necesito parecer espectacular; necesito sonar creíble dentro de este momento.',
-    'Lo importante aquí no es impresionar, sino hacer que la situación se sienta real.'
-  ];
-  var esSceneLinesLong=[
-    'No quiero darte una respuesta diseñada para gustarte; prefiero que suene real, aunque eso signifique que el tono tenga más verdad que comodidad.',
-    'Hay situaciones en las que una sola frase tiene que sostener contexto, emoción y credibilidad al mismo tiempo, y esta es una de ellas.',
-    'No hace falta que esta escena suene enorme; basta con que se sienta viva, concreta y honestamente metida dentro del momento.',
-    'Si esta frase no entra en la situación con naturalidad, todo se cae, así que necesito que suene dicha desde dentro y no desde fuera.',
-    'Hay veces en las que una escena no necesita más volumen ni más gesto, sino una voz que parezca realmente afectada por lo que está pasando.',
-    'No quiero que esta frase suene leída; quiero que parezca dicha por alguien que está viviendo exactamente esta situación.'
-  ];
-  var esAllLines = esSceneLinesShort.concat(esSceneLinesMedium, esSceneLinesLong);
-  for(var k=0;k<160;k++) prompts.scene.es.push(esSceneSetups[k%esSceneSetups.length]+esAllLines[k%esAllLines.length]);
+  for(var k=0;k<240;k++) prompts.scene.es.push(esSceneSetups[k%esSceneSetups.length] + esSceneLines[k%esSceneLines.length]);
 
   var enSceneSetups=[
     'Situation: you are in an important interview and want to sound confident. Line: ',
@@ -782,30 +788,12 @@ scene:{es:[],en:[]}
     'Situation: you are defending an idea in front of people who doubt you. Line: ',
     'Situation: you are meeting someone and want to create intrigue without sounding calculated. Line: '
   ];
-  var enSceneLinesShort=[
+  var enSceneLines=[
     'Tell me why I should trust you.','I do not usually talk too much at first, but I notice everything.','Right now the most important thing is to stay calm.','Let us get straight to the point because we did not come here to waste time.','I am willing to listen, but I will not accept just anything.','I do not need you to believe me now; you will understand later.','We did not come this far just to give up right now.','This is not easy to say, but I would rather you hear it clearly.','I do not need much time to know when someone is worth it.','After everything that happened, I am still here and that says enough.',
-    'This is not only about what you say, but how you arrive.','I did not come here to get lost in circles.','I need you to understand what this means before you answer.'
+    'This is not only about what you say, but how you arrive.','I did not come here to get lost in circles.','I need you to understand what this means before you answer.','I am not going to sell you a perfect image, but I do want you to understand exactly what I can bring here.','I am not trying to sound impressive for the sake of it; I want you to understand why this decision affects you too.','Before we keep arguing, I need you to hear the intention in this, not just the words.','I do not want this to sound cold, but I also do not want to sweeten it until it becomes unrecognizable.','There is no need to overdramatize this for you to notice that it is serious and I am not going to dodge it.','If you are going to judge me by this sentence, at least hear it with the weight I am giving it.','I do not need to sound spectacular; I need to sound believable inside this moment.',
+    'What matters here is not impressing you, but making the situation feel real.','I do not want to give you a line designed to please you; I would rather it sound real, even if that means the tone carries more truth than comfort.','There are situations in which one sentence has to carry context, emotion and credibility all at once, and this is one of them.','This scene does not need to sound huge; it only needs to feel alive, specific and honestly inside the moment.','If this line does not enter the situation naturally, everything collapses, so it needs to sound spoken from inside the moment, not from outside it.','Sometimes a scene does not need more volume or more gesture, but a voice that genuinely sounds affected by what is happening.','I do not want this line to sound read; I want it to sound spoken by someone living exactly this situation.','The whole scene changes if this line lands with truth instead of sounding rehearsed.','I do not need to overact this situation; I need it to feel inhabited from the inside.','I want this line to feel inevitable inside the context, not placed on top of it.'
   ];
-  var enSceneLinesMedium=[
-    'I am not going to sell you a perfect image, but I do want you to understand exactly what I can bring here.',
-    'I am not trying to sound impressive for the sake of it; I want you to understand why this decision affects you too.',
-    'Before we keep arguing, I need you to hear the intention in this, not just the words.',
-    'I do not want this to sound cold, but I also do not want to sweeten it until it becomes unrecognizable.',
-    'There is no need to overdramatize this for you to notice that it is serious and I am not going to dodge it.',
-    'If you are going to judge me by this sentence, at least hear it with the weight I am giving it.',
-    'I do not need to sound spectacular; I need to sound believable inside this moment.',
-    'What matters here is not impressing you, but making the situation feel real.'
-  ];
-  var enSceneLinesLong=[
-    'I do not want to give you a line designed to please you; I would rather it sound real, even if that means the tone carries more truth than comfort.',
-    'There are situations in which one sentence has to carry context, emotion and credibility all at once, and this is one of them.',
-    'This scene does not need to sound huge; it only needs to feel alive, specific and honestly inside the moment.',
-    'If this line does not enter the situation naturally, everything collapses, so it needs to sound spoken from inside the moment, not from outside it.',
-    'Sometimes a scene does not need more volume or more gesture, but a voice that genuinely sounds affected by what is happening.',
-    'I do not want this line to sound read; I want it to sound spoken by someone living exactly this situation.'
-  ];
-  var enAllLines = enSceneLinesShort.concat(enSceneLinesMedium, enSceneLinesLong);
-  for(var m=0;m<160;m++) prompts.scene.en.push(enSceneSetups[m%enSceneSetups.length]+enAllLines[m%enAllLines.length]);
+  for(var m=0;m<240;m++) prompts.scene.en.push(enSceneSetups[m%enSceneSetups.length] + enSceneLines[m%enSceneLines.length]);
 })();
 
 function buildPersonalityPool(lang){
@@ -1655,18 +1643,89 @@ function renderPrompt(raw){
   $('promptText').innerHTML = "<div class='prompt-dialog'><div class='prompt-dialog-text'>" + raw + "</div></div>";
 }
 
-function nextPrompt(){ scrollTopApp();
-  state.pendingCompare=false;
 
+function getPromptFamily(prompt, mode){
+  var p=(prompt||'').toLowerCase();
+  if(mode==='personality'){
+    if(/seguridad|autoridad|domin|convicci|precisa|firme/.test(p)) return 'security';
+    if(/calma|sereno|tranquil|silencio|centrad/.test(p)) return 'calm';
+    if(/impacto|huella|presencia|peso/.test(p)) return 'impact';
+    return 'base';
+  }
+  if(mode==='thoughts'){
+    if(/confianza|trust|primera impresión|first impression/.test(p)) return 'trust';
+    if(/mister|fr[ií]a|warm|cálida|cercan/.test(p)) return 'social';
+    if(/distancia|barrera|distance|reserved|reserv/.test(p)) return 'distance';
+    return 'base';
+  }
+  if(mode==='challenge'){
+    if(/líder|leader|controla la sala|owning/.test(p)) return 'authority';
+    if(/calma|quirúrgica|surgical|control/.test(p)) return 'control';
+    if(/miedo|peligro|danger|escond/.test(p)) return 'dark';
+    if(/ganar|seducción|seduction|magnet/.test(p)) return 'magnetic';
+    return 'generic';
+  }
+  if(mode==='scene'){
+    if(/entrevista|interview|reunión|meeting/.test(p)) return 'professional';
+    if(/cita|date|conociendo/.test(p)) return 'social';
+    if(/mala noticia|bad news|calmando|tenso/.test(p)) return 'emotional';
+    if(/película|movie|escena final/.test(p)) return 'cinematic';
+    return 'generic';
+  }
+  return 'base';
+}
+function getPreferredPromptFamily(){
+  var title = ((state.lastResult && state.lastResult.title) || '').toLowerCase();
+  if(state.mode==='personality'){
+    if(/domin|lider|leader|hipn[oó]tico|estrat[eé]gico/.test(title)) return 'calm';
+    if(/reserv|insegur|duda|fr[aá]gil/.test(title)) return 'security';
+  }
+  if(state.mode==='thoughts'){
+    if(/fr[ií]o|distant|mister/.test(title)) return 'trust';
+    if(/cercan|warm|confianza|reliable/.test(title)) return 'distance';
+  }
+  if(state.mode==='challenge'){
+    if(/domin|brut|imparable/.test(title)) return 'control';
+    if(/irregular|fail|plano|weak/.test(title)) return 'authority';
+  }
+  if(state.mode==='scene'){
+    if(/encaja|credible|fit/.test(title)) return 'cinematic';
+    if(/no entra|weak|neutral/.test(title)) return 'professional';
+  }
+  return '';
+}
+function chooseSmartPrompt(pool){
+  var history = state.promptHistory[state.lang][state.mode] || [];
+  var recentTexts = history.slice(-14).map(function(x){ return x.text; });
+  var recentFamilies = history.slice(-5).map(function(x){ return x.family; });
+  var preferred = getPreferredPromptFamily();
+
+  var candidates = pool.filter(function(p){ return recentTexts.indexOf(p)===-1; });
+  if(!candidates.length) candidates = pool.slice();
+
+  if(preferred){
+    var preferredCandidates = candidates.filter(function(p){ return getPromptFamily(p, state.mode)===preferred; });
+    if(preferredCandidates.length && Math.random() < 0.7) candidates = preferredCandidates;
+  }
+
+  var familyFiltered = candidates.filter(function(p){ return recentFamilies.indexOf(getPromptFamily(p, state.mode))===-1; });
+  if(familyFiltered.length >= 3) candidates = familyFiltered;
+
+  var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+  state.promptHistory[state.lang][state.mode].push({text:chosen,family:getPromptFamily(chosen,state.mode)});
+  if(state.promptHistory[state.lang][state.mode].length > 18) state.promptHistory[state.lang][state.mode].shift();
+  return chosen;
+}
+
+function nextPrompt(){
+  state.pendingCompare=false;
   if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
     state.currentPrompt = state.incomingChallenge.prompt;
   } else {
-    state.currentPrompt=randomFrom(prompts[state.mode][state.lang]);
+    state.currentPrompt = chooseSmartPrompt(prompts[state.mode][state.lang]);
   }
-
-  renderPrompt(state.currentPrompt)
+  renderPrompt(state.currentPrompt);
   clearResult();
-
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.mode==='challenge' && state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
   if(state.mode==='challenge' && state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
   if(typeof updateDuelButton === 'function') updateDuelButton();
