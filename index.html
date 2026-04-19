@@ -349,6 +349,13 @@ text-align:center
 .progress-sub{margin-top:8px;font-size:14px;color:#d8def0}
 .progress-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .progress-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
+
+.superation-head{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.72}
+.superation-main{font-size:22px;font-weight:800;margin-top:6px}
+.superation-sub{margin-top:8px;font-size:14px;color:#d8def0}
+.superation-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.superation-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
+.superation-pill.accent{background:#17233f;border-color:#4a67a8}
 </style>
 </head>
 <body>
@@ -376,7 +383,7 @@ text-align:center
 <div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
 <div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div id="recordTime" class="status" style="font-size:18px;opacity:.95;margin-top:6px;">0.0 s</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
 <div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" preload="metadata" playsinline style="display:none"></audio><div id="customPlayer" class="custom-player" style="display:none"><button id="playerBtn" class="player-btn" type="button" onclick="togglePlayback()">▶</button><div class="player-main"><div id="playerTime" class="player-time">0.0 s / 0.0 s</div><div class="player-track"><div id="playerFill" class="player-fill"></div></div></div></div></div>
-<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
+<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="superationBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
 
 </section>
 
@@ -953,6 +960,7 @@ function checkIncomingChallenge(){
 
     if(typeof setLang === 'function') setLang(state.lang);
 vmRenderProgress();
+vmRenderSuperation();
     if(typeof updateModeHeader === 'function') updateModeHeader();
     state.currentPrompt = data.prompt;
     if($('promptText')) renderPrompt(state.currentPrompt)
@@ -1383,6 +1391,7 @@ function clearResult(){
   $('scoreBox').className='score-box hidden';
   $('scoreBox').style.display='none';
   try{ vmRenderProgress(); }catch(e){}
+  try{ vmRenderSuperation(); }catch(e){}
 }
 
 
@@ -1786,6 +1795,8 @@ function renderScore(energy,clarity,confidence){
     scoreText.innerHTML = state.lang==='es'
       ? 'Se ha detectado muy poca voz real. La toma necesita más voz clara para que el análisis sea fiable.'
       : 'Very little real voice was detected. This take needs clearer voice for a reliable analysis.';
+    vmRenderProgress(score);
+    vmRenderSuperation(score);
     return score;
   }
 
@@ -2161,6 +2172,65 @@ function vmPickPrompt(pool){
   if(history.length > 25) history.shift();
   vmSetPromptHistory(history);
   return chosen;
+}
+
+
+function vmRenderSuperation(score){
+  var box = document.getElementById('superationBox');
+  if(!box) return;
+  var history = vmGetHistory();
+  if(!history.length){
+    box.style.display = 'none';
+    return;
+  }
+
+  var current = typeof score === 'number' && !isNaN(score) ? score : history[history.length - 1];
+  var previousBest = 0;
+  if(history.length > 1){
+    previousBest = Math.max.apply(null, history.slice(0, -1));
+  } else {
+    previousBest = current;
+  }
+  var bestNow = Math.max.apply(null, history);
+
+  var headline = '';
+  var sub = '';
+  var delta = current - previousBest;
+
+  if(history.length === 1){
+    headline = state.lang==='es' ? 'Tu mejor empieza aquí' : 'Your best starts here';
+    sub = state.lang==='es'
+      ? 'Haz otra toma para empezar a superarte.'
+      : 'Take another shot to start beating yourself.';
+  } else if(current > previousBest){
+    headline = state.lang==='es' ? '🏆 Nuevo mejor resultado' : '🏆 New personal best';
+    sub = state.lang==='es'
+      ? ('Has superado tu anterior ' + previousBest + '/100. Este es tu nuevo mejor nivel.')
+      : ('You beat your previous ' + previousBest + '/100. This is your new best level.');
+  } else if(current === previousBest){
+    headline = state.lang==='es' ? '🎯 Has igualado tu mejor' : '🎯 You matched your best';
+    sub = state.lang==='es'
+      ? 'Estás en tu techo actual. Intenta una toma más para romperlo.'
+      : 'You reached your current ceiling. Try one more take to break it.';
+  } else {
+    headline = state.lang==='es' ? 'Supera tu mejor versión' : 'Beat your best self';
+    sub = state.lang==='es'
+      ? ('Te faltan +' + Math.abs(delta) + ' puntos para superar tu mejor ' + previousBest + '/100.')
+      : ('You need +' + Math.abs(delta) + ' points to beat your best ' + previousBest + '/100.');
+  }
+
+  var nextTarget = Math.min(100, Math.max(bestNow + 3, current + 2));
+
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div class="superation-head">' + (state.lang==='es' ? 'Modo superación' : 'Improvement mode') + '</div>' +
+    '<div class="superation-main">' + headline + '</div>' +
+    '<div class="superation-sub">' + sub + '</div>' +
+    '<div class="superation-row">' +
+      '<div class="superation-pill">' + (state.lang==='es' ? 'Tu mejor' : 'Your best') + ': ' + bestNow + '/100</div>' +
+      '<div class="superation-pill">' + (state.lang==='es' ? 'Ahora' : 'Now') + ': ' + current + '/100</div>' +
+      '<div class="superation-pill accent">' + (state.lang==='es' ? 'Objetivo siguiente' : 'Next target') + ': ' + nextTarget + '/100</div>' +
+    '</div>';
 }
 
 function toggleRecording(){
