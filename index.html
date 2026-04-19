@@ -1731,11 +1731,12 @@ function renderInsight(){
 
 function renderScore(energy,clarity,confidence){
   var scoreBox = $('scoreBox');
+  var scoreLabel = $('scoreLabel');
   var scoreValue = $('scoreBig');
   var scoreText = $('scoreNote');
-  if(!scoreBox || !scoreValue || !scoreText) return;
+  if(!scoreBox || !scoreValue || !scoreText) return 0;
 
-  var score;
+  var score = 0;
   if(state.mode==='challenge'){
     score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
   } else if(state.mode==='scene'){
@@ -1744,11 +1745,9 @@ function renderScore(energy,clarity,confidence){
     score = Math.round((energy + clarity + confidence) / 3);
   }
 
-  scoreBox.className = 'score-box';
-  if(score >= 85){
-    scoreBox.className += ' positive';
-  }
-
+  scoreBox.className = 'score-box' + (score >= 85 ? ' positive' : '');
+  scoreBox.style.display = 'block';
+  if(scoreLabel) scoreLabel.innerHTML = state.lang==='es' ? 'Puntuación' : 'Score';
   scoreValue.innerHTML = score + '/100';
 
   if(state.mode==='challenge'){
@@ -1776,8 +1775,7 @@ function renderScore(energy,clarity,confidence){
          score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
-
-  scoreBox.style.display = 'block';
+  return score;
 }
 
 function shareCurrent(){
@@ -1873,7 +1871,14 @@ function finishRecording(){
     ? ('Toma registrada ('+duration.toFixed(1)+' s).')
     : ('Take recorded ('+duration.toFixed(1)+' s).');
   $('metricEnergy').innerHTML=energy; $('metricClarity').innerHTML=clarity; $('metricConfidence').innerHTML=confidence;
-  formatTags(result.tags); renderScore(energy,clarity,confidence); renderComparison(result); renderInsight();
+  formatTags(result.tags);
+  var forcedScore = renderScore(energy,clarity,confidence);
+  if($('scoreBox')){
+    $('scoreBox').className = 'score-box' + (forcedScore >= 85 ? ' positive' : '');
+    $('scoreBox').style.display = 'block';
+  }
+  renderComparison(result);
+  renderInsight();
 
   if(state.mode==='personality'){
     if(result.title.indexOf('Líder')!==-1||result.title.indexOf('Leader')!==-1) playTone('leader'); else if(result.title.indexOf('Domin')!==-1) playTone('dominant'); else if(result.title.indexOf('Indomable')!==-1||result.title.indexOf('Indomitable')!==-1) playTone('intense'); else playTone('secure');
