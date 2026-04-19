@@ -1748,8 +1748,16 @@ function renderScore(energy,clarity,confidence){
   if(!scoreBox || !scoreValue || !scoreText) return 0;
 
   var score = 0;
+  var metricsSilent = !!(state.audioStats && (
+    (state.audioStats.speechRatio || 0) < 0.25 ||
+    (state.audioStats.avgRms || 0) < 0.016 ||
+    (state.recordSeconds || 0) < 1.1
+  ));
+
   try{
-    if(state.mode==='challenge'){
+    if(metricsSilent){
+      score = Math.min(48, Math.round((energy + clarity + confidence) / 3));
+    } else if(state.mode==='challenge'){
       score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
     } else if(state.mode==='scene'){
       score = Math.round((energy*0.28) + (clarity*0.37) + (confidence*0.35));
@@ -1764,6 +1772,13 @@ function renderScore(energy,clarity,confidence){
   scoreBox.style.display = 'block';
   if(scoreLabel) scoreLabel.innerHTML = state.lang==='es' ? 'Puntuación' : 'Score';
   scoreValue.innerHTML = score + '/100';
+
+  if(metricsSilent){
+    scoreText.innerHTML = state.lang==='es'
+      ? 'Se ha detectado muy poca voz real. La toma necesita más voz clara para que el análisis sea fiable.'
+      : 'Very little real voice was detected. This take needs clearer voice for a reliable analysis.';
+    return score;
+  }
 
   if(state.mode==='challenge'){
     scoreText.innerHTML = state.lang==='es'
@@ -2018,7 +2033,7 @@ function startLiveAudioAnalysis(stream){
       state.audioStats.samples += 1;
       state.audioStats.sumRms += rms;
       if(rms > state.audioStats.peakRms) state.audioStats.peakRms = rms;
-      if(rms > 0.018) state.audioStats.speechFrames += 1;
+      if(rms > 0.035) state.audioStats.speechFrames += 1;
       state.audioStats.avgRms = state.audioStats.sumRms / Math.max(1, state.audioStats.samples);
       state.audioStats.speechRatio = state.audioStats.speechFrames / Math.max(1, state.audioStats.samples);
     }, 120);
@@ -2047,23 +2062,31 @@ function computeMetricsFromAudio(duration){
   var dynamic = Math.max(0, peak - avg);
   var durationBoost = Math.min(12, duration * 2.2);
 
-  if(s.samples < 2 || speaking < 2 || ratio < 0.10 || avg < 0.010){
+  // Strong silence / false-positive guard
+  if(
+    s.samples < 3 ||
+    speaking < 3 ||
+    ratio < 0.25 ||
+    avg < 0.016 ||
+    (duration < 1.5 && ratio < 0.35) ||
+    (peak < 0.045)
+  ){
     return {
-      energy: clamp(Math.round(18 + ratio*120 + avg*900 + duration*3), 12, 42),
-      clarity: clamp(Math.round(28 + ratio*80 + duration*2), 20, 50),
-      confidence: clamp(Math.round(20 + ratio*90 + avg*700 + duration*2), 15, 45),
+      energy: clamp(Math.round(12 + ratio*70 + avg*500 + duration*4), 8, 40),
+      clarity: clamp(Math.round(18 + ratio*65 + duration*5), 12, 48),
+      confidence: clamp(Math.round(14 + ratio*75 + avg*420 + duration*4), 10, 45),
       silent: true
     };
   }
 
-  var energy = Math.round(30 + avg*1200 + ratio*38 + durationBoost + dynamic*260);
-  var clarity = Math.round(42 + ratio*28 + (1-Math.min(1,dynamic*8))*16 + Math.min(8,duration*1.2));
-  var confidence = Math.round(34 + avg*820 + ratio*34 + Math.min(10,duration*1.7) + dynamic*110);
+  var energy = Math.round(26 + avg*980 + ratio*34 + durationBoost + dynamic*180);
+  var clarity = Math.round(36 + ratio*24 + (1-Math.min(1,dynamic*7))*14 + Math.min(8,duration*1.2));
+  var confidence = Math.round(28 + avg*720 + ratio*28 + Math.min(10,duration*1.7) + dynamic*85);
 
   return {
-    energy: clamp(energy, 38, 96),
-    clarity: clamp(clarity, 40, 96),
-    confidence: clamp(confidence, 35, 96),
+    energy: clamp(energy, 35, 95),
+    clarity: clamp(clarity, 35, 95),
+    confidence: clamp(confidence, 30, 95),
     silent: false
   };
 }
