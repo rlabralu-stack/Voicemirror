@@ -1777,7 +1777,8 @@ function renderScore(energy,clarity,confidence){
     scoreText.innerHTML = state.lang==='es'
       ? 'Se ha detectado muy poca voz real. La toma necesita más voz clara para que el análisis sea fiable.'
       : 'Very little real voice was detected. This take needs clearer voice for a reliable analysis.';
-    return score;
+    renderProgress(score);
+  return score;
   }
 
   if(state.mode==='challenge'){
@@ -1805,6 +1806,7 @@ function renderScore(energy,clarity,confidence){
          score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
+  renderProgress(score);
   return score;
 }
 
@@ -2216,6 +2218,40 @@ function vm_pick(pool){
   return pick;
 }
 
+
+function getLevel(score){
+  if(score<50) return 'Básico';
+  if(score<70) return 'Sólido';
+  if(score<85) return 'Impacto';
+  return 'Presencia real 🔥';
+}
+
+function renderProgress(score){
+  var box = document.getElementById('progressBox');
+  if(!box) return;
+
+  var history = JSON.parse(localStorage.getItem('vm_history') || '[]');
+  history.push(score);
+  if(history.length>5) history.shift();
+  localStorage.setItem('vm_history', JSON.stringify(history));
+
+  var best = Math.max(...history);
+  var level = getLevel(score);
+
+  box.innerHTML = `
+    <div style="margin-top:20px;padding:15px;border:1px solid #3a4a6a;border-radius:12px;">
+      <div style="font-size:14px;opacity:.7">PROGRESO</div>
+      <div style="font-size:22px;margin-top:5px">${level}</div>
+      <div style="margin-top:10px;font-size:14px;">Mejor: ${best}/100</div>
+      <div style="margin-top:10px;font-size:13px;opacity:.7">Últimas:</div>
+      <div style="display:flex;gap:6px;margin-top:5px;">
+        ${history.map(s=>`<div style="padding:4px 8px;border-radius:6px;background:#222;">${s}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
 </script>
+<div id="progressBox"></div>
 </body>
 </html>
