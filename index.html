@@ -349,13 +349,6 @@ text-align:center
 .progress-sub{margin-top:8px;font-size:14px;color:#d8def0}
 .progress-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .progress-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
-
-.superation-head{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.72}
-.superation-main{font-size:22px;font-weight:800;margin-top:6px}
-.superation-sub{margin-top:8px;font-size:14px;color:#d8def0}
-.superation-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.superation-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
-.superation-pill.accent{background:#17233f;border-color:#4a67a8}
 </style>
 </head>
 <body>
@@ -960,7 +953,6 @@ function checkIncomingChallenge(){
 
     if(typeof setLang === 'function') setLang(state.lang);
 vmRenderProgress();
-vmRenderSuperation();
     if(typeof updateModeHeader === 'function') updateModeHeader();
     state.currentPrompt = data.prompt;
     if($('promptText')) renderPrompt(state.currentPrompt)
@@ -1391,7 +1383,6 @@ function clearResult(){
   $('scoreBox').className='score-box hidden';
   $('scoreBox').style.display='none';
   try{ vmRenderProgress(); }catch(e){}
-  try{ vmRenderSuperation(); }catch(e){}
 }
 
 
@@ -1795,10 +1786,6 @@ function renderScore(energy,clarity,confidence){
     scoreText.innerHTML = state.lang==='es'
       ? 'Se ha detectado muy poca voz real. La toma necesita más voz clara para que el análisis sea fiable.'
       : 'Very little real voice was detected. This take needs clearer voice for a reliable analysis.';
-    vmRenderProgress(score);
-    vmRenderSuperation(score);
-    vmRenderSuperation(score);
-    vmRenderProgress(score);
     return score;
   }
 
@@ -1827,6 +1814,7 @@ function renderScore(energy,clarity,confidence){
          score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
+  vmRenderSuperation(score);
   vmRenderProgress(score);
   return score;
 }
@@ -2128,15 +2116,44 @@ function vmGetLevel(score){
   return state.lang==='es' ? 'Presencia real 🔥' : 'Real presence 🔥';
 }
 
-function vmGetBestBeforeCurrent(score){
+function vmRenderSuperation(score){
+  var box = document.getElementById('superationBox');
+  if(!box) return;
+
   var history = vmGetHistory();
-  if(typeof score !== 'number' || isNaN(score) || !history.length) return 0;
-  var idx = history.lastIndexOf(score);
-  if(idx !== -1){
-    var withoutCurrent = history.slice(0, idx).concat(history.slice(idx + 1));
-    if(withoutCurrent.length) return Math.max.apply(null, withoutCurrent);
+  var bestBefore = history.length ? Math.max.apply(null, history) : 0;
+  var current = score;
+
+  var headline = '';
+  var sub = '';
+  var delta = bestBefore - current;
+
+  if(!bestBefore){
+    headline = 'Tu mejor empieza aquí';
+    sub = 'Haz otra toma para empezar a superarte.';
+  } else if(current > bestBefore){
+    headline = '🏆 Nuevo mejor resultado';
+    sub = 'Has superado tu mejor anterior ' + bestBefore + '/100.';
+  } else if(current === bestBefore){
+    headline = '🎯 Has igualado tu mejor';
+    sub = 'Estás en tu techo actual. Intenta superarlo.';
+  } else {
+    headline = 'Supera tu mejor versión';
+    sub = 'Te faltan +' + delta + ' puntos para superar tu mejor ' + bestBefore + '/100.';
   }
-  return history.length ? Math.max.apply(null, history) : 0;
+
+  var nextTarget = Math.min(100, bestBefore + 1);
+
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div class="superation-head">Modo superación</div>' +
+    '<div class="superation-main">' + headline + '</div>' +
+    '<div class="superation-sub">' + sub + '</div>' +
+    '<div class="superation-row">' +
+      '<div class="superation-pill">Tu mejor: ' + (current > bestBefore ? current : bestBefore) + '/100</div>' +
+      '<div class="superation-pill">Ahora: ' + current + '/100</div>' +
+      '<div class="superation-pill accent">Objetivo: ' + nextTarget + '/100</div>' +
+    '</div>';
 }
 
 function vmRenderProgress(score){
@@ -2186,61 +2203,6 @@ function vmPickPrompt(pool){
   if(history.length > 25) history.shift();
   vmSetPromptHistory(history);
   return chosen;
-}
-
-
-function vmRenderSuperation(score){
-  var box = document.getElementById('superationBox');
-  if(!box) return;
-
-  var history = vmGetHistory();
-  if(!history.length && (typeof score !== 'number' || isNaN(score))){
-    box.style.display = 'none';
-    return;
-  }
-
-  var current = (typeof score === 'number' && !isNaN(score)) ? score : (history.length ? history[history.length - 1] : 0);
-  var bestBefore = vmGetBestBeforeCurrent(current);
-  var bestNow = history.length ? Math.max.apply(null, history) : current;
-
-  var headline = '';
-  var sub = '';
-
-  if(!bestBefore){
-    headline = state.lang==='es' ? 'Tu mejor empieza aquí' : 'Your best starts here';
-    sub = state.lang==='es'
-      ? 'Haz otra toma para empezar a superarte.'
-      : 'Take another shot to start beating yourself.';
-  } else if(current > bestBefore){
-    headline = state.lang==='es' ? '🏆 Nuevo mejor resultado' : '🏆 New personal best';
-    sub = state.lang==='es'
-      ? ('Has superado tu mejor anterior ' + bestBefore + '/100.')
-      : ('You beat your previous best ' + bestBefore + '/100.');
-  } else if(current === bestBefore){
-    headline = state.lang==='es' ? '🎯 Has igualado tu mejor' : '🎯 You matched your best';
-    sub = state.lang==='es'
-      ? ('Has igualado tu mejor ' + bestBefore + '/100. Intenta una toma más para romperlo.')
-      : ('You matched your best ' + bestBefore + '/100. Try one more take to break it.');
-  } else {
-    var delta = bestBefore - current;
-    headline = state.lang==='es' ? 'Supera tu mejor versión' : 'Beat your best self';
-    sub = state.lang==='es'
-      ? ('Te faltan +' + delta + ' puntos para superar tu mejor ' + bestBefore + '/100.')
-      : ('You need +' + delta + ' points to beat your best ' + bestBefore + '/100.');
-  }
-
-  var nextTarget = Math.min(100, Math.max(bestNow + 1, current + 1));
-
-  box.style.display = 'block';
-  box.innerHTML =
-    '<div class="superation-head">' + (state.lang==='es' ? 'Modo superación' : 'Improvement mode') + '</div>' +
-    '<div class="superation-main">' + headline + '</div>' +
-    '<div class="superation-sub">' + sub + '</div>' +
-    '<div class="superation-row">' +
-      '<div class="superation-pill">' + (state.lang==='es' ? 'Tu mejor' : 'Your best') + ': ' + bestNow + '/100</div>' +
-      '<div class="superation-pill">' + (state.lang==='es' ? 'Ahora' : 'Now') + ': ' + current + '/100</div>' +
-      '<div class="superation-pill accent">' + (state.lang==='es' ? 'Objetivo siguiente' : 'Next target') + ': ' + nextTarget + '/100</div>' +
-    '</div>';
 }
 
 function toggleRecording(){
