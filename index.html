@@ -74,6 +74,9 @@ audio{width:100%;margin-top:10px}
 .compare-text{margin-top:10px;color:#d1d8eb;line-height:1.5}
 .compare-note{margin-top:16px;background:linear-gradient(180deg,rgba(255,77,77,.10),rgba(255,77,77,.05));border:1px solid rgba(255,110,110,.18);border-radius:18px;padding:16px;color:#ffe2e2;font-size:15px;line-height:1.5}
 .hidden{display:none!important}
+.score-box.positive{background:linear-gradient(180deg,rgba(34,197,94,.14),rgba(22,163,74,.08));border-color:rgba(74,222,128,.55)}
+.score-box.positive #scoreLabel,.score-box.positive #scoreBig,.score-box.positive #scoreNote{color:#eafff1}
+.score-box.positive #scoreBig{ text-shadow:0 0 18px rgba(74,222,128,.12)}
 .score-box{margin-top:14px;background:#2a1220;border:2px solid #ff6a78;border-radius:18px;padding:14px}
 .score-big{font-size:44px;font-weight:800;line-height:1}
 .score-note{margin-top:8px;color:#ffd7dc}
@@ -325,20 +328,27 @@ text-align:center
 }
 
 
-.level-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.level-badge{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:linear-gradient(180deg,rgba(255,84,84,.18),rgba(255,84,84,.06));border:1px solid rgba(255,110,110,.22);font-weight:800}
-.level-dot{width:12px;height:12px;border-radius:50%;background:#ff8a57;box-shadow:0 0 16px rgba(255,120,80,.65)}
-.goal-card{margin-top:14px;background:#111b31;border:1px solid #2f477d;border-radius:20px;padding:16px}
-.goal-main{font-size:clamp(20px,4vw,28px);font-weight:800;line-height:1.2}
-.goal-sub{margin-top:8px;color:#d1d8eb;line-height:1.45}
-.goal-mini{margin-top:10px;font-size:14px;color:#c9d4f0}
+.custom-player{display:none;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:18px;background:#111b31;border:1px solid #2f477d}
+.custom-player.show{display:flex !important}
+.player-btn{width:52px;height:52px;border:none;border-radius:999px;background:linear-gradient(180deg,#ff5a57,#ff9a4d);color:#fff;font-size:20px;font-weight:800;box-shadow:0 8px 24px rgba(255,90,87,.28)}
+.player-main{flex:1}
+.player-time{font-size:14px;color:#d6dced;margin-bottom:8px}
+.player-track{height:12px;border-radius:999px;background:#24365f;overflow:hidden}
+.player-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff5a57,#ffb14e)}
 
 
-.progress-head,.feedback-head,.cta-head,.achievements-head{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.72}
+#audioPlayer{
+  display:none !important;
+  height:0 !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+.progress-head{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.72}
 .progress-level{font-size:24px;font-weight:800;margin-top:6px}
 .progress-sub{margin-top:8px;font-size:14px;color:#d8def0}
-.progress-row,.cta-row,.achievements-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.progress-pill,.cta-pill,.achievement-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
+.progress-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.progress-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
 </style>
 </head>
 <body>
@@ -364,9 +374,9 @@ text-align:center
 <section id="mode" class="screen">
 <div class="topbar"><div><h2 id="modeTitle" style="margin:0">🧠 Personalidad</h2><div id="modeSub" class="small" style="margin-top:6px">Descubre qué rasgo transmite tu voz</div></div><div class="langs"><button id="langEs2" class="lang-btn active" onclick="setLang('es')">ES</button><button id="langEn2" class="lang-btn" onclick="setLang('en')">EN</button><button id="homeBtn" class="btn btn-secondary" onclick="showScreen('home')">← Inicio</button></div></div>
 <div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
-<div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
-<div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" controls style="display:none"></audio></div>
-<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="dynamicFeedbackBox" class="box" style="display:none;margin-top:14px"></div><div id="ctaBox" class="box" style="display:none;margin-top:14px"></div><div id="achievementsBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
+<div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div id="recordTime" class="status" style="font-size:18px;opacity:.95;margin-top:6px;">0.0 s</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+<div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" preload="metadata" playsinline style="display:none"></audio><div id="customPlayer" class="custom-player" style="display:none"><button id="playerBtn" class="player-btn" type="button" onclick="togglePlayback()">▶</button><div class="player-main"><div id="playerTime" class="player-time">0.0 s / 0.0 s</div><div class="player-track"><div id="playerFill" class="player-fill"></div></div></div></div></div>
+<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
 
 </section>
 
@@ -374,8 +384,6 @@ text-align:center
 <section id="profile" class="screen">
 <div class="topbar"><div><h2 id="profileTitle" style="margin:0">📈 Perfil de voz</h2><div id="profileSub" class="small" style="margin-top:6px">Evolución acumulada y fortalezas</div></div><div class="langs"><button class="btn btn-secondary" id="profileHomeBtn" onclick="showScreen('home')">← Inicio</button></div></div>
 <div class="panel">
-  <div class="level-hero"><div id="currentLevelBadge" class="level-badge"><span class="level-dot"></span><span>Nivel 1 · Despiertas</span></div><div id="levelProgressMini" class="small">—</div></div>
-  <div class="goal-card"><div id="goalMain" class="goal-main">—</div><div id="goalSub" class="goal-sub">—</div><div id="goalMini" class="goal-mini">—</div></div>
   <div class="profile-grid">
     <div class="profile-card">
       <h3 id="profileArchetypeLabel">Lectura global</h3>
@@ -525,62 +533,78 @@ text-align:center
 </div>
 
 <script>
-var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}')};
+function scrollTopApp(){
+  function doScroll(){
+    try{ window.scrollTo(0,0); }catch(e){}
+    try{ document.documentElement.scrollTop = 0; }catch(e){}
+    try{ document.body.scrollTop = 0; }catch(e){}
+    try{
+      var app = document.querySelector('.app');
+      if(app) app.scrollTop = 0;
+    }catch(e){}
+  }
+  doScroll();
+  setTimeout(doScroll, 0);
+  requestAnimationFrame(doScroll);
+}
+
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}},recordMimeType:'',audioStats:null,audioContext:null,analyser:null,sourceNode:null,analysisTimer:null};
 
 var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
 en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
 
-var prompts={personality:{es:['Cuando hablo con seguridad, la gente suele notarlo incluso antes de que termine la frase.','No necesito llamar demasiado la atención para que mi presencia se sienta cuando empiezo a hablar.','Sé mantener la calma y transmitir firmeza incluso cuando el ambiente se vuelve algo tenso.','Hay veces en las que digo poco, pero mi tono hace que lo que digo tenga más peso del esperado.','A veces basta una frase bien dicha para que alguien se replantee quién tiene el control.','Incluso cuando digo poco, el tono puede dejar más huella que una explicación larga.'],en:['When I speak with confidence, people usually notice it before I finish the sentence.','I do not need too much attention for my presence to be felt when I start talking.','Sometimes I say very little, but my tone gives my words more weight than expected.','A well delivered sentence can completely change how people perceive me.']},thoughts:{es:['Habla con naturalidad, como si alguien acabara de conocerte y estuviera formándose una impresión sobre ti.','Puede que no lo parezca, pero suelo pensar bastante antes de mostrar lo que siento.','No necesito exagerar para que se note que estoy aquí.','A veces digo menos de lo que realmente estoy pensando.','Hay personas que confían rápido y otras que tardan; yo no siempre doy toda esa confianza al principio.','No todo el mundo sabe interpretar bien lo que transmito al hablar, y eso se nota desde el principio.'],en:['Speak naturally for a few seconds, as if someone had just met you and was forming an opinion about you.','It may not look like it, but I usually think a lot before showing what I feel.','I do not need to exaggerate for people to notice I am here.','Sometimes I say less than what I am really thinking.']},challenge:{es:[],en:[]},scene:{es:[],en:[]}};
+var prompts={personality:{es:["Cuando hablo con seguridad, la gente suele notarlo incluso antes de que termine la frase.", "No necesito llamar demasiado la atención para que mi presencia se sienta cuando empiezo a hablar.", "Sé mantener la calma y transmitir firmeza incluso cuando el ambiente se vuelve algo tenso.", "Hay veces en las que digo poco, pero mi tono hace que lo que digo tenga más peso del esperado.", "A veces basta una frase bien dicha para que alguien se replantee quién tiene el control.", "Incluso cuando digo poco, el tono puede dejar más huella que una explicación larga.", "Puedo sonar tranquilo y aun así dejar claro que no estoy dudando.", "Mi voz cambia mucho según la intención, incluso si las palabras son sencillas.", "No siempre necesito subir el volumen para que se note autoridad.", "Cuando quiero sonar firme, intento que cada palabra entre sin vacilar.", "Hay días en los que mi tono transmite más de lo que estoy dispuesto a explicar.", "Si me escuchas con atención, suelo dejar bastante claro cómo me siento.", "No necesito acelerar para que una frase tenga impacto.", "Mi forma de hablar puede sonar cercana y dominante al mismo tiempo.", "Cuando estoy convencido, mi voz suele ir por delante de mis gestos.", "No todo depende de lo que digo, también importa cómo lo sostengo con el tono.", "Puedo parecer calmado aunque por dentro esté midiendo cada palabra.", "Mi voz a veces suena más segura de lo que la gente espera al conocerme.", "Hay frases que cambian por completo según el peso con el que las diga.", "Incluso un comentario breve puede sonar definitivo si el tono acompaña.", "No siempre hablo mucho, pero cuando entro en una conversación quiero dejar presencia.", "Mi voz puede sonar contenida sin perder intensidad.", "Cuando quiero convencer, suelo apoyarme más en el tono que en el discurso.", "La forma en la que digo algo cambia mucho la imagen que doy.", "Mi tono puede sonar sereno sin perder autoridad.", "Hay momentos en los que una voz firme vale más que una explicación larga.", "No necesito sonar agresivo para que se note decisión.", "Cuando estoy centrado, mi voz suele ordenar mejor lo que siento.", "Puedo sonar muy distinto según cuánto crea en lo que digo.", "Mi presencia al hablar depende menos de las palabras y más del peso con el que entran.", "Hay días en los que mi tono entra suave, pero deja claro que no voy a retroceder.", "Cuando quiero sonar seguro, intento que la frase caiga sin pedir permiso.", "No todo el mundo entiende lo que transmite una voz tranquila con intención real.", "Mi voz puede sonar cálida sin perder borde ni carácter.", "Hay una diferencia enorme entre decir algo y sostenerlo con el tono adecuado.", "No necesito demasiados gestos para que se note que estoy dentro de lo que digo.", "Mi seguridad se nota más cuando la frase entra limpia y sin prisa.", "Puedo sonar reservado y aun así dejar bastante presencia.", "Una frase simple puede volverse poderosa si entra con convicción.", "Cuando estoy bien colocado, mi voz tiene más centro y menos ruido.", "No necesito parecer perfecto; me basta con sonar creíble y firme.", "Mi tono puede ser más persuasivo cuando bajo el ritmo en lugar de acelerarlo.", "Hay voces que mandan por volumen y otras por peso; intento acercarme a lo segundo.", "Cuando una frase me representa de verdad, se nota en cómo la sujeto.", "La seguridad no siempre suena grande; a veces suena precisa.", "Mi voz cambia mucho cuando dejo de buscar aprobación.", "Puedo sonar estable incluso cuando la frase tiene tensión por dentro.", "Una voz con intención real se percibe aunque las palabras sean sencillas.", "Cuando entro bien en una frase, la presencia sale casi sola.", "No necesito llenar todos los huecos para que se note carácter.", "Hay palabras que solo funcionan si la voz entra con fe en ellas.", "Mi tono mejora cuando no intento impresionar, sino colocar bien la frase.", "Puedo parecer más dominante solo bajando un poco el ritmo.", "La autoridad no siempre entra fuerte; a veces entra limpia y sin ruido.", "No todo el impacto sale del volumen; mucho sale del centro con el que hablo.", "Cuando me siento dentro de una frase, la voz deja de sonar pensada y pasa a sonar real.", "Mi presencia se nota más cuando no corro por terminar.", "Hay una firmeza que no necesita dureza para sentirse.", "Puedo sonar cercano sin perder eje.", "Cuando la voz cae bien colocada, no necesito añadir más nada.", "Mi mejor tono aparece cuando dejo de controlar demasiado y empiezo a sostener mejor.", "No hace falta sonar grande para sonar importante.", "Hay frases que me obligan a elegir entre parecer seguro o serlo de verdad.", "Mi voz gana peso cuando entra con menos ansiedad y más decisión.", "Puedo parecer más firme solo dejando respirar mejor la frase.", "La seguridad se escucha más cuando el inicio no entra con prisa.", "No siempre necesito intensidad; a veces me basta con claridad y dirección.", "Mi tono puede sonar elegante si no aprieto demasiado.", "Cuando suelto una frase sin pedir permiso, cambia por completo la presencia.", "Hay una diferencia clara entre sonar correcto y sonar inevitable.", "Mi voz mejora cuando dejo de adornar demasiado.", "Puedo sonar más convincente si entro con menos impulso y más control.", "No hace falta cargar la frase de emoción para que se note fondo.", "La calma bien colocada también puede imponer.", "Mi presencia aparece más cuando no lucho con la frase.", "Hay veces en las que la mejor autoridad suena casi silenciosa.", "Puedo sonar con más carácter usando menos fuerza.", "Mi tono gana cuando sostengo la frase hasta el final.", "No necesito demostrar demasiado para que se note intención.", "Hay una seguridad que no se explica, solo se escucha.", "Mi mejor voz suele salir cuando no quiero caer bien a toda costa.", "Puedo sonar más firme si la frase entra desde abajo y no desde la garganta.", "Cuando la intención está clara, la voz se ordena sola.", "Hay tonos que parecen fuertes y otros que de verdad tienen base.", "No siempre sueno mejor por ir más alto; a veces sueno mejor por ir más limpio.", "Mi voz transmite más cuando está menos cargada y más centrada.", "Puedo sonar más dominante si reduzco el ruido emocional.", "La presencia también depende de cuánto sostengo el silencio entre palabras.", "No necesito empujar cada frase para que tenga peso.", "Mi tono se vuelve más creíble cuando no busca lucirse.", "Hay una fuerza tranquila que me favorece más que la intensidad continua.", "Puedo sonar más claro si dejo caer mejor el final de la frase.", "La autoridad real a veces entra sin gesto, sin volumen y sin aviso.", "Mi voz tiene más peso cuando parece inevitable en lugar de esforzada.", "Cuando hablo desde dentro, se nota más que cuando intento sonar de una forma concreta.", "Puedo sonar más seguro si la frase entra con menos tensión facial.", "Mi mejor presencia aparece cuando estoy dentro del mensaje y no fuera de él.", "Hay frases que solo funcionan cuando la voz las sostiene de verdad."],en:["When I speak with confidence, people usually notice it before I finish the sentence.", "I do not need too much attention for my presence to be felt when I start talking.", "Sometimes I say very little, but my tone gives my words more weight than expected.", "A well delivered sentence can completely change how people perceive me.", "I can sound calm and still make it clear that I am not doubting anything.", "My voice changes a lot depending on intention, even when the words are simple.", "I do not need to raise my volume for authority to be felt.", "When I want to sound firm, I try to make every word land without hesitation.", "Some days my tone reveals more than I am willing to explain.", "If you listen closely, my voice usually says quite a lot about how I feel.", "I do not need to rush for a sentence to have impact.", "I can sound close and dominant at the same time.", "When I am convinced, my voice often moves ahead of my gestures.", "Not everything depends on what I say; it also depends on how I hold the tone.", "I can seem calm while still measuring every word.", "My voice can sound more confident than people expect when they first meet me.", "Some sentences change completely depending on the weight behind them.", "Even a brief comment can sound final if the tone supports it.", "I do not always talk much, but when I enter a conversation I want to leave presence.", "My voice can sound contained without losing intensity.", "There are moments when a steady voice matters more than a long explanation.", "I do not need to sound aggressive for decision to be felt.", "When I am centered, my voice usually organizes what I feel more clearly.", "My presence depends less on the words and more on the weight with which they land.", "A simple line can become powerful if it arrives with conviction.", "Confidence does not always sound big; sometimes it sounds precise.", "My voice changes when I stop looking for approval.", "A voice with real intention can be felt even when the words are simple.", "When I enter a line well, presence almost appears on its own.", "I do not need to fill every silence for character to be noticed.", "There is a difference between saying something and actually holding it through tone.", "My best tone appears when I stop trying to impress and start placing the line well.", "Authority does not always enter loudly; sometimes it enters cleanly.", "My voice can sound warmer without losing edge or character.", "Sometimes real power sounds almost quiet.", "My tone becomes more persuasive when I slow down instead of rushing.", "I do not need to push every line for it to carry weight.", "Presence can come from stillness as much as from force.", "I sound better when the line feels lived instead of performed.", "My strongest voice usually appears when I stop chasing approval."]},thoughts:{es:["Habla con naturalidad, como si alguien acabara de conocerte y estuviera formándose una impresión sobre ti.", "Puede que no lo parezca, pero suelo pensar bastante antes de mostrar lo que siento.", "No necesito exagerar para que se note que estoy aquí.", "A veces digo menos de lo que realmente estoy pensando.", "Hay personas que confían rápido y otras que tardan; yo no siempre doy toda esa confianza al principio.", "No todo el mundo sabe interpretar bien lo que transmito al hablar, y eso se nota desde el principio.", "A veces la gente no recuerda exactamente mis palabras, pero sí la sensación que les dejo.", "No siempre busco caer bien rápido; me importa más sonar real.", "Hay personas que inspiran confianza por cómo hablan antes que por lo que dicen.", "La primera impresión puede cambiar mucho solo por el tono.", "Puedo sonar cercano sin parecer necesitado de aprobación.", "No necesito parecer simpático todo el tiempo para caer bien.", "A veces un tono tranquilo genera más confianza que una energía exagerada.", "Si hablo con calma, la gente suele escucharme de otra manera.", "No siempre doy una impresión cálida, pero sí intento sonar claro y honesto.", "Hay voces que entran bien porque parecen seguras sin ser agresivas.", "La forma de hablar dice mucho sobre cómo te colocas frente a los demás.", "Puedo dar una imagen seria sin sonar distante.", "Cuando quiero conectar, prefiero sonar natural antes que impresionante.", "No todo el mundo genera la misma sensación al decir algo simple.", "A veces lo que transmite cercanía no es sonreír, sino el tono.", "La gente interpreta confianza, frialdad o interés mucho antes de pensar en las palabras.", "Una voz puede parecer abierta, reservada, cálida o cortante en segundos.", "Intento que mi tono no suene forzado cuando alguien me escucha por primera vez.", "Puedo parecer tranquilo o misterioso según cómo entre en la frase.", "La impresión que dejo no siempre depende del contenido, sino del ambiente que crea mi voz.", "Hay tonos que invitan a seguir hablando y otros que cierran la distancia.", "No necesito hablar demasiado para que alguien note si me siento cómodo o no.", "Una primera impresión puede abrir una puerta o levantar una barrera en segundos.", "Mi voz puede sonar amable, seria o difícil de leer según cómo entre en la frase.", "No siempre se trata de gustar, a veces se trata de transmitir bien quién eres.", "Hay voces que parecen honestas desde el primer segundo y otras que generan distancia.", "Lo que alguien piensa de ti muchas veces empieza en el tono, no en el contenido.", "Puedo sonar confiable sin sonar blando.", "Una voz demasiado tensa puede hacerte parecer menos cercano de lo que eres.", "La seguridad también influye en si alguien te percibe interesante o plano.", "Hay una línea fina entre sonar misterioso y sonar distante.", "La cercanía muchas veces depende de cuánto dejas respirar la frase.", "No hace falta sonreír para sonar humano, pero sí conviene sonar presente.", "La gente decide muy rápido si tu voz les invita a seguir escuchando.", "Puedo dejar una impresión más cálida o más fría solo cambiando el ritmo.", "No siempre se recuerda lo que dices, pero sí cómo haces sentir al escuchar.", "Una voz creíble suele pesar más que una voz demasiado preparada.", "Si la frase entra natural, la percepción mejora mucho.", "Lo social en la voz no siempre es energía; a veces es comodidad.", "Una primera escucha ya deja pistas sobre confianza, interés y apertura.", "La forma de empezar una frase puede acercar mucho o levantar distancia.", "Hay tonos que hacen pensar “confío” y otros que hacen pensar “me cierro”.", "No necesito esforzarme demasiado para sonar real; necesito sonar colocado.", "La impresión que dejo cambia mucho si entro más cálido o más serio.", "A veces parecer interesante depende más del fondo que del brillo.", "Una voz demasiado neutra puede borrar matices importantes de tu personalidad.", "Lo que suena cómodo para ti no siempre suena cercano para quien escucha.", "Puedo parecer más abierto solo dejando un poco más de aire en la frase.", "La confianza se percibe antes de que alguien entienda el contenido exacto.", "No hace falta parecer extrovertido para sonar accesible.", "Hay voces que invitan a quedarse y otras que sugieren distancia casi sin querer.", "La forma de sostener una frase cambia mucho la sensación que dejas.", "Una entrada demasiado brusca puede cerrar a la otra persona antes de tiempo.", "Puedo sonar más confiable si el ritmo no parece apresurado.", "La cercanía también depende de cuánto espacio doy al otro en mi tono.", "No se trata solo de agradar, sino de no sonar defensivo.", "Una voz más limpia suele parecer más segura y más fácil de leer.", "La manera en que termino una frase también deja impresión.", "Puedo parecer más reservado solo por cómo arranco la voz.", "Hay una seriedad que genera respeto y otra que crea distancia.", "No siempre conviene sonar brillante; a veces conviene sonar cómodo.", "La intriga funciona mejor cuando no se confunde con frialdad.", "Una voz muy controlada puede sonar fiable o demasiado medida según el contexto.", "La gente nota rápido si estás dentro de lo que dices o solo cumpliendo.", "Una primera impresión no necesita ser intensa para ser fuerte.", "Puedo caer mejor si la frase entra menos tensa y más viva.", "La voz dice mucho sobre si estás disponible o encerrado.", "No todo el carisma es energía; una parte importante es cómo haces sentir al otro.", "Una presencia tranquila puede resultar más atractiva que una exagerada.", "La forma de entrar en una conversación ya insinúa el rol que ocupas en ella.", "Puedo sonar más humano si no aprieto tanto el final de cada frase.", "La distancia social se escucha antes de explicarse.", "A veces sonar creíble es más importante que sonar brillante.", "Hay frases que, bien dichas, te vuelven inmediatamente más cercano.", "La gente percibe muy rápido si tu tono está cómodo o protegiéndose.", "Una voz reservada puede interesar o cerrar, según el matiz.", "La apertura no siempre suena grande; a veces suena sencilla.", "No necesito decir mucho para que alguien intuya si confío o no.", "La primera impresión mejora cuando la voz parece vivida y no montada.", "Una voz demasiado rígida puede sonar menos cálida aunque el contenido sea amable.", "Puedo parecer más interesante si la frase entra con menos esfuerzo visible.", "Lo que dejas entre líneas también forma parte de la impresión.", "Una voz honesta suele notarse incluso cuando no intenta gustar.", "La percepción cambia mucho si suenas estable en lugar de acelerado.", "No todo el mundo necesita calor, pero casi todo el mundo nota la incomodidad.", "La confianza vocal abre puertas que el contenido por sí solo no abre.", "Una voz colocada puede darte mucha más presencia social que una frase brillante.", "La forma en la que hablas ya sugiere cómo te relacionas con los demás.", "A veces parecer interesante es simplemente no sonar obvio.", "La impresión mejora cuando no luchas contra la frase y la dejas vivir."],en:["Speak naturally, as if someone had just met you and was forming a first impression.", "It may not look like it, but I usually think a lot before showing what I feel.", "I do not need to exaggerate for people to notice I am here.", "Sometimes I say less than what I am really thinking.", "I do not always give all my trust at the beginning, and that often shows.", "Not everyone knows how to read what I transmit when I speak, and that is noticeable from the start.", "Sometimes people do not remember my exact words, but they do remember the feeling I leave.", "I do not always try to be liked quickly; I care more about sounding real.", "Some people inspire trust through the way they speak before anything else.", "A first impression can change a lot through tone alone.", "I can sound close without seeming hungry for approval.", "I do not need to sound nice all the time to leave a good impression.", "Sometimes a calm tone creates more trust than exaggerated energy.", "If I speak calmly, people usually listen in a different way.", "I do not always sound warm, but I try to sound clear and honest.", "Some voices land well because they feel secure without becoming aggressive.", "The way you speak says a lot about how you position yourself around other people.", "I can sound serious without sounding distant.", "When I want to connect, I prefer sounding natural over sounding impressive.", "People interpret confidence, coldness or interest long before they think about the words.", "A voice can sound open, reserved, warm or sharp within seconds.", "Trust often starts in tone, not in content.", "I can sound reliable without sounding soft.", "There is a thin line between sounding mysterious and sounding distant.", "The way a line begins can either open people up or create distance.", "Some tones make people think “I trust this,” while others make them pull back.", "I do not need to try too hard to sound real; I need to sound placed.", "The impression I leave changes a lot if I enter warmer or more serious.", "People decide quickly whether your voice makes them want to keep listening.", "Sometimes what feels social in a voice is not energy, but comfort.", "A voice that sounds too tense can make you seem less approachable than you are.", "You do not need to sound extroverted to sound accessible.", "Credibility often matters more than brilliance in a first impression.", "Warmth can come from comfort, not only from enthusiasm.", "The way I end a line also shapes what people think of me.", "A quiet voice can still feel socially strong if it sounds settled.", "Distance can be heard long before it is explained.", "Not every interesting voice is energetic; some are simply hard to place.", "People notice quickly whether your tone feels available or protected.", "The first impression improves when the line sounds lived, not manufactured."]},challenge:{es:[],en:[]},scene:{es:[],en:[]}};
 
 (function buildPromptPools(){
-  var esBases=['Sé perfectamente lo que estoy haciendo.','No hace falta gritar para imponer presencia.','Ya he tenido suficiente y no voy a repetirlo.','No tengo ninguna duda de lo que voy a hacer ahora.','No necesito demostrar nada para estar por encima.','Hoy sí que se ha notado quién estaba preparado.','No necesito insistir para que me prestes atención.','No deberías subestimarme tan rápido.','Lo que viene ahora lo decides conmigo, no sin mí.','No pasa nada, aún estamos a tiempo de hacerlo bien.','Todo estaba previsto mucho antes de que llegaras.','Esta vez no pienso dar ni un paso atrás.','Hoy empieza algo que no vais a olvidar fácilmente.','No todo el mundo está preparado para saberlo.','Después de esto, nada vuelve a ser lo mismo.','No estoy preguntando, estoy decidiendo.'];
-  var esIntents=['Desafío: dilo como un líder que entra y ya controla la sala. Frase: ','Desafío: dilo con calma total pero autoridad real. Frase: ','Desafío: dilo con intensidad, sin perder claridad. Frase: ','Desafío: dilo como si dieras miedo sin gritar. Frase: ','Desafío: dilo como si acabaras de ganar algo enorme. Frase: ','Desafío: dilo con control y seducción a la vez. Frase: ','Desafío: dilo como si nadie pudiera contradecirte. Frase: ','Desafío: dilo como si escondieras algo peligroso. Frase: '];
-  for(var i=0;i<70;i++) prompts.challenge.es.push(esIntents[i%esIntents.length]+esBases[i%esBases.length]);
+  var esChallengeIntents=["Desafío: dilo como un líder que entra y ya controla la sala. Frase: ", "Desafío: dilo con calma total pero autoridad real. Frase: ", "Desafío: dilo con intensidad, sin perder claridad. Frase: ", "Desafío: dilo como si dieras miedo sin gritar. Frase: ", "Desafío: dilo como si acabaras de ganar algo enorme. Frase: ", "Desafío: dilo con control y seducción a la vez. Frase: ", "Desafío: dilo como si nadie pudiera contradecirte. Frase: ", "Desafío: dilo como si escondieras algo peligroso. Frase: ", "Desafío: dilo como si estuvieras cansado de repetir lo obvio. Frase: ", "Desafío: dilo como si tuvieras el desenlace claro antes que nadie. Frase: ", "Desafío: dilo como una última advertencia elegante. Frase: ", "Desafío: dilo como si el peso estuviera en el tono, no en el volumen. Frase: ", "Dilo como si lideraras un equipo. Frase: ", "Dilo como si estuvieras decepcionado pero en control. Frase: ", "Dilo como si fuera un secreto importante. Frase: ", "Dilo como si tuvieras toda la razón. Frase: ", "Dilo como si no necesitaras aprobación. Frase: ", "Dilo como si te estuvieran subestimando. Frase: ", "Dilo como si marcaras el ritmo de todo. Frase: ", "Dilo como si dieras una orden final. Frase: ", "Dilo como si no hubiera vuelta atrás. Frase: ", "Dilo como si te observaran todos. Frase: ", "Dilo como si fueras superior sin decirlo. Frase: ", "Dilo como si supieras algo que otros no. Frase: ", "Dilo como si esto decidiera el final. Frase: ", "Dilo como si tu paciencia se hubiera terminado. Frase: ", "Dilo como si fueras imparable. Frase: ", "Dilo como si tu silencio pesara más que tus palabras. Frase: ", "Dilo como si todo dependiera de ti. Frase: ", "Dilo como si ya hubieras tomado la decisión. Frase: "];
+  var esChallengeBases=["Sé perfectamente lo que estoy haciendo.", "No hace falta gritar para imponer presencia.", "Ya he tenido suficiente y no voy a repetirlo.", "No tengo ninguna duda de lo que voy a hacer ahora.", "No necesito demostrar nada para estar por encima.", "Hoy sí que se ha notado quién estaba preparado.", "No necesito insistir para que me prestes atención.", "No deberías subestimarme tan rápido.", "Lo que viene ahora lo decides conmigo, no sin mí.", "No pasa nada, aún estamos a tiempo de hacerlo bien.", "Todo estaba previsto mucho antes de que llegaras.", "Esta vez no pienso dar ni un paso atrás.", "Hoy empieza algo que no vais a olvidar fácilmente.", "No todo el mundo está preparado para saberlo.", "Después de esto, nada vuelve a ser lo mismo.", "No estoy preguntando, estoy decidiendo.", "No necesito convencerte a gritos.", "A estas alturas ya deberías haberlo entendido.", "No vine hasta aquí para dudar ahora.", "Lo importante no es lo que parece, sino lo que viene.", "No necesito alargar esta conversación para que entiendas perfectamente dónde estoy y hasta dónde pienso llegar.", "A veces una frase bien dicha pesa más que cualquier discurso largo, y este es uno de esos momentos.", "No voy a explicarlo diez veces para que parezca más verdad; basta con decirlo una sola vez con el tono correcto.", "Hay decisiones que no se anuncian con ruido, sino con una calma que deja claro quién manda.", "No me interesa parecer más grande de lo que soy; me basta con sonar imposible de ignorar.", "Si has llegado hasta aquí pensando que ibas a decidirlo todo, creo que vas a tener que recalcular bastante rápido.", "Lo que más debería preocuparte no es esta frase, sino la tranquilidad con la que la estoy diciendo.", "No estoy intentando impresionarte; solo quiero que se note que ya no hay espacio para la duda.", "No hace falta montar una escena ni buscar palabras enormes cuando el tono ya deja claro que aquí se ha terminado la negociación.", "No estoy intentando sonar peligroso; simplemente quiero que se note que he dejado de ceder y que esta vez no pienso retroceder.", "A veces la diferencia entre una frase cualquiera y una frase inolvidable está en decirla como si ya supieras el desenlace de todo.", "No necesito que estés de acuerdo conmigo ahora mismo; solo necesito que escuches el peso con el que lo estoy diciendo.", "Hay momentos en los que hablar más bajo, más lento y con menos gesto genera mucho más impacto que cualquier explosión innecesaria.", "No quiero sonar teatral ni exagerado; quiero sonar como alguien que ya ha tomado una decisión y no necesita adornarla.", "Esta frase no necesita más volumen; necesita verdad y una intención que entre sin pedir permiso.", "No se trata de sonar enfadado, sino de sonar imposible de mover.", "Quiero que esta frase se escuche como un límite, no como una opinión.", "A veces el verdadero poder está en sonar estable cuando cualquiera se alteraría."];
+  for(var i=0;i<320;i++) prompts.challenge.es.push(esChallengeIntents[i%esChallengeIntents.length] + esChallengeBases[i%esChallengeBases.length]);
 
-  var enBases=['I know exactly what I am doing.','You do not need to shout to impose presence.','I have had enough and I am not repeating myself.','I have no doubt about what I am about to do.','I do not need to prove anything to be above this.','Today it really showed who was prepared.','I do not need to insist for you to pay attention.','You should not underestimate me that quickly.','What happens next is decided with me, not without me.','It is fine, we still have time to do this right.','Everything was decided long before you arrived.','This time I am not taking a single step back.','Today begins something you will not easily forget.','Not everyone is ready to know that.','After this, nothing is ever the same again.','I am not asking, I am deciding.'];
-  var enIntents=['Challenge: say it like a leader entering and owning the room. Line: ','Challenge: say it with total calm but real authority. Line: ','Challenge: say it with intensity without losing clarity. Line: ','Challenge: say it as if you were intimidating without shouting. Line: ','Challenge: say it like you had just won something huge. Line: ','Challenge: say it with control and seduction at the same time. Line: ','Challenge: say it like nobody can contradict you. Line: ','Challenge: say it like you are hiding something dangerous. Line: '];
-  for(var j=0;j<70;j++) prompts.challenge.en.push(enIntents[j%enIntents.length]+enBases[j%enBases.length]);
+  var enChallengeIntents=["Challenge: dilo como un líder que entra y ya controla la sala. Line: ", "Challenge: dilo con calma total pero autoridad real. Line: ", "Challenge: dilo con intensidad, sin perder claridad. Line: ", "Challenge: dilo como si dieras miedo sin gritar. Line: ", "Challenge: dilo como si acabaras de ganar algo enorme. Line: ", "Challenge: dilo con control y seducción a la vez. Line: ", "Challenge: dilo como si nadie pudiera contradecirte. Line: ", "Challenge: dilo como si escondieras algo peligroso. Line: ", "Challenge: dilo como si estuvieras cansado de repetir lo obvio. Line: ", "Challenge: dilo como si tuvieras el desenlace claro antes que nadie. Line: ", "Challenge: dilo como una última advertencia elegante. Line: ", "Challenge: dilo como si el peso estuviera en el tono, no en el volumen. Line: ", "Say it like si lideraras un equipo. Line: ", "Say it like si estuvieras decepcionado pero en control. Line: ", "Say it like si fuera un secreto importante. Line: ", "Say it like si tuvieras toda la razón. Line: ", "Say it like si no necesitaras aprobación. Line: ", "Say it like si te estuvieran subestimando. Line: ", "Say it like si marcaras el ritmo de todo. Line: ", "Say it like si dieras una orden final. Line: ", "Say it like si no hubiera vuelta atrás. Line: ", "Say it like si te observaran todos. Line: ", "Say it like si fueras superior sin decirlo. Line: ", "Say it like si supieras algo que otros no. Line: ", "Say it like si esto decidiera el final. Line: ", "Say it like si tu paciencia se hubiera terminado. Line: ", "Say it like si fueras imparable. Line: ", "Say it like si tu silencio pesara más que tus palabras. Line: ", "Say it like si todo dependiera de ti. Line: ", "Say it like si ya hubieras tomado la decisión. Line: "];
+  var enChallengeBases=["I know exactly what I am doing.", "You do not need to shout to impose presence.", "I have had enough and I am not repeating myself.", "I have no doubt about what I am about to do.", "I do not need to prove anything to be above this.", "Today it really showed who was prepared.", "I do not need to insist for you to pay attention.", "You should not underestimate me that quickly.", "What happens next is decided with me, not without me.", "It is fine, we still have time to do this right.", "Everything was decided long before you arrived.", "This time I am not taking a single step back.", "Today begins something you will not easily forget.", "Not everyone is ready to know that.", "After this, nothing is ever the same again.", "I am not asking, I am deciding.", "I do not need to convince you by force.", "You should have understood this by now.", "I did not come this far to doubt now.", "What matters is not what it looks like, but what comes next.", "I do not need to stretch this conversation for you to understand exactly where I stand and how far I am willing to go.", "Sometimes one sentence delivered the right way weighs more than any long speech, and this is one of those moments.", "I am not going to explain it ten times just to make it sound more true; once with the right tone is enough.", "Some decisions are not announced with noise, but with a calm that makes it obvious who is in command.", "I am not trying to sound bigger than I am; it is enough for me to sound impossible to ignore.", "If you came this far thinking you would decide everything, I think you may need to recalculate very quickly.", "What should worry you is not this sentence, but the calm with which I am saying it.", "I am not trying to impress you; I just want it to be clear that doubt is no longer welcome.", "There is no need for a dramatic scene or oversized words when the tone already makes it clear that the negotiation is over.", "I am not trying to sound dangerous; I simply want it to be obvious that I have stopped yielding and I am not stepping back now.", "Sometimes the difference between an ordinary sentence and an unforgettable one is saying it like you already know how everything ends.", "I do not need you to agree with me right now; I only need you to hear the weight behind the way I am saying it.", "There are moments when speaking lower, slower and with less gesture creates far more impact than any unnecessary explosion.", "I do not want to sound theatrical or exaggerated; I want to sound like someone who already made a decision and does not need to decorate it.", "This line does not need more volume; it needs truth and an intention that lands without asking permission.", "It is not about sounding angry, but about sounding impossible to move.", "I want this line to be heard as a limit, not as an opinion.", "Sometimes real power is sounding stable when anyone else would lose control."];
+  for(var j=0;j<320;j++) prompts.challenge.en.push(enChallengeIntents[j%enChallengeIntents.length] + enChallengeBases[j%enChallengeBases.length]);
 
-  var esSceneSetups=['Situación: estás en una entrevista importante y quieres sonar seguro. Frase: ','Situación: estás en una cita y quieres parecer interesante sin forzar nada. Frase: ','Situación: estás calmando a alguien en un momento tenso. Frase: ','Situación: estás entrando en una reunión como alguien con autoridad. Frase: ','Situación: estás negociando algo importante. Frase: ','Situación: estás discutiendo con alguien que te ha fallado. Frase: ','Situación: estás intentando motivar a un equipo cansado. Frase: ','Situación: estás dando una mala noticia. Frase: ','Situación: estás entrando en una sala donde nadie cree en ti. Frase: ','Situación: estás grabando una escena final de película. Frase: '];
-  var esSceneLines=['Cuéntame por qué debería confiar en ti.','No suelo hablar demasiado al principio, pero me fijo en todo.','Ahora mismo lo más importante es que mantengamos la calma.','Vamos a ir al grano porque no hemos venido a perder el tiempo.','Estoy dispuesto a escuchar, pero no voy a aceptar cualquier cosa.','No es solo lo que pasó, es cómo decidiste hacerlo.','Todavía no hemos llegado hasta aquí para rendirnos justo ahora.','No es fácil decir esto, pero prefiero que lo escuches claro.','No necesito que me creáis ahora; lo entenderéis después.','Después de todo lo que pasó, sigo aquí y eso ya lo dice todo.','Sé que hice daño, pero también sé lo que valgo.','No necesito demasiado tiempo para saber cuándo alguien merece la pena.'];
-  for(var k=0;k<72;k++) prompts.scene.es.push(esSceneSetups[k%esSceneSetups.length]+esSceneLines[k%esSceneLines.length]);
+  var esSceneSetups=["Situación: estás en una entrevista importante y quieres sonar seguro sin parecer artificial. Frase: ", "Situación: estás en una cita y quieres parecer interesante sin forzar nada. Frase: ", "Situación: estás calmando a alguien en un momento tenso. Frase: ", "Situación: estás entrando en una reunión como alguien con autoridad. Frase: ", "Situación: estás negociando algo importante. Frase: ", "Situación: estás confrontando a alguien que te falló. Frase: ", "Situación: estás motivando a un equipo cansado. Frase: ", "Situación: estás dando una mala noticia. Frase: ", "Situación: estás entrando en una sala donde nadie cree en ti todavía. Frase: ", "Situación: estás grabando una escena final de película. Frase: ", "Situación: estás defendiendo una idea delante de gente que duda de ti. Frase: ", "Situación: estás conociendo a alguien y quieres generar intriga sin parecer calculado. Frase: ", "Situación: estás en una presentación importante. Frase: ", "Situación: estás bajo presión y no puedes fallar. Frase: ", "Situación: estás explicando algo delicado. Frase: ", "Situación: estás marcando un límite claro. Frase: ", "Situación: estás intentando convencer a alguien. Frase: ", "Situación: estás cerrando una conversación difícil. Frase: ", "Situación: estás empezando algo nuevo frente a otros. Frase: ", "Situación: estás respondiendo a una crítica injusta. Frase: ", "Situación: estás tomando una decisión clave. Frase: ", "Situación: estás entrando en una escena incómoda. Frase: ", "Situación: estás pidiendo algo importante. Frase: ", "Situación: estás recuperando el control de la situación. Frase: ", "Situación: estás reaccionando a una noticia inesperada. Frase: ", "Situación: estás hablando con alguien a quien admiras. Frase: ", "Situación: estás diciendo algo que cambia la relación. Frase: ", "Situación: estás intentando sonar creíble en un momento difícil. Frase: ", "Situación: estás intentando sonar humano sin sonar frágil. Frase: ", "Situación: estás en un momento decisivo y todos te miran. Frase: "];
+  var esSceneLines=["Cuéntame por qué debería confiar en ti.", "No suelo hablar demasiado al principio, pero me fijo en todo.", "Ahora mismo lo más importante es que mantengamos la calma.", "Vamos a ir al grano porque no hemos venido a perder el tiempo.", "Estoy dispuesto a escuchar, pero no voy a aceptar cualquier cosa.", "No necesito que me creáis ahora; lo entenderéis después.", "Todavía no hemos llegado hasta aquí para rendirnos justo ahora.", "No es fácil decir esto, pero prefiero que lo escuches claro.", "No necesito demasiado tiempo para saber cuándo alguien merece la pena.", "Después de todo lo que pasó, sigo aquí y eso ya lo dice todo.", "Esto no va solo de lo que dices, sino de cómo llegas.", "No vine a perderme en rodeos.", "Quiero que entiendas lo que significa esto antes de responder.", "No voy a venderte una imagen perfecta, pero sí quiero que tengas claro que sé exactamente lo que puedo aportar aquí.", "No estoy buscando sonar impresionante porque sí; estoy intentando que entiendas por qué esta decisión también te afecta a ti.", "Antes de seguir discutiendo, necesito que escuches la intención con la que estoy diciendo esto y no solo las palabras.", "No quiero que esto suene frío, pero tampoco quiero endulzarlo hasta hacerlo irreconocible.", "No hace falta dramatizar más de la cuenta para que notes que esto es serio y que no pienso esquivarlo.", "Si me vas a juzgar por esta frase, prefiero que al menos la escuches con el peso con el que la estoy diciendo.", "No necesito parecer espectacular; necesito sonar creíble dentro de este momento.", "Lo importante aquí no es impresionar, sino hacer que la situación se sienta real.", "No quiero darte una respuesta diseñada para gustarte; prefiero que suene real, aunque eso signifique que el tono tenga más verdad que comodidad.", "Hay situaciones en las que una sola frase tiene que sostener contexto, emoción y credibilidad al mismo tiempo, y esta es una de ellas.", "No hace falta que esta escena suene enorme; basta con que se sienta viva, concreta y honestamente metida dentro del momento.", "Si esta frase no entra en la situación con naturalidad, todo se cae, así que necesito que suene dicha desde dentro y no desde fuera.", "Hay veces en las que una escena no necesita más volumen ni más gesto, sino una voz que parezca realmente afectada por lo que está pasando.", "No quiero que esta frase suene leída; quiero que parezca dicha por alguien que está viviendo exactamente esta situación.", "La escena cambia por completo si esta línea entra con verdad en lugar de sonar ensayada.", "No necesito sobreactuar esta situación; necesito que parezca habitada por dentro.", "Quiero que esta frase parezca inevitable dentro del contexto, no puesta encima."];
+  for(var k=0;k<320;k++) prompts.scene.es.push(esSceneSetups[k%esSceneSetups.length] + esSceneLines[k%esSceneLines.length]);
 
-  var enSceneSetups=['Situation: you are in an important interview and want to sound confident. Line: ','Situation: you are on a date and want to sound interesting without forcing it. Line: ','Situation: you are calming someone in a tense moment. Line: ','Situation: you are entering a meeting as someone with authority. Line: ','Situation: you are negotiating something important. Line: ','Situation: you are confronting someone who failed you. Line: ','Situation: you are trying to motivate a tired team. Line: ','Situation: you are delivering bad news. Line: ','Situation: you are entering a room where nobody believes in you. Line: ','Situation: you are recording a final movie scene. Line: '];
-  var enSceneLines=['Tell me why I should trust you.','I do not usually talk too much at first, but I notice everything.','Right now the most important thing is to stay calm.','Let us get straight to the point because we did not come here to waste time.','I am willing to listen, but I will not accept just anything.','It is not only what happened, it is how you chose to do it.','We did not come this far just to give up right now.','This is not easy to say, but I would rather you hear it clearly.','I do not need you to believe me now; you will understand later.','After everything that happened, I am still here and that says enough.','I know I caused harm, but I also know what I am worth.','I do not need much time to know when someone is worth it.'];
-  for(var m=0;m<72;m++) prompts.scene.en.push(enSceneSetups[m%enSceneSetups.length]+enSceneLines[m%enSceneLines.length]);
+  var enSceneSetups=["Situation: estás en una entrevista importante y quieres sonar seguro sin parecer artificial. Line: ", "Situation: estás en una cita y quieres parecer interesante sin forzar nada. Line: ", "Situation: estás calmando a alguien en un momento tenso. Line: ", "Situation: estás entrando en una reunión como alguien con autoridad. Line: ", "Situation: estás negociando algo importante. Line: ", "Situation: estás confrontando a alguien que te falló. Line: ", "Situation: estás motivando a un equipo cansado. Line: ", "Situation: estás dando una mala noticia. Line: ", "Situation: estás entrando en una sala donde nadie cree en ti todavía. Line: ", "Situation: estás grabando una escena final de película. Line: ", "Situation: estás defendiendo una idea delante de gente que duda de ti. Line: ", "Situation: estás conociendo a alguien y quieres generar intriga sin parecer calculado. Line: ", "Situation: estás en una presentación importante. Line: ", "Situation: estás bajo presión y no puedes fallar. Line: ", "Situation: estás explicando algo delicado. Line: ", "Situation: estás marcando un límite claro. Line: ", "Situation: estás intentando convencer a alguien. Line: ", "Situation: estás cerrando una conversación difícil. Line: ", "Situation: estás empezando algo nuevo frente a otros. Line: ", "Situation: estás respondiendo a una crítica injusta. Line: ", "Situation: estás tomando una decisión clave. Line: ", "Situation: estás entrando en una escena incómoda. Line: ", "Situation: estás pidiendo algo importante. Line: ", "Situation: estás recuperando el control de la situación. Line: ", "Situation: estás reaccionando a una noticia inesperada. Line: ", "Situation: estás hablando con alguien a quien admiras. Line: ", "Situation: estás diciendo algo que cambia la relación. Line: ", "Situation: estás intentando sonar creíble en un momento difícil. Line: ", "Situation: estás intentando sonar humano sin sonar frágil. Line: ", "Situation: estás en un momento decisivo y todos te miran. Line: "];
+  var enSceneLines=["Tell me why I should trust you.", "I do not usually talk too much at first, but I notice everything.", "Right now the most important thing is to stay calm.", "Let us get straight to the point because we did not come here to waste time.", "I am willing to listen, but I will not accept just anything.", "I do not need you to believe me now; you will understand later.", "We did not come this far just to give up right now.", "This is not easy to say, but I would rather you hear it clearly.", "I do not need much time to know when someone is worth it.", "After everything that happened, I am still here and that says enough.", "This is not only about what you say, but how you arrive.", "I did not come here to get lost in circles.", "I need you to understand what this means before you answer.", "I am not going to sell you a perfect image, but I do want you to understand exactly what I can bring here.", "I am not trying to sound impressive for the sake of it; I want you to understand why this decision affects you too.", "Before we keep arguing, I need you to hear the intention in this, not just the words.", "I do not want this to sound cold, but I also do not want to sweeten it until it becomes unrecognizable.", "There is no need to overdramatize this for you to notice that it is serious and I am not going to dodge it.", "If you are going to judge me by this sentence, at least hear it with the weight I am giving it.", "I do not need to sound spectacular; I need to sound believable inside this moment.", "What matters here is not impressing you, but making the situation feel real.", "I do not want to give you a line designed to please you; I would rather it sound real, even if that means the tone carries more truth than comfort.", "There are situations in which one sentence has to carry context, emotion and credibility all at once, and this is one of them.", "This scene does not need to sound huge; it only needs to feel alive, specific and honestly inside the moment.", "If this line does not enter the situation naturally, everything collapses, so it needs to sound spoken from inside the moment, not from outside it.", "Sometimes a scene does not need more volume or more gesture, but a voice that genuinely sounds affected by what is happening.", "I do not want this line to sound read; I want it to sound spoken by someone living exactly this situation.", "The whole scene changes if this line lands with truth instead of sounding rehearsed.", "I do not need to overact this situation; I need it to feel inhabited from the inside.", "I want this line to feel inevitable inside the context, not placed on top of it."];
+  for(var m=0;m<320;m++) prompts.scene.en.push(enSceneSetups[m%enSceneSetups.length] + enSceneLines[m%enSceneLines.length]);
 })();
 
 function buildPersonalityPool(lang){
-  var bases = lang==='es'
-    ? [['👑','Líder','Tu voz transmite autoridad natural y sensación clara de control.','authority'],['⚡','Dominante','Tu voz impone presencia y cuesta ignorarla.','power'],['🔥','Indomable','Hay una fuerza difícil de frenar en la manera en que proyectas.','power'],['🧠','Analítico','Tu voz suena ordenada, pensada y con bastante control mental.','mind'],['🦊','Perspicaz','Proyectas observación y una inteligencia que parece leer más de lo habitual.','mind'],['🕶️','Imperturbable','Suenas difícil de alterar, como alguien que no pierde el control fácilmente.','calm'],['🧲','Hipnótico','Tu voz tiene un ritmo que atrapa y dan ganas de seguir escuchando.','magnet'],['💎','Carismático','Conectas rápido y dejas una impresión agradable.','magnet'],['🌙','Enigmático','Tu voz sugiere fondo y reserva, como alguien que no se muestra entero de golpe.','mystery'],['🛡️','Seguro','Tu tono proyecta firmeza y una base emocional bastante estable.','calm'],['🎯','Directo','No das demasiadas vueltas y eso hace que tu voz suene eficaz.','authority'],['🌊','Sereno','Tu voz tiene calma y pausa, como si controlases bien el ritmo interno.','calm']]
-    : [['👑','Leader','Your voice projects natural authority and a clear sense of control.','authority'],['⚡','Dominant','Your voice imposes presence and is hard to ignore.','power'],['🔥','Indomitable','There is a force in your projection that feels hard to stop.','power'],['🧠','Analytical','Your voice sounds ordered, deliberate and mentally controlled.','mind'],['🦊','Perceptive','Your voice sounds observant and sharp.','mind'],['🕶️','Unshakable','You sound hard to disturb, like someone who keeps control.','calm'],['🧲','Hypnotic','Your voice has a rhythm that pulls people in.','magnet'],['💎','Charismatic','You connect quickly and leave a pleasant impression.','magnet'],['🌙','Enigmatic','Your voice suggests depth and reserve.','mystery'],['🛡️','Secure','Your tone projects firmness and inner stability.','calm'],['🎯','Direct','You do not overcomplicate and that makes your voice feel efficient.','authority'],['🌊','Serene','Your voice carries calm and pacing.','calm']];
+  var bases = lang==='es' ? [["👑", "Líder", "Tu voz transmite autoridad natural y sensación clara de control.", "authority"], ["🧲", "Magnético", "Tu tono atrae y mantiene la atención casi sin esfuerzo.", "magnet"], ["🔥", "Dominante", "Tu voz impone presencia y cuesta ignorarla.", "power"], ["🌊", "Sereno", "Tu voz tiene calma y estabilidad muy marcadas.", "calm"], ["🎯", "Preciso", "Cada palabra entra con intención y bastante limpieza.", "mind"], ["⚡", "Contundente", "Tu voz impacta sin demasiados rodeos.", "power"], ["🗣️", "Persuasivo", "Convences más por tono que por volumen.", "magnet"], ["🌀", "Hipnótico", "Tienes un ritmo vocal que invita a seguir escuchando.", "magnet"], ["🧱", "Sólido", "Se percibe una base firme y estable.", "calm"], ["⚖️", "Equilibrado", "Buena mezcla entre control, energía y foco.", "calm"], ["🧊", "Reservado", "Guardas más de lo que muestras al hablar.", "mystery"], ["🔥", "Intenso", "Tu energía se percibe alta desde el principio.", "power"], ["🔒", "Seguro", "Confianza clara en tu manera de entrar en la frase.", "authority"], ["❗", "Inseguro", "Se percibe duda en el tono o en el apoyo vocal.", "mystery"], ["⚪", "Neutral", "No generas un impacto especialmente definido.", "calm"], ["☀️", "Cálido", "Transmites cercanía sin perder estructura.", "magnet"], ["❄️", "Frío", "Tu tono deja cierta distancia emocional.", "mystery"], ["🎩", "Elegante", "Tu forma de hablar tiene estilo y control.", "mind"], ["➡️", "Directo", "Vas al punto y eso te da presencia.", "authority"], ["💥", "Explosivo", "Hay un empuje alto en la entrega.", "power"], ["♟️", "Estratégico", "Parece que eliges bien cada palabra.", "mind"], ["🌑", "Dominante silencioso", "No haces ruido, pero impones bastante.", "authority"], ["🎲", "Impredecible", "No eres fácil de anticipar del todo.", "mystery"], ["🔁", "Constante", "Mantienes una línea bastante estable.", "calm"], ["✂️", "Cortante", "Tu voz marca límites con claridad.", "authority"], ["🌿", "Flexible", "Te adaptas sin perder demasiada identidad.", "calm"], ["🧠", "Racional", "Predomina la estructura mental en tu tono.", "mind"], ["❤️", "Emocional", "Se percibe carga afectiva en la entrega.", "magnet"], ["🧊🔥", "Seguro contenido", "Hay control interno y bastante fondo.", "calm"], ["🛑", "Autoritario", "Ordenas más de lo que propones.", "authority"], ["🌫️", "Sutil", "Tu impacto es suave, pero está ahí.", "mystery"], ["🧲", "Convincente", "Difícil no creerte cuando entras bien.", "magnet"], ["⚔️", "Intimidante", "Generas presión vocal con facilidad.", "power"], ["🛋️", "Relajado", "Tu tono parece cómodo y poco forzado.", "calm"], ["🧭", "Determinado", "La dirección de tu voz está clara.", "authority"], ["🌊", "Fluido", "Hay naturalidad al hablar y poca fricción.", "magnet"], ["🌑", "Denso", "Cada palabra parece tener más peso del habitual.", "power"], ["🍃", "Ligero", "Tu tono es liviano y fácil de recibir.", "magnet"], ["🖊️", "Marcado", "Las frases dejan huella con facilidad.", "power"], ["🧱", "Estable", "Sin demasiados altibajos internos.", "calm"], ["⚡", "Volátil", "Cambios rápidos en energía o apoyo.", "power"], ["🔒", "Contenido", "Te guardas bastante aunque haya fondo.", "mystery"], ["🌞", "Abierto", "Tu voz suena disponible y poco defensiva.", "magnet"], ["🚪", "Frontal", "No hay demasiados filtros al entrar.", "authority"], ["🔄", "Indirecto", "No siempre vas directo al punto.", "mystery"], ["👑", "Seguro dominante", "Confianza y control van juntas aquí.", "authority"], ["⚠️", "Tenso", "Hay una presión interna notable en la voz.", "power"], ["🌙", "Suave", "Tono agradable y poco agresivo.", "magnet"], ["🔊", "Potente", "Gran presencia sonora al entrar.", "power"], ["🎛️", "Controlado", "Buen dominio de la intensidad y del foco.", "mind"], ["⏩", "Acelerado", "El ritmo va demasiado rápido y resta presencia.", "power"], ["⏸️", "Pausado", "Control del ritmo y de las entradas.", "calm"], ["🎯", "Enfocado", "Se nota bastante foco en cómo dices la frase.", "mind"], ["🌪️", "Disperso", "Falta algo de centro en la entrega.", "mystery"], ["🌿", "Seguro natural", "Confianza sin sensación de esfuerzo.", "authority"], ["🤖", "Forzado", "Se nota algo artificial o demasiado montado.", "mystery"], ["🧬", "Auténtico", "Suena real y poco construido.", "magnet"], ["❓", "Dudoso", "Falta convicción sostenida.", "mystery"], ["👔", "Con autoridad", "Presencia fuerte y ordenada.", "authority"], ["👻", "Invisible", "Poco impacto en comparación con la frase.", "mystery"], ["🏛️", "Imponente", "Hay grandeza clara en la forma de entrar.", "power"], ["🪨", "Compacto", "Todo suena unido y bien sostenido.", "calm"], ["🫀", "Vivo", "La voz parece estar dentro de lo que dice.", "magnet"], ["📌", "Firme", "La frase cae con seguridad y buen apoyo.", "authority"], ["🔍", "Lúcido", "Se percibe claridad mental en la entrega.", "mind"], ["🕶️", "Imperturbable", "Difícil imaginar que algo te saque del eje.", "calm"], ["🌙", "Enigmático", "Dejas fondo y reservas parte de ti.", "mystery"], ["💎", "Carismático", "Conectas rápido y dejas buena impresión.", "magnet"], ["🦊", "Perspicaz", "Tu voz sugiere observación y criterio.", "mind"], ["🛡️", "Inquebrantable", "Hay sensación de base fuerte y estable.", "authority"]] : [["👑", "Líder", "Tu voz transmite autoridad natural y sensación clara de control.", "authority"], ["🧲", "Magnético", "Tu tono atrae y mantiene la atención casi sin esfuerzo.", "magnet"], ["🔥", "Dominante", "Tu voz impone presencia y cuesta ignorarla.", "power"], ["🌊", "Sereno", "Tu voz tiene calma y estabilidad muy marcadas.", "calm"], ["🎯", "Preciso", "Cada palabra entra con intención y bastante limpieza.", "mind"], ["⚡", "Contundente", "Tu voz impacta sin demasiados rodeos.", "power"], ["🗣️", "Persuasivo", "Convences más por tono que por volumen.", "magnet"], ["🌀", "Hipnótico", "Tienes un ritmo vocal que invita a seguir escuchando.", "magnet"], ["🧱", "Sólido", "Se percibe una base firme y estable.", "calm"], ["⚖️", "Equilibrado", "Buena mezcla entre control, energía y foco.", "calm"], ["🧊", "Reservado", "Guardas más de lo que muestras al hablar.", "mystery"], ["🔥", "Intenso", "Tu energía se percibe alta desde el principio.", "power"], ["🔒", "Seguro", "Confianza clara en tu manera de entrar en la frase.", "authority"], ["❗", "Inseguro", "Se percibe duda en el tono o en el apoyo vocal.", "mystery"], ["⚪", "Neutral", "No generas un impacto especialmente definido.", "calm"], ["☀️", "Cálido", "Transmites cercanía sin perder estructura.", "magnet"], ["❄️", "Frío", "Tu tono deja cierta distancia emocional.", "mystery"], ["🎩", "Elegante", "Tu forma de hablar tiene estilo y control.", "mind"], ["➡️", "Directo", "Vas al punto y eso te da presencia.", "authority"], ["💥", "Explosivo", "Hay un empuje alto en la entrega.", "power"], ["♟️", "Estratégico", "Parece que eliges bien cada palabra.", "mind"], ["🌑", "Dominante silencioso", "No haces ruido, pero impones bastante.", "authority"], ["🎲", "Impredecible", "No eres fácil de anticipar del todo.", "mystery"], ["🔁", "Constante", "Mantienes una línea bastante estable.", "calm"], ["✂️", "Cortante", "Tu voz marca límites con claridad.", "authority"], ["🌿", "Flexible", "Te adaptas sin perder demasiada identidad.", "calm"], ["🧠", "Racional", "Predomina la estructura mental en tu tono.", "mind"], ["❤️", "Emocional", "Se percibe carga afectiva en la entrega.", "magnet"], ["🧊🔥", "Seguro contenido", "Hay control interno y bastante fondo.", "calm"], ["🛑", "Autoritario", "Ordenas más de lo que propones.", "authority"], ["🌫️", "Sutil", "Tu impacto es suave, pero está ahí.", "mystery"], ["🧲", "Convincente", "Difícil no creerte cuando entras bien.", "magnet"], ["⚔️", "Intimidante", "Generas presión vocal con facilidad.", "power"], ["🛋️", "Relajado", "Tu tono parece cómodo y poco forzado.", "calm"], ["🧭", "Determinado", "La dirección de tu voz está clara.", "authority"], ["🌊", "Fluido", "Hay naturalidad al hablar y poca fricción.", "magnet"], ["🌑", "Denso", "Cada palabra parece tener más peso del habitual.", "power"], ["🍃", "Ligero", "Tu tono es liviano y fácil de recibir.", "magnet"], ["🖊️", "Marcado", "Las frases dejan huella con facilidad.", "power"], ["🧱", "Estable", "Sin demasiados altibajos internos.", "calm"], ["⚡", "Volátil", "Cambios rápidos en energía o apoyo.", "power"], ["🔒", "Contenido", "Te guardas bastante aunque haya fondo.", "mystery"], ["🌞", "Abierto", "Tu voz suena disponible y poco defensiva.", "magnet"], ["🚪", "Frontal", "No hay demasiados filtros al entrar.", "authority"], ["🔄", "Indirecto", "No siempre vas directo al punto.", "mystery"], ["👑", "Seguro dominante", "Confianza y control van juntas aquí.", "authority"], ["⚠️", "Tenso", "Hay una presión interna notable en la voz.", "power"], ["🌙", "Suave", "Tono agradable y poco agresivo.", "magnet"], ["🔊", "Potente", "Gran presencia sonora al entrar.", "power"], ["🎛️", "Controlado", "Buen dominio de la intensidad y del foco.", "mind"], ["⏩", "Acelerado", "El ritmo va demasiado rápido y resta presencia.", "power"], ["⏸️", "Pausado", "Control del ritmo y de las entradas.", "calm"], ["🎯", "Enfocado", "Se nota bastante foco en cómo dices la frase.", "mind"], ["🌪️", "Disperso", "Falta algo de centro en la entrega.", "mystery"], ["🌿", "Seguro natural", "Confianza sin sensación de esfuerzo.", "authority"], ["🤖", "Forzado", "Se nota algo artificial o demasiado montado.", "mystery"], ["🧬", "Auténtico", "Suena real y poco construido.", "magnet"], ["❓", "Dudoso", "Falta convicción sostenida.", "mystery"], ["👔", "Con autoridad", "Presencia fuerte y ordenada.", "authority"], ["👻", "Invisible", "Poco impacto en comparación con la frase.", "mystery"], ["🏛️", "Imponente", "Hay grandeza clara en la forma de entrar.", "power"], ["🪨", "Compacto", "Todo suena unido y bien sostenido.", "calm"], ["🫀", "Vivo", "La voz parece estar dentro de lo que dice.", "magnet"], ["📌", "Firme", "La frase cae con seguridad y buen apoyo.", "authority"], ["🔍", "Lúcido", "Se percibe claridad mental en la entrega.", "mind"], ["🕶️", "Imperturbable", "Difícil imaginar que algo te saque del eje.", "calm"], ["🌙", "Enigmático", "Dejas fondo y reservas parte de ti.", "mystery"], ["💎", "Carismático", "Conectas rápido y dejas buena impresión.", "magnet"], ["🦊", "Perspicaz", "Tu voz sugiere observación y criterio.", "mind"], ["🛡️", "Inquebrantable", "Hay sensación de base fuerte y estable.", "authority"]];
   var tagsMap = lang==='es'
-    ? {authority:[['presencia','control','mando'],['autoridad','peso','decisión'],['firmeza','dirección','seguridad']],power:[['impacto','fuerza','presión'],['intensidad','energía','dominio'],['rebeldía','potencia','impulso']],mind:[['orden','precisión','lectura'],['astucia','observación','criterio'],['mente fría','estructura','detalle']],calm:[['templanza','estabilidad','calma'],['control','sangre fría','pausa'],['serenidad','equilibrio','fondo']],magnet:[['atracción','enganche','ritmo'],['carisma','conexión','calidez'],['magnetismo','interés','presencia']],mystery:[['misterio','fondo','reserva'],['intriga','matiz','distancia'],['profundidad','rareza','silencio']]}
-    : {authority:[['presence','control','command'],['authority','weight','decision'],['firmness','direction','security']],power:[['impact','strength','pressure'],['intensity','energy','dominance'],['rebellion','power','drive']],mind:[['order','precision','reading'],['sharpness','observation','judgment'],['cold mind','structure','detail']],calm:[['temperance','stability','calm'],['control','cold blood','pause'],['serenity','balance','depth']],magnet:[['attraction','pull','rhythm'],['charisma','connection','warmth'],['magnetism','interest','presence']],mystery:[['mystery','depth','reserve'],['intrigue','nuance','distance'],['depth','rarity','silence']]};
-  var modifiers = lang==='es' ? ['con fondo silencioso','con una calma poco común','sin necesidad de exagerar','con intención contenida','con bastante peso interno'] : ['with quiet depth','with unusual calm','without needing exaggeration','with contained intention','with strong inner weight'];
+    ? {"authority":[["presencia","control","mando"],["autoridad","peso","decisión"],["firmeza","dirección","seguridad"]],"power":[["impacto","fuerza","presión"],["intensidad","energía","dominio"],["potencia","carácter","empuje"]],"mind":[["orden","precisión","lectura"],["criterio","claridad","estructura"],["detalle","control","foco"]],"calm":[["templanza","estabilidad","calma"],["control","pausa","equilibrio"],["serenidad","fondo","estabilidad"]],"magnet":[["atracción","enganche","ritmo"],["carisma","conexión","calidez"],["magnetismo","interés","presencia"]],"mystery":[["misterio","fondo","reserva"],["intriga","matiz","distancia"],["profundidad","rareza","silencio"]],"respect":[["seguridad","criterio","presencia"],["respeto","lectura","control"],["seriedad","firmeza","criterio"]],"reserve":[["credibilidad","reserva","control"],["distancia","seguridad","medida"],["presencia","autocontrol","filtro"]],"cold":[["frialdad","seriedad","contención"],["reserva","corte","distancia"],["rigidez","filtro","silencio"]],"warm":[["cercanía","suavidad","comodidad"],["amabilidad","calma","apertura"],["humanidad","calidez","trato fácil"]]}
+    : {"authority":[["presence","control","command"],["authority","weight","decision"],["firmness","direction","security"]],"power":[["impact","strength","pressure"],["intensity","energy","dominance"],["power","character","drive"]],"mind":[["order","precision","reading"],["judgment","clarity","structure"],["detail","control","focus"]],"calm":[["temperance","stability","calm"],["control","pause","balance"],["serenity","depth","stability"]],"magnet":[["attraction","pull","rhythm"],["charisma","connection","warmth"],["magnetism","interest","presence"]],"mystery":[["mystery","depth","reserve"],["intrigue","nuance","distance"],["depth","rarity","silence"]],"respect":[["confidence","judgment","presence"],["respect","reading","control"],["seriousness","firmness","judgment"]],"reserve":[["credibility","reserve","control"],["distance","security","measure"],["presence","self-control","filter"]],"cold":[["coldness","seriousness","restraint"],["reserve","distance","filter"],["rigidity","control","silence"]],"warm":[["closeness","softness","comfort"],["kindness","calm","openness"],["humanity","warmth","ease"]] };
+  var endings = lang==='es'
+    ? ['desde el primer momento','sin necesidad de exagerar','con bastante naturalidad','aunque no busques impresionar','de una forma bastante clara']
+    : ['from the first moment','without needing exaggeration','in a fairly natural way','even without trying to impress','in a fairly clear way'];
   var pool = [];
-  for (var i=0;i<60;i++){
-    var b=bases[i%bases.length], tags=tagsMap[b[3]][i%tagsMap[b[3]].length];
-    var title=b[1]+(i<bases.length?'':' '+(lang==='es'?['Nocturno','Nítido','Firme','Silencioso','Estratégico'][i%5]:['Nocturnal','Clear','Firm','Silent','Strategic'][i%5]));
-    var desc=b[2]+' '+(lang==='es'?'Se nota una forma de estar ':'There is a way of being ')+modifiers[i%modifiers.length]+'.';
+  for(var i=0;i<bases.length;i++){
+    var b=bases[i], tags=(tagsMap[b[3]]||tagsMap['calm'])[i%3];
+    var title = lang==='es' ? b[1] : b[1];
+    var desc = lang==='es' ? (b[2] + ' Eso se nota ' + endings[i%endings.length] + '.') : (b[2] + ' It shows ' + endings[i%endings.length] + '.');
     pool.push({emoji:b[0],title:title,desc:desc,tags:tags,archetype:b[3]});
   }
   return pool;
 }
 
 function buildThoughtsPool(lang){
-  var bases = lang==='es'
-    ? [['🪞','Parece que sabes lo que haces','Tu voz transmite criterio y seguridad, como si tuvieras más control interno del que enseñas.','respect'],['🌙','Generas intriga','No suenas fácil de leer del todo, y eso hace que otros quieran entenderte mejor.','mystery'],['🤝','Das confianza, pero con distancia','Tu tono suena creíble y estable, aunque no completamente abierto desde el principio.','reserve'],['🧊','Suenas más frío de lo que quizá eres','La impresión general es sólida, pero algo contenida o emocionalmente lejana.','cold'],['✨','Tienes algo interesante','Tu voz deja una sensación de fondo poco obvia, como alguien que no enseña todo de golpe.','mystery'],['🌊','Transmites calma','Tu tono parece estable y poco caótico, como alguien que no se desordena fácilmente.','calm'],['🧭','Tienes presencia, pero te reservas','Hay base para impactar más, aunque pareces medir bastante lo que muestras.','reserve'],['🔍','Pareces observador','Tu forma de hablar sugiere que notas más de lo que dices.','respect'],['🫥','Suenas difícil de descifrar','No es fácil saber rápido qué hay detrás de tu tono.','mystery'],['☁️','Das suavidad, pero no debilidad','Tu tono parece amable, pero no completamente expuesto.','warm']]
-    : [['🪞','You sound like someone who knows what they are doing','Your voice conveys judgment and confidence, as if you have more inner control than you openly show.','respect'],['🌙','You create intrigue','You do not sound easy to read, and that can make people want to understand you better.','mystery'],['🤝','You inspire trust, but with distance','Your tone sounds credible and stable, although not fully open from the first moment.','reserve'],['🧊','You sound colder than you may be','The overall impression is solid, but emotionally restrained or distant.','cold'],['✨','There is something interesting about you','Your voice leaves a subtle feeling, like someone who does not reveal everything at once.','mystery'],['🌊','You project calm','Your tone feels stable and not chaotic, like someone who does not get thrown off easily.','calm'],['🧭','You have presence, but you hold back','There is a base to make more impact, although you seem measured in what you show.','reserve'],['🔍','You seem observant','The way you speak suggests you notice more than you say.','respect'],['🫥','You are hard to decode','It is not easy to quickly understand what is behind your tone.','mystery'],['☁️','You sound soft, but not weak','Your tone feels kind without sounding fully exposed.','warm']];
+  var bases = lang==='es' ? [["🤝", "Confían en ti", "Generas seguridad bastante rápido al escuchar.", "respect"], ["🧱", "Impones respeto", "Te toman en serio con facilidad.", "respect"], ["🧠", "Pareces interesante", "Despiertas curiosidad desde el tono.", "mystery"], ["❄️", "Pareces distante", "Cuesta entrar del todo en tu espacio.", "cold"], ["☀️", "Pareces cercano", "La voz invita a la conexión.", "warm"], ["👑", "Pareces líder", "Se percibe alguien con peso social.", "respect"], ["❗", "Pareces inseguro", "Las dudas se notan más de lo que te favorece.", "reserve"], ["🧱", "Pareces sólido", "La impresión general es fiable y estable.", "respect"], ["🧊", "Pareces frío", "Dejas distancia emocional clara.", "cold"], ["❤️", "Pareces cálido", "Se percibe humanidad y facilidad para conectar.", "warm"], ["🎭", "Generas intriga", "No suenas del todo fácil de leer.", "mystery"], ["🔥", "Pareces dominante", "Tu presencia va por delante de la frase.", "respect"], ["⚪", "Pareces neutro", "No destacas demasiado en una dirección clara.", "calm"], ["💪", "Pareces fuerte", "Hay base y peso en la impresión general.", "respect"], ["🫥", "Pareces débil", "La energía no sostiene bien la imagen que dejas.", "reserve"], ["🧬", "Pareces auténtico", "Suena real y poco forzado.", "warm"], ["🤖", "Pareces forzado", "La impresión tiene algo de montaje o esfuerzo visible.", "cold"], ["🧲", "Pareces atractivo", "La voz engancha y deja interés.", "warm"], ["😐", "Pareces aburrido", "No termina de generar curiosidad.", "cold"], ["🔥", "Pareces intenso", "La energía sale muy clara.", "respect"], ["🌊", "Pareces calmado", "La estabilidad es una de las primeras cosas que se notan.", "calm"], ["⚔️", "Pareces peligroso", "Hay algo de tensión o filo en tu tono.", "mystery"], ["♟️", "Pareces estratégico", "Da la impresión de que piensas bien lo que dices.", "respect"], ["❤️", "Pareces emocional", "Se percibe bastante carga afectiva.", "warm"], ["🧠", "Pareces lógico", "Predomina la cabeza sobre el impulso.", "respect"], ["🔒", "Pareces seguro", "Transmites base y poca vacilación.", "respect"], ["❓", "Pareces dudoso", "Falta decisión clara en algunos momentos.", "reserve"], ["📢", "Pareces influyente", "La voz tiene capacidad de arrastre.", "respect"], ["💤", "Pareces pasivo", "La entrada se queda corta en presencia.", "reserve"], ["🧱", "Pareces firme", "Hay estructura y sostén en tu manera de hablar.", "respect"], ["⚡", "Pareces volátil", "La impresión cambia demasiado rápido.", "reserve"], ["➡️", "Pareces directo", "Vas al punto y eso deja claridad.", "respect"], ["🔄", "Pareces evasivo", "No se termina de sentir una postura clara.", "reserve"], ["🌑", "Pareces fuerte silencioso", "No haces ruido, pero se nota bastante peso.", "mystery"], ["🤝", "Pareces confiable", "Se te puede creer con relativa facilidad.", "respect"], ["🧊", "Pareces desconfiado", "La voz parece estar algo protegida.", "cold"], ["👑", "Pareces líder nato", "La presencia de mando se percibe natural.", "respect"], ["👥", "Pareces seguidor", "No ocupas del todo el centro de la escena.", "reserve"], ["🧲", "Pareces magnético", "Hay algo en tu voz que hace querer seguir escuchando.", "warm"], ["📉", "Pareces plano", "Falta relieve emocional o direccional.", "cold"], ["🌿", "Pareces natural", "Nada suena excesivamente montado.", "warm"], ["⚠️", "Pareces tenso", "La presión interna se escucha.", "cold"], ["🛋️", "Pareces relajado", "La voz transmite comodidad.", "calm"], ["🧱", "Pareces serio", "La impresión tiene formalidad y peso.", "respect"], ["😊", "Pareces cercano", "Abres espacio sin parecer blando.", "warm"], ["🌫️", "Pareces lejano", "No resulta fácil entrar del todo en tu tono.", "cold"], ["❤️‍🔥", "Pareces fuerte emocional", "Hay intensidad y fondo humano a la vez.", "warm"], ["⚖️", "Pareces estable", "La impresión general está equilibrada.", "calm"], ["⚡", "Pareces impulsivo", "Da sensación de reacción rápida.", "reserve"], ["♟️", "Pareces calculador", "Mides bien lo que enseñas.", "mystery"], ["🌊", "Pareces seguro tranquilo", "Confianza sin demasiado ruido.", "calm"], ["🌿", "Pareces firme natural", "Presencia sin sobreactuar.", "respect"], ["🏛️", "Pareces imponente", "La entrada tiene dimensión social alta.", "respect"], ["👻", "Pareces invisible", "Poca huella en la primera escucha.", "reserve"], ["🧱", "Pareces sólido tranquilo", "La base pesa más que la intensidad.", "calm"], ["🧲", "Pareces carismático", "La voz deja una impresión agradable y con tirón.", "warm"], ["✔️", "Pareces creíble", "La entrega se siente bastante fiable.", "respect"], ["❗", "Pareces dudoso leve", "Hay pequeñas dudas, pero no rompen del todo la imagen.", "reserve"], ["🔥", "Pareces intenso controlado", "Hay energía con bastante contención.", "respect"], ["🎩", "Pareces dominante elegante", "Clase y control van juntas.", "respect"], ["🔍", "Pareces observador", "Da la impresión de que notas más de lo que dices.", "mystery"], ["🫶", "Pareces fácil de tratar", "Tu tono resulta cómodo y humano.", "warm"], ["🪨", "Pareces consistente", "La impresión se mantiene sin demasiadas variaciones.", "calm"], ["🕶️", "Pareces inaccesible", "Hay estilo, pero también barrera.", "cold"], ["🫂", "Pareces acogedor", "Tu voz hace espacio al otro.", "warm"], ["🧭", "Pareces centrado", "La presencia se siente ordenada y ubicada.", "respect"], ["🌙", "Pareces misterioso", "No enseñas todo y eso genera intriga.", "mystery"], ["📍", "Pareces muy presente", "Tu voz ocupa espacio de forma clara.", "respect"], ["☁️", "Pareces suave", "La impresión es ligera y poco agresiva.", "warm"], ["🛡️", "Pareces fiable", "La voz transmite estabilidad y pocas sorpresas.", "calm"]] : [["🤝", "Confían en ti", "Generas seguridad bastante rápido al escuchar.", "respect"], ["🧱", "Impones respeto", "Te toman en serio con facilidad.", "respect"], ["🧠", "Pareces interesante", "Despiertas curiosidad desde el tono.", "mystery"], ["❄️", "Pareces distante", "Cuesta entrar del todo en tu espacio.", "cold"], ["☀️", "Pareces cercano", "La voz invita a la conexión.", "warm"], ["👑", "Pareces líder", "Se percibe alguien con peso social.", "respect"], ["❗", "Pareces inseguro", "Las dudas se notan más de lo que te favorece.", "reserve"], ["🧱", "Pareces sólido", "La impresión general es fiable y estable.", "respect"], ["🧊", "Pareces frío", "Dejas distancia emocional clara.", "cold"], ["❤️", "Pareces cálido", "Se percibe humanidad y facilidad para conectar.", "warm"], ["🎭", "Generas intriga", "No suenas del todo fácil de leer.", "mystery"], ["🔥", "Pareces dominante", "Tu presencia va por delante de la frase.", "respect"], ["⚪", "Pareces neutro", "No destacas demasiado en una dirección clara.", "calm"], ["💪", "Pareces fuerte", "Hay base y peso en la impresión general.", "respect"], ["🫥", "Pareces débil", "La energía no sostiene bien la imagen que dejas.", "reserve"], ["🧬", "Pareces auténtico", "Suena real y poco forzado.", "warm"], ["🤖", "Pareces forzado", "La impresión tiene algo de montaje o esfuerzo visible.", "cold"], ["🧲", "Pareces atractivo", "La voz engancha y deja interés.", "warm"], ["😐", "Pareces aburrido", "No termina de generar curiosidad.", "cold"], ["🔥", "Pareces intenso", "La energía sale muy clara.", "respect"], ["🌊", "Pareces calmado", "La estabilidad es una de las primeras cosas que se notan.", "calm"], ["⚔️", "Pareces peligroso", "Hay algo de tensión o filo en tu tono.", "mystery"], ["♟️", "Pareces estratégico", "Da la impresión de que piensas bien lo que dices.", "respect"], ["❤️", "Pareces emocional", "Se percibe bastante carga afectiva.", "warm"], ["🧠", "Pareces lógico", "Predomina la cabeza sobre el impulso.", "respect"], ["🔒", "Pareces seguro", "Transmites base y poca vacilación.", "respect"], ["❓", "Pareces dudoso", "Falta decisión clara en algunos momentos.", "reserve"], ["📢", "Pareces influyente", "La voz tiene capacidad de arrastre.", "respect"], ["💤", "Pareces pasivo", "La entrada se queda corta en presencia.", "reserve"], ["🧱", "Pareces firme", "Hay estructura y sostén en tu manera de hablar.", "respect"], ["⚡", "Pareces volátil", "La impresión cambia demasiado rápido.", "reserve"], ["➡️", "Pareces directo", "Vas al punto y eso deja claridad.", "respect"], ["🔄", "Pareces evasivo", "No se termina de sentir una postura clara.", "reserve"], ["🌑", "Pareces fuerte silencioso", "No haces ruido, pero se nota bastante peso.", "mystery"], ["🤝", "Pareces confiable", "Se te puede creer con relativa facilidad.", "respect"], ["🧊", "Pareces desconfiado", "La voz parece estar algo protegida.", "cold"], ["👑", "Pareces líder nato", "La presencia de mando se percibe natural.", "respect"], ["👥", "Pareces seguidor", "No ocupas del todo el centro de la escena.", "reserve"], ["🧲", "Pareces magnético", "Hay algo en tu voz que hace querer seguir escuchando.", "warm"], ["📉", "Pareces plano", "Falta relieve emocional o direccional.", "cold"], ["🌿", "Pareces natural", "Nada suena excesivamente montado.", "warm"], ["⚠️", "Pareces tenso", "La presión interna se escucha.", "cold"], ["🛋️", "Pareces relajado", "La voz transmite comodidad.", "calm"], ["🧱", "Pareces serio", "La impresión tiene formalidad y peso.", "respect"], ["😊", "Pareces cercano", "Abres espacio sin parecer blando.", "warm"], ["🌫️", "Pareces lejano", "No resulta fácil entrar del todo en tu tono.", "cold"], ["❤️‍🔥", "Pareces fuerte emocional", "Hay intensidad y fondo humano a la vez.", "warm"], ["⚖️", "Pareces estable", "La impresión general está equilibrada.", "calm"], ["⚡", "Pareces impulsivo", "Da sensación de reacción rápida.", "reserve"], ["♟️", "Pareces calculador", "Mides bien lo que enseñas.", "mystery"], ["🌊", "Pareces seguro tranquilo", "Confianza sin demasiado ruido.", "calm"], ["🌿", "Pareces firme natural", "Presencia sin sobreactuar.", "respect"], ["🏛️", "Pareces imponente", "La entrada tiene dimensión social alta.", "respect"], ["👻", "Pareces invisible", "Poca huella en la primera escucha.", "reserve"], ["🧱", "Pareces sólido tranquilo", "La base pesa más que la intensidad.", "calm"], ["🧲", "Pareces carismático", "La voz deja una impresión agradable y con tirón.", "warm"], ["✔️", "Pareces creíble", "La entrega se siente bastante fiable.", "respect"], ["❗", "Pareces dudoso leve", "Hay pequeñas dudas, pero no rompen del todo la imagen.", "reserve"], ["🔥", "Pareces intenso controlado", "Hay energía con bastante contención.", "respect"], ["🎩", "Pareces dominante elegante", "Clase y control van juntas.", "respect"], ["🔍", "Pareces observador", "Da la impresión de que notas más de lo que dices.", "mystery"], ["🫶", "Pareces fácil de tratar", "Tu tono resulta cómodo y humano.", "warm"], ["🪨", "Pareces consistente", "La impresión se mantiene sin demasiadas variaciones.", "calm"], ["🕶️", "Pareces inaccesible", "Hay estilo, pero también barrera.", "cold"], ["🫂", "Pareces acogedor", "Tu voz hace espacio al otro.", "warm"], ["🧭", "Pareces centrado", "La presencia se siente ordenada y ubicada.", "respect"], ["🌙", "Pareces misterioso", "No enseñas todo y eso genera intriga.", "mystery"], ["📍", "Pareces muy presente", "Tu voz ocupa espacio de forma clara.", "respect"], ["☁️", "Pareces suave", "La impresión es ligera y poco agresiva.", "warm"], ["🛡️", "Pareces fiable", "La voz transmite estabilidad y pocas sorpresas.", "calm"]];
   var tagsMap = lang==='es'
-    ? {respect:[['seguridad','criterio','presencia'],['respeto','lectura','control'],['seriedad','firmeza','criterio']],mystery:[['intriga','fondo','curiosidad'],['misterio','matiz','distancia'],['rareza','interés','silencio']],reserve:[['credibilidad','reserva','control'],['distancia','seguridad','medida'],['presencia','autocontrol','filtro']],cold:[['frialdad','seriedad','contención'],['reserva','corte','distancia'],['rigidez','filtro','silencio']],calm:[['calma','estabilidad','templanza'],['paz','equilibrio','pausa'],['serenidad','orden','control']],warm:[['cercanía','suavidad','comodidad'],['amabilidad','calma','apertura'],['trato fácil','humanidad','calidez']]}
-    : {respect:[['confidence','judgment','presence'],['respect','reading','control'],['seriousness','firmness','judgment']],mystery:[['intrigue','depth','curiosity'],['mystery','nuance','distance'],['rarity','interest','silence']],reserve:[['credibility','reserve','control'],['distance','security','measure'],['presence','self-control','filter']],cold:[['coldness','seriousness','restraint'],['reserve','distance','filter'],['rigidity','control','silence']],calm:[['calm','stability','temperance'],['peace','balance','pause'],['serenity','order','control']],warm:[['closeness','softness','comfort'],['kindness','calm','openness'],['easygoing','humanity','warmth']]};
-  var endings = lang==='es' ? ['desde el primer momento','sin necesidad de hablar demasiado','aunque no busques impresionar','de manera bastante natural','con una reserva que pesa'] : ['from the first moment','without needing to say much','even if you are not trying to impress','in a very natural way','with a reserve that carries weight'];
+    ? {"authority":[["presencia","control","mando"],["autoridad","peso","decisión"],["firmeza","dirección","seguridad"]],"power":[["impacto","fuerza","presión"],["intensidad","energía","dominio"],["potencia","carácter","empuje"]],"mind":[["orden","precisión","lectura"],["criterio","claridad","estructura"],["detalle","control","foco"]],"calm":[["templanza","estabilidad","calma"],["control","pausa","equilibrio"],["serenidad","fondo","estabilidad"]],"magnet":[["atracción","enganche","ritmo"],["carisma","conexión","calidez"],["magnetismo","interés","presencia"]],"mystery":[["misterio","fondo","reserva"],["intriga","matiz","distancia"],["profundidad","rareza","silencio"]],"respect":[["seguridad","criterio","presencia"],["respeto","lectura","control"],["seriedad","firmeza","criterio"]],"reserve":[["credibilidad","reserva","control"],["distancia","seguridad","medida"],["presencia","autocontrol","filtro"]],"cold":[["frialdad","seriedad","contención"],["reserva","corte","distancia"],["rigidez","filtro","silencio"]],"warm":[["cercanía","suavidad","comodidad"],["amabilidad","calma","apertura"],["humanidad","calidez","trato fácil"]]}
+    : {"authority":[["presence","control","command"],["authority","weight","decision"],["firmness","direction","security"]],"power":[["impact","strength","pressure"],["intensity","energy","dominance"],["power","character","drive"]],"mind":[["order","precision","reading"],["judgment","clarity","structure"],["detail","control","focus"]],"calm":[["temperance","stability","calm"],["control","pause","balance"],["serenity","depth","stability"]],"magnet":[["attraction","pull","rhythm"],["charisma","connection","warmth"],["magnetism","interest","presence"]],"mystery":[["mystery","depth","reserve"],["intrigue","nuance","distance"],["depth","rarity","silence"]],"respect":[["confidence","judgment","presence"],["respect","reading","control"],["seriousness","firmness","judgment"]],"reserve":[["credibility","reserve","control"],["distance","security","measure"],["presence","self-control","filter"]],"cold":[["coldness","seriousness","restraint"],["reserve","distance","filter"],["rigidity","control","silence"]],"warm":[["closeness","softness","comfort"],["kindness","calm","openness"],["humanity","warmth","ease"]] };
+  var endings = lang==='es'
+    ? ['desde el primer momento','sin necesidad de exagerar','con bastante naturalidad','aunque no busques impresionar','de una forma bastante clara']
+    : ['from the first moment','without needing exaggeration','in a fairly natural way','even without trying to impress','in a fairly clear way'];
   var pool = [];
-  for (var i=0;i<60;i++){
-    var b=bases[i%bases.length], tags=tagsMap[b[3]][i%tagsMap[b[3]].length];
-    var desc=b[2]+' '+(lang==='es'?'Eso se nota ':'That shows ')+endings[i%endings.length]+'.';
-    pool.push({emoji:b[0],title:b[1],desc:desc,tags:tags,archetype:b[3]});
+  for(var i=0;i<bases.length;i++){
+    var b=bases[i], tags=(tagsMap[b[3]]||tagsMap['calm'])[i%3];
+    var title = lang==='es' ? b[1] : b[1];
+    var desc = lang==='es' ? (b[2] + ' Eso se nota ' + endings[i%endings.length] + '.') : (b[2] + ' It shows ' + endings[i%endings.length] + '.');
+    pool.push({emoji:b[0],title:title,desc:desc,tags:tags,archetype:b[3]});
   }
   return pool;
 }
@@ -928,7 +952,7 @@ function checkIncomingChallenge(){
     if(data.lang) state.lang = data.lang;
 
     if(typeof setLang === 'function') setLang(state.lang);
-renderAddictiveExtras();
+vmRenderProgress();
     if(typeof updateModeHeader === 'function') updateModeHeader();
     state.currentPrompt = data.prompt;
     if($('promptText')) renderPrompt(state.currentPrompt)
@@ -966,6 +990,7 @@ function useIncomingChallenge(){
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = 'btn btn-secondary hidden';
   if(typeof updateDuelButton === 'function') updateDuelButton();
   showScreen('mode');
+  scrollTopApp();
 }
 function getDuelOutcome(myResult, rivalResult){
   var rivalConfidence = rivalResult ? (rivalResult.confidence || (rivalResult.result ? rivalResult.result.confidence : 0) || 0) : 0;
@@ -1061,6 +1086,7 @@ function startRematch(){
   if($('challengeFriendBtn')) $('challengeFriendBtn').className='btn btn-secondary hidden';
   if($('duelBtn')) $('duelBtn').className='btn btn-secondary hidden';
   showScreen('mode');
+  scrollTopApp();
 }
 
 
@@ -1148,10 +1174,8 @@ function profileAdviceText(summary){
   return state.lang==='es' ? 'Haz 5–10 tomas más mezclando Desafíos y Escenarios. Ahí empezará a verse un perfil mucho más preciso.' : 'Do 5–10 more takes mixing Challenges and Scenarios. That is where a much more precise profile starts to appear.';
 }
 function renderProfile(){
-  var p = state.progress;
+  var p = state.progress || {};
   var summary = getProfileSummary();
-  var levelData = getCurrentLevelData();
-  var goal = getDynamicGoal();
   var takes = p.takes || 0;
   var levels = {
     presence: Math.min(100, Math.round(summary.energy*0.45 + summary.confidence*0.55)),
@@ -1161,17 +1185,11 @@ function renderProfile(){
   var modes = p.modes || {};
   var modeNames = {personality: tt().personality, thoughts: tt().thoughts, challenge: tt().challenge, scene: tt().scene};
 
-  $('currentLevelBadge').innerHTML = '<span class="level-dot"></span><span>' + (state.lang==='es' ? 'Nivel ' : 'Level ') + levelData.current.n + ' · ' + levelData.current.name + '</span>';
-  $('levelProgressMini').innerHTML = (state.lang==='es' ? 'Media actual: ' : 'Current average: ') + levelData.avgScore + '/100';
-  $('goalMain').innerHTML = goal.main;
-  $('goalSub').innerHTML = goal.sub;
-  $('goalMini').innerHTML = goal.mini;
-
   $('profileArchetype').innerHTML = summary.title;
   $('profileArchetypeDesc').innerHTML = summary.desc;
   $('profileTakes').innerHTML = takes;
   $('profileBest').innerHTML = p.bestScore || 0;
-  $('profileStreak').innerHTML = p.streak || 0;
+  $('profileWins').innerHTML = p.wins || 0;
   $('profileFavorite').innerHTML = favoriteModeText();
 
   $('presenceValue').innerHTML = levels.presence;
@@ -1249,103 +1267,6 @@ function getLeadingEmoji(title){
   return m ? m[1] : '🎯';
 }
 
-
-function getCurrentLevelData(){
-  var p = state.progress || {};
-  var takes = p.takes || 0;
-  var avgScore = 0;
-  var denom = 0;
-  ['personality','thoughts','challenge','scene'].forEach(function(m){
-    var t = p.modes && p.modes[m] ? p.modes[m].takes : 0;
-    var s = p.modes && p.modes[m] ? p.modes[m].score : 0;
-    if(t){ avgScore += Math.round(s/t); denom += 1; }
-  });
-  avgScore = denom ? Math.round(avgScore/denom) : 0;
-  var levels = state.lang==='es'
-    ? [
-      {n:1,name:'Despiertas', needTakes:0, needAvg:0},
-      {n:2,name:'Presencia', needTakes:6, needAvg:68},
-      {n:3,name:'Control', needTakes:12, needAvg:72},
-      {n:4,name:'Impacto', needTakes:20, needAvg:77},
-      {n:5,name:'Dominio', needTakes:32, needAvg:83}
-    ]
-    : [
-      {n:1,name:'Awakening', needTakes:0, needAvg:0},
-      {n:2,name:'Presence', needTakes:6, needAvg:68},
-      {n:3,name:'Control', needTakes:12, needAvg:72},
-      {n:4,name:'Impact', needTakes:20, needAvg:77},
-      {n:5,name:'Mastery', needTakes:32, needAvg:83}
-    ];
-  var current = levels[0];
-  for(var i=0;i<levels.length;i++){
-    if(takes >= levels[i].needTakes && avgScore >= levels[i].needAvg) current = levels[i];
-  }
-  var next = levels[Math.min(levels.length-1, current.n)];
-  if(current.n === levels.length) next = null;
-  return {current:current,next:next,takes:takes,avgScore:avgScore};
-}
-function getDynamicGoal(){
-  var data = getCurrentLevelData();
-  var p = state.progress || {};
-  var takes = data.takes;
-  var avgScore = data.avgScore;
-  if(!data.next){
-    return state.lang==='es'
-      ? {main:'Has alcanzado Dominio.', sub:'Ahora el objetivo es mantener tu media alta y ampliar matices entre modos.', mini:'Siguiente reto recomendado: mezcla Desafíos y Escenarios para afinar tu perfil.'}
-      : {main:'You reached Mastery.', sub:'Now the goal is to sustain your high average and widen nuance across modes.', mini:'Recommended next step: mix Challenges and Scenarios to refine your profile.'};
-  }
-  var missingTakes = Math.max(0, data.next.needTakes - takes);
-  var missingAvg = Math.max(0, data.next.needAvg - avgScore);
-
-  var modes = p.modes || {};
-  var modeNames = {personality: tt().personality, thoughts: tt().thoughts, challenge: tt().challenge, scene: tt().scene};
-  var weakest = 'challenge'; var weakestAvg = 999;
-  ['personality','thoughts','challenge','scene'].forEach(function(m){
-    var t = modes[m] ? modes[m].takes : 0;
-    var s = modes[m] ? modes[m].score : 0;
-    var a = t ? Math.round(s/t) : 0;
-    if(a < weakestAvg){ weakestAvg = a; weakest = m; }
-  });
-
-  if(missingTakes > 0 && missingAvg > 0){
-    return state.lang==='es'
-      ? {
-          main:'Te faltan ' + missingTakes + ' tomas para subir a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
-          sub:'Además necesitas subir tu media unos ' + missingAvg + ' puntos para entrar en ese nivel.',
-          mini:'Ahora mismo tu modo más débil es ' + (modeNames[weakest] || weakest) + '.'
-        }
-      : {
-          main:'You need ' + missingTakes + ' more takes to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
-          sub:'You also need to raise your average by about ' + missingAvg + ' points to enter that level.',
-          mini:'Right now your weakest mode is ' + (modeNames[weakest] || weakest) + '.'
-        };
-  }
-  if(missingTakes > 0){
-    return state.lang==='es'
-      ? {
-          main:'Te faltan ' + missingTakes + ' tomas para subir a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
-          sub:'La media ya está cerca o dentro del rango. Ahora necesitas volumen real de práctica.',
-          mini:'Consejo: alterna 2 Desafíos y 2 Escenarios para subir más sólido.'
-        }
-      : {
-          main:'You need ' + missingTakes + ' more takes to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
-          sub:'Your average is already close enough. Now you need real practice volume.',
-          mini:'Tip: alternate 2 Challenges and 2 Scenarios for a stronger climb.'
-        };
-  }
-  return state.lang==='es'
-    ? {
-        main:'Te falta subir tu media ' + missingAvg + ' puntos para llegar a Nivel ' + data.next.n + ' · ' + data.next.name + '.',
-        sub:'Ya tienes suficiente actividad. El salto ahora depende de afinar control, presencia y credibilidad.',
-        mini:'Consejo: insiste en ' + (modeNames[weakest] || weakest) + ', que es donde más margen tienes.'
-      }
-    : {
-        main:'You need to raise your average by ' + missingAvg + ' points to reach Level ' + data.next.n + ' · ' + data.next.name + '.',
-        sub:'You already have enough activity. The jump now depends on refining control, presence and credibility.',
-        mini:'Tip: focus on ' + (modeNames[weakest] || weakest) + ', which is where you still have the most room.'
-      };
-}
-
 function setLang(lang){
   state.lang=lang;
   $('langEs').className='lang-btn'+(lang==='es'?' active':'');
@@ -1390,9 +1311,10 @@ function setLang(lang){
   if($('incomingChallengeTitle')) $('incomingChallengeTitle').innerHTML=tt().incomingChallengeTitle;
   if($('compareBtn')) $('compareBtn').innerHTML=tt().compareBtn;
   $('recordStatus').innerHTML=state.isRecording?tt().recordOn:tt().recordIdle;
+  if($('recordTime')) $('recordTime').innerHTML=((state.recordSeconds||0).toFixed(1)+' s');
+  if($('recordTime')) $('recordTime').innerHTML=((state.recordSeconds||0).toFixed(1)+' s');
   if($('recordTime')) $('recordTime').innerHTML = ((state.recordSeconds||0).toFixed(1) + ' s');
   if($('profileTitle')) $('profileTitle').innerHTML = state.lang==='es' ? '📈 Perfil de voz' : '📈 Voice profile';
-  if($('goalMain') && $('profile').classList && !$('profile').classList.contains('hidden')){ try{ renderProfile(); }catch(e){} }
   if($('profileSub')) $('profileSub').innerHTML = state.lang==='es' ? 'Evolución acumulada y fortalezas' : 'Accumulated evolution and strengths';
   if($('profileHomeBtn')) $('profileHomeBtn').innerHTML = tt().homeBtn;
   if($('profileArchetypeLabel')) $('profileArchetypeLabel').innerHTML = state.lang==='es' ? 'Lectura global' : 'Global reading';
@@ -1442,11 +1364,13 @@ function openMode(mode){
     }
   }
   showScreen('mode');
+  scrollTopApp();
 }
 
 function clearResult(){
   state.recordSeconds = 0;
   if($('recordTime')) $('recordTime').innerHTML = '0.0 s';
+  resetCustomPlayer();
   $('resultTitle').innerHTML=tt().resultPlaceholderTitle;
   $('resultDesc').innerHTML=tt().resultPlaceholderDesc;
   $('resultExtra').innerHTML='';
@@ -1457,6 +1381,8 @@ function clearResult(){
   $('compareBox').style.display='none';
   $('insightBox').style.display='none';
   $('scoreBox').className='score-box hidden';
+  $('scoreBox').style.display='none';
+  try{ vmRenderProgress(); }catch(e){}
 }
 
 
@@ -1498,24 +1424,97 @@ function renderPrompt(raw){
   $('promptText').innerHTML = "<div class='prompt-dialog'><div class='prompt-dialog-text'>" + raw + "</div></div>";
 }
 
+
+function getPromptFamily(prompt, mode){
+  var p=(prompt||'').toLowerCase();
+  if(mode==='personality'){
+    if(/seguridad|autoridad|domin|convicci|precisa|firme/.test(p)) return 'security';
+    if(/calma|sereno|tranquil|silencio|centrad/.test(p)) return 'calm';
+    if(/impacto|huella|presencia|peso/.test(p)) return 'impact';
+    return 'base';
+  }
+  if(mode==='thoughts'){
+    if(/confianza|trust|primera impresión|first impression/.test(p)) return 'trust';
+    if(/mister|fr[ií]a|warm|cálida|cercan/.test(p)) return 'social';
+    if(/distancia|barrera|distance|reserved|reserv/.test(p)) return 'distance';
+    return 'base';
+  }
+  if(mode==='challenge'){
+    if(/líder|leader|controla la sala|owning/.test(p)) return 'authority';
+    if(/calma|quirúrgica|surgical|control/.test(p)) return 'control';
+    if(/miedo|peligro|danger|escond/.test(p)) return 'dark';
+    if(/ganar|seducción|seduction|magnet/.test(p)) return 'magnetic';
+    return 'generic';
+  }
+  if(mode==='scene'){
+    if(/entrevista|interview|reunión|meeting/.test(p)) return 'professional';
+    if(/cita|date|conociendo/.test(p)) return 'social';
+    if(/mala noticia|bad news|calmando|tenso/.test(p)) return 'emotional';
+    if(/película|movie|escena final/.test(p)) return 'cinematic';
+    return 'generic';
+  }
+  return 'base';
+}
+function getPreferredPromptFamily(){
+  var title = ((state.lastResult && state.lastResult.title) || '').toLowerCase();
+  if(state.mode==='personality'){
+    if(/domin|lider|leader|hipn[oó]tico|estrat[eé]gico/.test(title)) return 'calm';
+    if(/reserv|insegur|duda|fr[aá]gil/.test(title)) return 'security';
+  }
+  if(state.mode==='thoughts'){
+    if(/fr[ií]o|distant|mister/.test(title)) return 'trust';
+    if(/cercan|warm|confianza|reliable/.test(title)) return 'distance';
+  }
+  if(state.mode==='challenge'){
+    if(/domin|brut|imparable/.test(title)) return 'control';
+    if(/irregular|fail|plano|weak/.test(title)) return 'authority';
+  }
+  if(state.mode==='scene'){
+    if(/encaja|credible|fit/.test(title)) return 'cinematic';
+    if(/no entra|weak|neutral/.test(title)) return 'professional';
+  }
+  return '';
+}
+function chooseSmartPrompt(pool){
+  var history = state.promptHistory[state.lang][state.mode] || [];
+  var recentTexts = history.slice(-14).map(function(x){ return x.text; });
+  var recentFamilies = history.slice(-5).map(function(x){ return x.family; });
+  var preferred = getPreferredPromptFamily();
+
+  var candidates = pool.filter(function(p){ return recentTexts.indexOf(p)===-1; });
+  if(!candidates.length) candidates = pool.slice();
+
+  if(preferred){
+    var preferredCandidates = candidates.filter(function(p){ return getPromptFamily(p, state.mode)===preferred; });
+    if(preferredCandidates.length && Math.random() < 0.7) candidates = preferredCandidates;
+  }
+
+  var familyFiltered = candidates.filter(function(p){ return recentFamilies.indexOf(getPromptFamily(p, state.mode))===-1; });
+  if(familyFiltered.length >= 3) candidates = familyFiltered;
+
+  var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+  state.promptHistory[state.lang][state.mode].push({text:chosen,family:getPromptFamily(chosen,state.mode)});
+  if(state.promptHistory[state.lang][state.mode].length > 18) state.promptHistory[state.lang][state.mode].shift();
+  return chosen;
+}
+
 function nextPrompt(){
   state.pendingCompare=false;
-
   if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
     state.currentPrompt = state.incomingChallenge.prompt;
   } else {
-    state.currentPrompt=randomFrom(prompts[state.mode][state.lang]);
+    state.currentPrompt = chooseSmartPrompt(prompts[state.mode][state.lang]);
   }
-
-  renderPrompt(state.currentPrompt)
+  renderPrompt(state.currentPrompt);
   clearResult();
-
+  scrollTopApp();
+  setTimeout(scrollTopApp, 30);
   if($('challengeFriendBtn')) $('challengeFriendBtn').className = (state.mode==='challenge' && state.lastResult && state.lastResult.mode==='challenge' && !state.autoChallengeMode) ? 'btn btn-secondary' : 'btn btn-secondary hidden';
   if(state.mode==='challenge' && state.incomingChallenge && $('incomingChallengeBox')) $('incomingChallengeBox').className='panel';
   if(typeof updateDuelButton === 'function') updateDuelButton();
 }
 
-function retrySamePrompt(){
+function retrySamePrompt(){ scrollTopApp();
   state.pendingCompare=true;
   $('resultTitle').innerHTML=tt().retryTitle;
   $('resultDesc').innerHTML=tt().retryDesc;
@@ -1651,49 +1650,60 @@ function filterBySceneSubProfile(pool, sub){
 }
 
 function chooseResult(energy,clarity,confidence){
-  var pool = results[state.mode][state.lang];
-  var offset = Math.floor((energy*3 + clarity*5 + confidence*7 + (state.currentPrompt||'').length) % 997);
+  try{
+    var pool = results[state.mode][state.lang];
+    if(!pool || !pool.length) return null;
+    var offset = Math.floor((energy*3 + clarity*5 + confidence*7 + (state.currentPrompt||'').length) % 997);
 
-  if(state.mode==='personality'){
-    var bandP = getBandForPersonality(energy,clarity,confidence);
-    var candidatesP = pool.filter(function(x){ return x.archetype===bandP; });
-    if(!candidatesP.length) candidatesP = pool.slice();
-    candidatesP = filterRepeated(candidatesP);
-    return candidatesP[offset % candidatesP.length];
+    if(state.mode==='personality'){
+      var bandP = getBandForPersonality(energy,clarity,confidence);
+      var candidatesP = pool.filter(function(x){ return x.archetype===bandP; });
+      if(!candidatesP.length) candidatesP = pool.slice();
+      candidatesP = filterRepeated(candidatesP);
+      return candidatesP[offset % candidatesP.length];
+    }
+
+    if(state.mode==='thoughts'){
+      var bandT = getBandForThoughts(energy,clarity,confidence);
+      var candidatesT = pool.filter(function(x){ return x.archetype===bandT; });
+      if(!candidatesT.length) candidatesT = pool.slice();
+      candidatesT = filterRepeated(candidatesT);
+      return candidatesT[offset % candidatesT.length];
+    }
+
+    if(state.mode==='challenge'){
+      var intent = getChallengeIntent(state.currentPrompt);
+      var bandC = getBandForChallenge(energy,clarity,confidence,intent);
+      var candidatesC = pool.filter(function(x){ return x.archetype===bandC; });
+      if(!candidatesC.length) candidatesC = pool.slice();
+      var subC = getSubProfileForChallenge(energy,clarity,confidence,intent);
+      candidatesC = filterByChallengeSubProfile(candidatesC, subC);
+      candidatesC = filterRepeated(candidatesC);
+      return candidatesC[offset % candidatesC.length];
+    }
+
+    if(state.mode==='scene'){
+      var sceneIntent = getSceneIntent(state.currentPrompt);
+      var bandS = getBandForScene(energy,clarity,confidence,sceneIntent);
+      var candidatesS = pool.filter(function(x){ return x.archetype===bandS; });
+      if(!candidatesS.length) candidatesS = pool.slice();
+      var subS = getSubProfileForScene(energy,clarity,confidence,sceneIntent);
+      candidatesS = filterBySceneSubProfile(candidatesS, subS);
+      candidatesS = filterRepeated(candidatesS);
+      if(!candidatesS.length) candidatesS = pool.slice();
+      return candidatesS[offset % candidatesS.length];
+    }
+
+    var fallback = filterRepeated(pool.slice());
+    return fallback[offset % fallback.length];
+  }catch(e){
+    try{
+      var safePool = results[state.mode][state.lang];
+      return safePool && safePool.length ? safePool[0] : null;
+    }catch(err){
+      return null;
+    }
   }
-
-  if(state.mode==='thoughts'){
-    var bandT = getBandForThoughts(energy,clarity,confidence);
-    var candidatesT = pool.filter(function(x){ return x.archetype===bandT; });
-    if(!candidatesT.length) candidatesT = pool.slice();
-    candidatesT = filterRepeated(candidatesT);
-    return candidatesT[offset % candidatesT.length];
-  }
-
-  if(state.mode==='challenge'){
-    var intent = getChallengeIntent(state.currentPrompt);
-    var bandC = getBandForChallenge(energy,clarity,confidence,intent);
-    var candidatesC = pool.filter(function(x){ return x.archetype===bandC; });
-    if(!candidatesC.length) candidatesC = pool.slice();
-    var subC = getSubProfileForChallenge(energy,clarity,confidence,intent);
-    candidatesC = filterByChallengeSubProfile(candidatesC, subC);
-    candidatesC = filterRepeated(candidatesC);
-    return candidatesC[offset % candidatesC.length];
-  }
-
-  if(state.mode==='scene'){
-    var sceneIntent = getSceneIntent(state.currentPrompt);
-    var bandS = getBandForScene(energy,clarity,confidence,sceneIntent);
-    var candidatesS = pool.filter(function(x){ return x.archetype===bandS; });
-    if(!candidatesS.length) candidatesS = pool.slice();
-    var subS = getSubProfileForScene(energy,clarity,confidence,sceneIntent);
-    candidatesS = filterBySceneSubProfile(candidatesS, subS);
-    candidatesS = filterRepeated(candidatesS);
-    return candidatesS[offset % candidatesS.length];
-  }
-
-  var fallback = filterRepeated(pool.slice());
-  return fallback[offset % fallback.length];
 }
 
 function renderComparison(current){
@@ -1775,7 +1785,10 @@ function renderScore(energy,clarity,confidence){
     scoreText.innerHTML = state.lang==='es'
       ? 'Se ha detectado muy poca voz real. La toma necesita más voz clara para que el análisis sea fiable.'
       : 'Very little real voice was detected. This take needs clearer voice for a reliable analysis.';
-  } else if(state.mode==='challenge'){
+    return score;
+  }
+
+  if(state.mode==='challenge'){
     scoreText.innerHTML = state.lang==='es'
       ? (score>=85 ? 'Reto muy bien resuelto: tu voz entra con fuerza, intención y bastante control.' :
          score>=70 ? 'Buen reto: hay base y momentos potentes, aunque todavía puedes afinar más la entrada.' :
@@ -1800,8 +1813,7 @@ function renderScore(energy,clarity,confidence){
          score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
-
-  renderAddictiveExtras(score, metricsSilent);
+  vmRenderProgress(score);
   return score;
 }
 
@@ -1852,26 +1864,58 @@ function playTone(type){
 }
 
 function finishRecording(){
-  stopBar(); animateViz(true);
-  var blob=new Blob(state.chunks,{type:'audio/webm'});
+  stopBar();
+  animateViz(true);
+  stopRecordTimer();
+  stopLiveAudioAnalysis();
+
+  var blobType = state.recordMimeType || (state.mediaRecorder && state.mediaRecorder.mimeType) || 'audio/mp4';
+  var blob=new Blob(state.chunks,{type:blobType});
   if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
   state.audioUrl=URL.createObjectURL(blob);
-  $('audioPlayer').src=state.audioUrl; $('audioPlayer').style.display='block';
+  $('audioPlayer').src=state.audioUrl;
+  $('audioPlayer').load();
+  $('audioPlayer').style.display='none';
 
   var duration = Math.max(0.8, state.recordSeconds || 0);
-  var durationBoost = Math.min(8, Math.round(duration * 1.2));
-  var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
-  clarity = Math.min(98, clarity + (duration > 2.6 ? 2 : 0));
-  confidence = Math.min(98, confidence + durationBoost);
-  if(confidence>98) confidence=98;
+  updateRecordTime(duration);
+
+  try{
+    $('audioPlayer').onplay = syncCustomPlayer;
+    $('audioPlayer').onpause = syncCustomPlayer;
+    $('audioPlayer').ontimeupdate = syncCustomPlayer;
+    $('audioPlayer').onended = function(){
+      try{ $('audioPlayer').currentTime = 0; }catch(e){}
+      syncCustomPlayer();
+    };
+    $('audioPlayer').onloadedmetadata = function(){ syncCustomPlayer(); };
+  }catch(e){}
+  showCustomPlayer();
+
+  var metrics = computeMetricsFromAudio(duration);
+  var energy = metrics.energy;
+  var clarity = metrics.clarity;
+  var confidence = metrics.confidence;
+
   if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
 
-  var chosen=chooseResult(energy,clarity,confidence);
-  if(!chosen){ chosen = results[state.mode][state.lang][0]; }
+  var chosen = null;
+  try{ chosen = chooseResult(energy,clarity,confidence); }catch(e){ chosen = null; }
+
+  if(metrics.silent){
+    try{
+      var weakPool = (results[state.mode][state.lang] || []).filter(function(x){ return x.archetype==='weak' || x.archetype==='reserve' || x.archetype==='mystery' || x.archetype==='cold'; });
+      if(weakPool.length) chosen = weakPool[0];
+    }catch(e){}
+  }
+
+  if(!chosen){
+    try{ chosen = results[state.mode][state.lang][0]; }catch(e){ chosen = {emoji:'🎭',title:(state.lang==='es'?'Resultado generado':'Generated result'),desc:(state.lang==='es'?'La app generó un resultado de respaldo.':'The app generated a fallback result.'),tags:['voz','resultado','análisis'],archetype:'mid'}; }
+  }
+
   var result={mode:state.mode,prompt:state.currentPrompt,energy:energy,clarity:clarity,confidence:confidence,title:chosen.emoji+' '+chosen.title,desc:chosen.desc,tags:chosen.tags,archetype:chosen.archetype};
   state.lastResult=result;
   rememberResult(result);
-  updateProgress(result);
   if(state.mode==='personality' || state.mode==='thoughts') state.saved[state.mode]=result;
   if(state.mode==='challenge'){ state.lastChallengeScore=getChallengeScore(result); state.lastChallengeResult=result; if($('challengeFriendBtn')) $('challengeFriendBtn').className = state.autoChallengeMode ? 'btn btn-secondary hidden' : 'btn btn-secondary'; }
   saveToHistory(result);
@@ -1880,9 +1924,18 @@ function finishRecording(){
 
   $('resultTitle').innerHTML=result.title;
   $('resultDesc').innerHTML=result.desc;
-  $('resultExtra').innerHTML=state.lang==='es'?'Toma registrada. El resultado se ajusta a tu energía, claridad, confianza y evita repetir lecturas recientes.':'Take recorded. The result adapts to your energy, clarity, confidence, and avoids repeating recent readings.';
+  $('resultExtra').innerHTML=state.lang==='es'
+    ? ('Toma registrada ('+duration.toFixed(1)+' s).' + (metrics.silent ? ' Se detectó muy poca voz real en la toma.' : ''))
+    : ('Take recorded ('+duration.toFixed(1)+' s).' + (metrics.silent ? ' Very little real voice was detected in this take.' : ''));
   $('metricEnergy').innerHTML=energy; $('metricClarity').innerHTML=clarity; $('metricConfidence').innerHTML=confidence;
-  formatTags(result.tags); renderScore(energy,clarity,confidence); renderComparison(result); renderInsight();
+  formatTags(result.tags);
+  var forcedScore = renderScore(energy,clarity,confidence);
+  if($('scoreBox')){
+    $('scoreBox').className = 'score-box' + (forcedScore >= 85 ? ' positive' : '');
+    $('scoreBox').style.display = 'block';
+  }
+  renderComparison(result);
+  renderInsight();
 
   if(state.mode==='personality'){
     if(result.title.indexOf('Líder')!==-1||result.title.indexOf('Leader')!==-1) playTone('leader'); else if(result.title.indexOf('Domin')!==-1) playTone('dominant'); else if(result.title.indexOf('Indomable')!==-1||result.title.indexOf('Indomitable')!==-1) playTone('intense'); else playTone('secure');
@@ -1895,22 +1948,239 @@ function finishRecording(){
     updateDuelButton();
     setTimeout(function(){ showDuel(); }, 300);
   }
-
   state.pendingCompare=false;
 }
 
+
+function formatSecsShort(s){
+  s = Math.max(0, Number(s) || 0);
+  if(s < 60) return s.toFixed(1) + ' s';
+  var m = Math.floor(s / 60);
+  var rem = s - (m * 60);
+  return m + ':' + String(Math.floor(rem)).padStart(2,'0');
+}
+function resetCustomPlayer(){
+  if($('customPlayer')){
+    $('customPlayer').className = 'custom-player';
+    $('customPlayer').style.display = 'none';
+  }
+  if($('playerBtn')) $('playerBtn').innerHTML = '▶';
+  if($('playerFill')) $('playerFill').style.width = '0%';
+  if($('playerTime')) $('playerTime').innerHTML = formatSecsShort(0) + ' / ' + formatSecsShort(state.recordSeconds || 0);
+  if($('audioPlayer')){
+    try{ $('audioPlayer').pause(); }catch(e){}
+    try{ $('audioPlayer').currentTime = 0; }catch(e){}
+  }
+}
+function syncCustomPlayer(){
+  var audio = $('audioPlayer');
+  if(!audio) return;
+  var duration = Math.max(0.1, state.recordSeconds || 0);
+  var current = Math.min(duration, Number(audio.currentTime) || 0);
+  var pct = Math.max(0, Math.min(100, (current / duration) * 100));
+  if($('playerFill')) $('playerFill').style.width = pct + '%';
+  if($('playerTime')) $('playerTime').innerHTML = formatSecsShort(current) + ' / ' + formatSecsShort(duration);
+  if($('playerBtn')) $('playerBtn').innerHTML = audio.paused ? '▶' : '❚❚';
+}
+function showCustomPlayer(){
+  if($('customPlayer')){
+    $('customPlayer').className = 'custom-player show';
+    $('customPlayer').style.display = 'flex';
+  }
+  syncCustomPlayer();
+}
+function togglePlayback(){
+  var audio = $('audioPlayer');
+  if(!audio || !audio.src) return;
+  if(audio.paused){
+    audio.play().then(function(){ syncCustomPlayer(); }).catch(function(){});
+  } else {
+    audio.pause();
+    syncCustomPlayer();
+  }
+}
+
+
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+function getBestRecorderMimeType(){
+  var candidates = ['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'];
+  try{
+    if(typeof MediaRecorder==='undefined' || !MediaRecorder.isTypeSupported) return '';
+    for(var i=0;i<candidates.length;i++){
+      if(MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
+    }
+  }catch(e){}
+  return '';
+}
+
+function resetAudioStats(){
+  state.audioStats = {samples:0,speechFrames:0,sumRms:0,peakRms:0,speechRatio:0,avgRms:0};
+}
+
+function startLiveAudioAnalysis(stream){
+  resetAudioStats();
+  try{
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    state.audioContext = new AudioCtx();
+    state.sourceNode = state.audioContext.createMediaStreamSource(stream);
+    state.analyser = state.audioContext.createAnalyser();
+    state.analyser.fftSize = 1024;
+    state.analyser.smoothingTimeConstant = 0.65;
+    state.sourceNode.connect(state.analyser);
+    var data = new Uint8Array(state.analyser.fftSize);
+    state.analysisTimer = setInterval(function(){
+      if(!state.analyser || !state.isRecording || !state.audioStats) return;
+      state.analyser.getByteTimeDomainData(data);
+      var sum = 0;
+      for(var i=0;i<data.length;i++){
+        var v = (data[i]-128)/128;
+        sum += v*v;
+      }
+      var rms = Math.sqrt(sum / data.length);
+      state.audioStats.samples += 1;
+      state.audioStats.sumRms += rms;
+      if(rms > state.audioStats.peakRms) state.audioStats.peakRms = rms;
+      if(rms > 0.035) state.audioStats.speechFrames += 1;
+      state.audioStats.avgRms = state.audioStats.sumRms / Math.max(1, state.audioStats.samples);
+      state.audioStats.speechRatio = state.audioStats.speechFrames / Math.max(1, state.audioStats.samples);
+    }, 120);
+  }catch(e){}
+}
+
+function stopLiveAudioAnalysis(){
+  try{ if(state.analysisTimer){ clearInterval(state.analysisTimer); state.analysisTimer = null; } }catch(e){}
+  try{ if(state.sourceNode){ state.sourceNode.disconnect(); state.sourceNode = null; } }catch(e){}
+  try{ if(state.analyser){ state.analyser.disconnect && state.analyser.disconnect(); state.analyser = null; } }catch(e){}
+  try{
+    if(state.audioContext){
+      var ctx = state.audioContext;
+      state.audioContext = null;
+      if(ctx.state !== 'closed' && ctx.close) ctx.close();
+    }
+  }catch(e){}
+}
+
+function computeMetricsFromAudio(duration){
+  var s = state.audioStats || {samples:0,speechFrames:0,sumRms:0,peakRms:0,speechRatio:0,avgRms:0};
+  var avg = s.avgRms || 0;
+  var peak = s.peakRms || 0;
+  var ratio = s.speechRatio || 0;
+  var speaking = s.speechFrames || 0;
+  var dynamic = Math.max(0, peak - avg);
+  var durationBoost = Math.min(12, duration * 2.2);
+
+  // Strong silence / false-positive guard
+  if(
+    s.samples < 3 ||
+    speaking < 3 ||
+    ratio < 0.25 ||
+    avg < 0.016 ||
+    (duration < 1.5 && ratio < 0.35) ||
+    (peak < 0.045)
+  ){
+    return {
+      energy: clamp(Math.round(12 + ratio*70 + avg*500 + duration*4), 8, 40),
+      clarity: clamp(Math.round(18 + ratio*65 + duration*5), 12, 48),
+      confidence: clamp(Math.round(14 + ratio*75 + avg*420 + duration*4), 10, 45),
+      silent: true
+    };
+  }
+
+  var energy = Math.round(26 + avg*980 + ratio*34 + durationBoost + dynamic*180);
+  var clarity = Math.round(36 + ratio*24 + (1-Math.min(1,dynamic*7))*14 + Math.min(8,duration*1.2));
+  var confidence = Math.round(28 + avg*720 + ratio*28 + Math.min(10,duration*1.7) + dynamic*85);
+
+  return {
+    energy: clamp(energy, 35, 95),
+    clarity: clamp(clarity, 35, 95),
+    confidence: clamp(confidence, 30, 95),
+    silent: false
+  };
+}
+
+
+function vmGetHistory(){
+  try{ return JSON.parse(localStorage.getItem('vm_history') || '[]'); }catch(e){ return []; }
+}
+function vmSetHistory(arr){
+  try{ localStorage.setItem('vm_history', JSON.stringify(arr || [])); }catch(e){}
+}
+function vmGetLevel(score){
+  if(score < 50) return state.lang==='es' ? 'Básico' : 'Basic';
+  if(score < 70) return state.lang==='es' ? 'Sólido' : 'Solid';
+  if(score < 85) return state.lang==='es' ? 'Impacto' : 'Impact';
+  return state.lang==='es' ? 'Presencia real 🔥' : 'Real presence 🔥';
+}
+function vmRenderProgress(score){
+  var box = document.getElementById('progressBox');
+  if(!box) return;
+  var history = vmGetHistory();
+  if(typeof score === 'number' && !isNaN(score)){
+    history.push(score);
+    if(history.length > 5) history.shift();
+    vmSetHistory(history);
+  }
+  if(!history.length){
+    box.style.display = 'none';
+    return;
+  }
+  var best = Math.max.apply(null, history);
+  var current = history[history.length - 1];
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div class="progress-head">' + (state.lang==='es' ? 'Progreso' : 'Progress') + '</div>' +
+    '<div class="progress-level">' + vmGetLevel(current) + '</div>' +
+    '<div class="progress-sub">' + (state.lang==='es' ? 'Mejor puntuación' : 'Best score') + ': <strong>' + best + '/100</strong></div>' +
+    '<div class="progress-sub">' + (state.lang==='es' ? 'Últimas tomas' : 'Last takes') + '</div>' +
+    '<div class="progress-row">' +
+      history.map(function(s){ return '<div class="progress-pill">' + s + '/100</div>'; }).join('') +
+    '</div>';
+}
+
 function toggleRecording(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.'); return; }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.');
+    return;
+  }
   if(state.isRecording){
     try{ state.mediaRecorder.stop(); }catch(e){}
-    state.isRecording=false; $('micBtn').className='mic-btn'; $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...'; return;
+    state.isRecording=false;
+    stopRecordTimer();
+    stopLiveAudioAnalysis();
+    $('micBtn').className='mic-btn';
+    $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...';
+    return;
   }
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    state.stream=stream; state.mediaRecorder=new MediaRecorder(stream); state.chunks=[];
-    state.mediaRecorder.ondataavailable=function(e){ state.chunks.push(e.data); };
-    state.mediaRecorder.onstop=function(){ $('recordStatus').innerHTML=tt().recordIdle; finishRecording(); };
-    state.mediaRecorder.start(); state.isRecording=true; $('micBtn').className='mic-btn recording'; $('recordStatus').innerHTML=tt().recordOn; startBar(); animateViz(false); playTone('start');
-  }).catch(function(){ alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.'); });
+    state.stream=stream;
+    state.chunks=[];
+    state.recordMimeType = getBestRecorderMimeType();
+    try{
+      state.mediaRecorder = state.recordMimeType ? new MediaRecorder(stream,{mimeType:state.recordMimeType}) : new MediaRecorder(stream);
+    }catch(e){
+      state.mediaRecorder = new MediaRecorder(stream);
+      state.recordMimeType = state.mediaRecorder.mimeType || '';
+    }
+    state.mediaRecorder.ondataavailable=function(e){ if(e.data && e.data.size>0) state.chunks.push(e.data); };
+    state.mediaRecorder.onstop=function(){
+      if(state.stream){ try{ state.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} }
+      $('recordStatus').innerHTML=tt().recordIdle;
+      finishRecording();
+    };
+    state.mediaRecorder.start();
+    state.isRecording=true;
+    $('micBtn').className='mic-btn recording';
+    $('recordStatus').innerHTML=tt().recordOn;
+    startBar();
+    animateViz(false);
+    startRecordTimer();
+    startLiveAudioAnalysis(stream);
+    playTone('start');
+  }).catch(function(){
+    alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.');
+  });
 }
 
 setLang('es');
@@ -1958,108 +2228,40 @@ document.addEventListener('visibilitychange', function(){
   }catch(e){}
 });
 
-function getLevel(score){
-  if(score < 50) return state.lang==='es' ? 'Básico' : 'Basic';
-  if(score < 70) return state.lang==='es' ? 'Sólido' : 'Solid';
-  if(score < 85) return state.lang==='es' ? 'Impacto' : 'Impact';
-  return state.lang==='es' ? 'Presencia real 🔥' : 'Real presence 🔥';
+// --- Smart rotation system ---
+var vm_history = {phrases:[], types:[]};
+
+function vm_getType(text){
+  if(!text) return 'neutral';
+  if(/control|lider|decidir|mand/i.test(text)) return 'authority';
+  if(/calma|tranquil/i.test(text)) return 'calm';
+  if(/miedo|tenso|presion/i.test(text)) return 'tension';
+  if(/secreto|misterio|intriga/i.test(text)) return 'mystery';
+  if(/seduc|atra/i.test(text)) return 'magnet';
+  if(/precis|claro/i.test(text)) return 'precision';
+  return 'neutral';
 }
-function vmGetHistory(){
-  try{ return JSON.parse(localStorage.getItem('vm_history') || '[]'); }catch(e){ return []; }
-}
-function vmSetHistory(arr){
-  try{ localStorage.setItem('vm_history', JSON.stringify(arr || [])); }catch(e){}
-}
-function vmGetAchievements(){
-  try{ return JSON.parse(localStorage.getItem('vm_achievements') || '[]'); }catch(e){ return []; }
-}
-function vmSetAchievements(arr){
-  try{ localStorage.setItem('vm_achievements', JSON.stringify(arr || [])); }catch(e){}
-}
-function vmAddAchievement(label){
-  var arr = vmGetAchievements();
-  if(arr.indexOf(label) === -1){
-    arr.push(label);
-    vmSetAchievements(arr);
-  }
-}
-function renderProgress(score){
-  var box = document.getElementById('progressBox');
-  if(!box) return;
-  var history = vmGetHistory();
-  if(typeof score === 'number' && !isNaN(score)){
-    history.push(score);
-    if(history.length > 5) history.shift();
-    vmSetHistory(history);
-  }
-  if(!history.length){
-    box.style.display = 'none';
-    return;
-  }
-  var best = Math.max.apply(null, history);
-  var current = history[history.length - 1];
-  box.style.display = 'block';
-  box.innerHTML =
-    '<div class="progress-head">' + (state.lang==='es' ? 'Progreso' : 'Progress') + '</div>' +
-    '<div class="progress-level">' + getLevel(current) + '</div>' +
-    '<div class="progress-sub">' + (state.lang==='es' ? 'Mejor puntuación' : 'Best score') + ': <strong>' + best + '/100</strong></div>' +
-    '<div class="progress-sub">' + (state.lang==='es' ? 'Últimas tomas' : 'Last takes') + '</div>' +
-    '<div class="progress-row">' + history.map(function(s){ return '<div class="progress-pill">' + s + '/100</div>'; }).join('') + '</div>';
-}
-function renderDynamicFeedback(score, silent){
-  var box = document.getElementById('dynamicFeedbackBox');
-  if(!box) return;
-  var history = vmGetHistory();
-  var prev = history.length >= 2 ? history[history.length-2] : null;
-  var best = history.length ? Math.max.apply(null, history) : score;
-  var text = '';
-  if(silent){
-    text = state.lang==='es' ? '⚠️ Se ha detectado muy poca voz real. Prueba otra vez con una entrada más clara.' : '⚠️ Very little real voice was detected. Try again with a clearer take.';
-  } else if(score >= best){
-    text = state.lang==='es' ? '🏆 Nuevo mejor resultado. Esta toma mejora tu nivel actual.' : '🏆 New personal best. This take improves your current level.';
-  } else if(prev !== null && score > prev){
-    text = state.lang==='es' ? '📈 Has mejorado respecto a la toma anterior.' : '📈 You improved versus the previous take.';
-  } else if(prev !== null && score < prev){
-    text = state.lang==='es' ? '↔️ Esta toma queda por debajo de la anterior. Repite buscando una entrada más firme.' : '↔️ This take is below the previous one. Try again with a firmer entry.';
-  } else {
-    text = state.lang==='es' ? '🎯 Buen intento. Ahora intenta superar tu mejor puntuación.' : '🎯 Good attempt. Now try to beat your best score.';
-  }
-  box.style.display = 'block';
-  box.innerHTML = '<div class="feedback-head">' + (state.lang==='es' ? 'Feedback' : 'Feedback') + '</div><div class="progress-sub">' + text + '</div>';
-}
-function renderCTA(){
-  var box = document.getElementById('ctaBox');
-  if(!box) return;
-  var history = vmGetHistory();
-  if(!history.length){ box.style.display = 'none'; return; }
-  var best = Math.max.apply(null, history);
-  var target = Math.min(100, best + 3);
-  box.style.display = 'block';
-  box.innerHTML =
-    '<div class="cta-head">' + (state.lang==='es' ? 'Siguiente paso' : 'Next step') + '</div>' +
-    '<div class="cta-row"><div class="cta-pill">' + (state.lang==='es' ? '🎯 Supera tu mejor: ' : '🎯 Beat your best: ') + best + '/100</div><div class="cta-pill">' + (state.lang==='es' ? '🚀 Objetivo siguiente: ' : '🚀 Next target: ') + target + '/100</div><div class="cta-pill">' + (state.lang==='es' ? '🔁 Haz otra toma' : '🔁 Take another shot') + '</div></div>';
-}
-function renderAchievements(score, silent){
-  var box = document.getElementById('achievementsBox');
-  if(!box) return;
-  if(typeof score === 'number' && !silent){
-    if(score >= 70) vmAddAchievement(state.lang==='es' ? 'Primera vez 70+' : 'First 70+');
-    if(score >= 80) vmAddAchievement(state.lang==='es' ? 'Superas 80' : 'You crossed 80');
-    if(score >= 90) vmAddAchievement(state.lang==='es' ? 'Top 90' : 'Top 90');
-    var hist = vmGetHistory();
-    if(hist.length >= 2) vmAddAchievement(state.lang==='es' ? 'Dos tomas guardadas' : 'Two takes saved');
-    if(hist.length >= 3 && hist.slice(-3).every(function(v){ return v >= 70; })) vmAddAchievement(state.lang==='es' ? '3 intentos seguidos por encima de 70' : '3 takes in a row above 70');
-  }
-  var arr = vmGetAchievements();
-  if(!arr.length){ box.style.display='none'; return; }
-  box.style.display = 'block';
-  box.innerHTML = '<div class="achievements-head">' + (state.lang==='es' ? 'Logros' : 'Achievements') + '</div><div class="achievements-row">' + arr.slice(-6).reverse().map(function(x){ return '<div class="achievement-pill">🏆 ' + x + '</div>'; }).join('') + '</div>';
-}
-function renderAddictiveExtras(score, silent){
-  renderProgress(score);
-  renderDynamicFeedback(score, silent);
-  renderCTA();
-  renderAchievements(score, silent);
+
+function vm_pick(pool){
+  var filtered = pool.filter(p=>!vm_history.phrases.includes(p));
+  if(filtered.length<5) filtered = pool;
+
+  var candidates = filtered.filter(p=>{
+    var t = vm_getType(p);
+    return !vm_history.types.slice(-2).includes(t);
+  });
+
+  if(!candidates.length) candidates = filtered;
+
+  var pick = candidates[Math.floor(Math.random()*candidates.length)];
+
+  vm_history.phrases.push(pick);
+  vm_history.types.push(vm_getType(pick));
+
+  if(vm_history.phrases.length>15) vm_history.phrases.shift();
+  if(vm_history.types.length>10) vm_history.types.shift();
+
+  return pick;
 }
 
 </script>
