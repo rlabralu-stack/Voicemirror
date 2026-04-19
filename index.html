@@ -1740,7 +1740,12 @@ function renderScore(energy,clarity,confidence){
   if(state.mode==='challenge'){
     score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
   } else if(state.mode==='scene'){
-    score = getSceneScore({energy:energy, clarity:clarity, confidence:confidence});
+    try{
+      score = getSceneScore({energy:energy, clarity:clarity, confidence:confidence});
+      if(isNaN(score)) throw 'err';
+    }catch(e){
+      score = Math.round((energy + clarity + confidence) / 3);
+    }
   } else {
     score = Math.round((energy + clarity + confidence) / 3);
   }
@@ -1877,6 +1882,7 @@ function finishRecording(){
     $('scoreBox').className = 'score-box' + (forcedScore >= 85 ? ' positive' : '');
     $('scoreBox').style.display = 'block';
   }
+  renderScore(energy,clarity,confidence);
   renderComparison(result);
   renderInsight();
 
