@@ -2178,48 +2178,42 @@ function vmPickPrompt(pool){
 function vmRenderSuperation(score){
   var box = document.getElementById('superationBox');
   if(!box) return;
+
   var history = vmGetHistory();
   if(!history.length){
     box.style.display = 'none';
     return;
   }
 
-  var current = (typeof score === 'number' && !isNaN(score)) ? score : history[history.length - 1];
+  var current = score;
   var bestNow = Math.max.apply(null, history);
-  var previousBest = bestNow;
 
   var headline = '';
   var sub = '';
-  var delta = previousBest - current;
+  var delta = bestNow - current;
 
   if(history.length === 1){
-    headline = state.lang==='es' ? 'Tu mejor empieza aquí' : 'Your best starts here';
-    sub = state.lang==='es'
-      ? 'Haz otra toma para empezar a superarte.'
-      : 'Take another shot to start beating yourself.';
-  } else if(current >= previousBest){
-    headline = state.lang==='es' ? '🏆 Nuevo mejor resultado' : '🏆 New personal best';
-    sub = state.lang==='es'
-      ? ('Has igualado o superado tu mejor ' + previousBest + '/100. Este es tu nuevo techo.')
-      : ('You matched or beat your best ' + previousBest + '/100. This is your new ceiling.');
+    headline = 'Tu mejor empieza aquí';
+    sub = 'Haz otra toma para empezar a superarte.';
+  } else if(current >= bestNow){
+    headline = '🏆 Nuevo mejor resultado';
+    sub = 'Has alcanzado o superado tu mejor nivel.';
   } else {
-    headline = state.lang==='es' ? 'Supera tu mejor versión' : 'Beat your best self';
-    sub = state.lang==='es'
-      ? ('Te faltan +' + delta + ' puntos para superar tu mejor ' + previousBest + '/100.')
-      : ('You need +' + delta + ' points to beat your best ' + previousBest + '/100.');
+    headline = 'Supera tu mejor versión';
+    sub = 'Te faltan +' + delta + ' puntos para superar tu mejor ' + bestNow + '/100.';
   }
 
-  var nextTarget = Math.min(100, Math.max(bestNow + 3, current + 2));
+  var nextTarget = Math.min(100, bestNow + 3);
 
   box.style.display = 'block';
   box.innerHTML =
-    '<div class="superation-head">' + (state.lang==='es' ? 'Modo superación' : 'Improvement mode') + '</div>' +
+    '<div class="superation-head">Modo superación</div>' +
     '<div class="superation-main">' + headline + '</div>' +
     '<div class="superation-sub">' + sub + '</div>' +
     '<div class="superation-row">' +
-      '<div class="superation-pill">' + (state.lang==='es' ? 'Tu mejor' : 'Your best') + ': ' + bestNow + '/100</div>' +
-      '<div class="superation-pill">' + (state.lang==='es' ? 'Ahora' : 'Now') + ': ' + current + '/100</div>' +
-      '<div class="superation-pill accent">' + (state.lang==='es' ? 'Objetivo siguiente' : 'Next target') + ': ' + nextTarget + '/100</div>' +
+      '<div class="superation-pill">Tu mejor: ' + bestNow + '/100</div>' +
+      '<div class="superation-pill">Ahora: ' + current + '/100</div>' +
+      '<div class="superation-pill accent">Objetivo: ' + nextTarget + '/100</div>' +
     '</div>';
 }
 
