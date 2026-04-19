@@ -1642,49 +1642,60 @@ function filterBySceneSubProfile(pool, sub){
 }
 
 function chooseResult(energy,clarity,confidence){
-  var pool = results[state.mode][state.lang];
-  var offset = Math.floor((energy*3 + clarity*5 + confidence*7 + (state.currentPrompt||'').length) % 997);
+  try{
+    var pool = results[state.mode][state.lang];
+    if(!pool || !pool.length) return null;
+    var offset = Math.floor((energy*3 + clarity*5 + confidence*7 + (state.currentPrompt||'').length) % 997);
 
-  if(state.mode==='personality'){
-    var bandP = getBandForPersonality(energy,clarity,confidence);
-    var candidatesP = pool.filter(function(x){ return x.archetype===bandP; });
-    if(!candidatesP.length) candidatesP = pool.slice();
-    candidatesP = filterRepeated(candidatesP);
-    return candidatesP[offset % candidatesP.length];
+    if(state.mode==='personality'){
+      var bandP = getBandForPersonality(energy,clarity,confidence);
+      var candidatesP = pool.filter(function(x){ return x.archetype===bandP; });
+      if(!candidatesP.length) candidatesP = pool.slice();
+      candidatesP = filterRepeated(candidatesP);
+      return candidatesP[offset % candidatesP.length];
+    }
+
+    if(state.mode==='thoughts'){
+      var bandT = getBandForThoughts(energy,clarity,confidence);
+      var candidatesT = pool.filter(function(x){ return x.archetype===bandT; });
+      if(!candidatesT.length) candidatesT = pool.slice();
+      candidatesT = filterRepeated(candidatesT);
+      return candidatesT[offset % candidatesT.length];
+    }
+
+    if(state.mode==='challenge'){
+      var intent = getChallengeIntent(state.currentPrompt);
+      var bandC = getBandForChallenge(energy,clarity,confidence,intent);
+      var candidatesC = pool.filter(function(x){ return x.archetype===bandC; });
+      if(!candidatesC.length) candidatesC = pool.slice();
+      var subC = getSubProfileForChallenge(energy,clarity,confidence,intent);
+      candidatesC = filterByChallengeSubProfile(candidatesC, subC);
+      candidatesC = filterRepeated(candidatesC);
+      return candidatesC[offset % candidatesC.length];
+    }
+
+    if(state.mode==='scene'){
+      var sceneIntent = getSceneIntent(state.currentPrompt);
+      var bandS = getBandForScene(energy,clarity,confidence,sceneIntent);
+      var candidatesS = pool.filter(function(x){ return x.archetype===bandS; });
+      if(!candidatesS.length) candidatesS = pool.slice();
+      var subS = getSubProfileForScene(energy,clarity,confidence,sceneIntent);
+      candidatesS = filterBySceneSubProfile(candidatesS, subS);
+      candidatesS = filterRepeated(candidatesS);
+      if(!candidatesS.length) candidatesS = pool.slice();
+      return candidatesS[offset % candidatesS.length];
+    }
+
+    var fallback = filterRepeated(pool.slice());
+    return fallback[offset % fallback.length];
+  }catch(e){
+    try{
+      var safePool = results[state.mode][state.lang];
+      return safePool && safePool.length ? safePool[0] : null;
+    }catch(err){
+      return null;
+    }
   }
-
-  if(state.mode==='thoughts'){
-    var bandT = getBandForThoughts(energy,clarity,confidence);
-    var candidatesT = pool.filter(function(x){ return x.archetype===bandT; });
-    if(!candidatesT.length) candidatesT = pool.slice();
-    candidatesT = filterRepeated(candidatesT);
-    return candidatesT[offset % candidatesT.length];
-  }
-
-  if(state.mode==='challenge'){
-    var intent = getChallengeIntent(state.currentPrompt);
-    var bandC = getBandForChallenge(energy,clarity,confidence,intent);
-    var candidatesC = pool.filter(function(x){ return x.archetype===bandC; });
-    if(!candidatesC.length) candidatesC = pool.slice();
-    var subC = getSubProfileForChallenge(energy,clarity,confidence,intent);
-    candidatesC = filterByChallengeSubProfile(candidatesC, subC);
-    candidatesC = filterRepeated(candidatesC);
-    return candidatesC[offset % candidatesC.length];
-  }
-
-  if(state.mode==='scene'){
-    var sceneIntent = getSceneIntent(state.currentPrompt);
-    var bandS = getBandForScene(energy,clarity,confidence,sceneIntent);
-    var candidatesS = pool.filter(function(x){ return x.archetype===bandS; });
-    if(!candidatesS.length) candidatesS = pool.slice();
-    var subS = getSubProfileForScene(energy,clarity,confidence,sceneIntent);
-    candidatesS = filterBySceneSubProfile(candidatesS, subS);
-    candidatesS = filterRepeated(candidatesS);
-    return candidatesS[offset % candidatesS.length];
-  }
-
-  var fallback = filterRepeated(pool.slice());
-  return fallback[offset % fallback.length];
 }
 
 function renderComparison(current){
@@ -1737,16 +1748,15 @@ function renderScore(energy,clarity,confidence){
   if(!scoreBox || !scoreValue || !scoreText) return 0;
 
   var score = 0;
-  if(state.mode==='challenge'){
-    score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
-  } else if(state.mode==='scene'){
-    try{
-      score = getSceneScore({energy:energy, clarity:clarity, confidence:confidence});
-      if(isNaN(score)) throw 'err';
-    }catch(e){
+  try{
+    if(state.mode==='challenge'){
+      score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
+    } else if(state.mode==='scene'){
+      score = Math.round((energy*0.28) + (clarity*0.37) + (confidence*0.35));
+    } else {
       score = Math.round((energy + clarity + confidence) / 3);
     }
-  } else {
+  }catch(e){
     score = Math.round((energy + clarity + confidence) / 3);
   }
 
@@ -1765,12 +1775,12 @@ function renderScore(energy,clarity,confidence){
          'You do not fully own this challenge yet: it needs more intention or more control.');
   } else if(state.mode==='scene'){
     scoreText.innerHTML = state.lang==='es'
-      ? (score>=85 ? 'Encajas muy bien en esta escena: la voz entra con verdad y vende mejor la situación.' :
-         score>=70 ? 'La escena funciona bastante bien, aunque aún puedes hacerla más creíble.' :
-         'Todavía no termina de sentirse dentro de la escena: falta más verdad o más contexto en la voz.')
-      : (score>=85 ? 'You fit this scene very well: the voice lands truthfully and sells the situation better.' :
-         score>=70 ? 'The scene works fairly well, though it can still feel more believable.' :
-         'It does not fully feel inside the scene yet: it needs more truth or stronger context.');
+      ? (score>=85 ? 'Escena muy lograda: la voz entra con verdad, contexto y bastante credibilidad.' :
+         score>=70 ? 'Buena escena: se entiende el contexto, aunque todavía puede sentirse más viva.' :
+         'Escena mejorable: falta más intención o más verdad contextual en la voz.')
+      : (score>=85 ? 'Very strong scene: the voice lands with truth, context and strong credibility.' :
+         score>=70 ? 'Good scene: the context is clear, though it can still feel more alive.' :
+         'This scene can improve: it needs more intention or contextual truth in the voice.');
   } else {
     scoreText.innerHTML = state.lang==='es'
       ? (score>=85 ? 'Resultado muy sólido: presencia, claridad y confianza están jugando a tu favor.' :
@@ -1859,8 +1869,11 @@ function finishRecording(){
   if(confidence>98) confidence=98;
   if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
 
-  var chosen=chooseResult(energy,clarity,confidence);
-  if(!chosen){ chosen = results[state.mode][state.lang][0]; }
+  var chosen = null;
+  try{ chosen = chooseResult(energy,clarity,confidence); }catch(e){ chosen = null; }
+  if(!chosen){
+    try{ chosen = results[state.mode][state.lang][0]; }catch(e){ chosen = {emoji:'🎭',title:(state.lang==='es'?'Resultado generado':'Generated result'),desc:(state.lang==='es'?'La app generó un resultado de respaldo.':'The app generated a fallback result.'),tags:['voz','resultado','análisis'],archetype:'mid'}; }
+  }
   var result={mode:state.mode,prompt:state.currentPrompt,energy:energy,clarity:clarity,confidence:confidence,title:chosen.emoji+' '+chosen.title,desc:chosen.desc,tags:chosen.tags,archetype:chosen.archetype};
   state.lastResult=result;
   rememberResult(result);
@@ -1882,7 +1895,6 @@ function finishRecording(){
     $('scoreBox').className = 'score-box' + (forcedScore >= 85 ? ' positive' : '');
     $('scoreBox').style.display = 'block';
   }
-  renderScore(energy,clarity,confidence);
   renderComparison(result);
   renderInsight();
 
