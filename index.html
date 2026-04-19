@@ -2184,39 +2184,29 @@ function vmRenderSuperation(score){
     return;
   }
 
-  var current = typeof score === 'number' && !isNaN(score) ? score : history[history.length - 1];
-  var previousBest = 0;
-  if(history.length > 1){
-    previousBest = Math.max.apply(null, history.slice(0, -1));
-  } else {
-    previousBest = current;
-  }
+  var current = (typeof score === 'number' && !isNaN(score)) ? score : history[history.length - 1];
   var bestNow = Math.max.apply(null, history);
+  var previousBest = bestNow;
 
   var headline = '';
   var sub = '';
-  var delta = current - previousBest;
+  var delta = previousBest - current;
 
   if(history.length === 1){
     headline = state.lang==='es' ? 'Tu mejor empieza aquí' : 'Your best starts here';
     sub = state.lang==='es'
       ? 'Haz otra toma para empezar a superarte.'
       : 'Take another shot to start beating yourself.';
-  } else if(current > previousBest){
+  } else if(current >= previousBest){
     headline = state.lang==='es' ? '🏆 Nuevo mejor resultado' : '🏆 New personal best';
     sub = state.lang==='es'
-      ? ('Has superado tu anterior ' + previousBest + '/100. Este es tu nuevo mejor nivel.')
-      : ('You beat your previous ' + previousBest + '/100. This is your new best level.');
-  } else if(current === previousBest){
-    headline = state.lang==='es' ? '🎯 Has igualado tu mejor' : '🎯 You matched your best';
-    sub = state.lang==='es'
-      ? 'Estás en tu techo actual. Intenta una toma más para romperlo.'
-      : 'You reached your current ceiling. Try one more take to break it.';
+      ? ('Has igualado o superado tu mejor ' + previousBest + '/100. Este es tu nuevo techo.')
+      : ('You matched or beat your best ' + previousBest + '/100. This is your new ceiling.');
   } else {
     headline = state.lang==='es' ? 'Supera tu mejor versión' : 'Beat your best self';
     sub = state.lang==='es'
-      ? ('Te faltan +' + Math.abs(delta) + ' puntos para superar tu mejor ' + previousBest + '/100.')
-      : ('You need +' + Math.abs(delta) + ' points to beat your best ' + previousBest + '/100.');
+      ? ('Te faltan +' + delta + ' puntos para superar tu mejor ' + previousBest + '/100.')
+      : ('You need +' + delta + ' points to beat your best ' + previousBest + '/100.');
   }
 
   var nextTarget = Math.min(100, Math.max(bestNow + 3, current + 2));
