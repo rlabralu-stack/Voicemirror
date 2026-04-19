@@ -75,8 +75,8 @@ audio{width:100%;margin-top:10px}
 .compare-note{margin-top:16px;background:linear-gradient(180deg,rgba(255,77,77,.10),rgba(255,77,77,.05));border:1px solid rgba(255,110,110,.18);border-radius:18px;padding:16px;color:#ffe2e2;font-size:15px;line-height:1.5}
 .hidden{display:none!important}
 .score-box.positive{background:linear-gradient(180deg,rgba(34,197,94,.14),rgba(22,163,74,.08));border-color:rgba(74,222,128,.55)}
-.score-box.positive .score-title,.score-box.positive .score-value,.score-box.positive .score-text{color:#eafff1}
-.score-box.positive .score-value{ text-shadow:0 0 18px rgba(74,222,128,.12)}
+.score-box.positive #scoreLabel,.score-box.positive #scoreBig,.score-box.positive #scoreNote{color:#eafff1}
+.score-box.positive #scoreBig{ text-shadow:0 0 18px rgba(74,222,128,.12)}
 .score-box{margin-top:14px;background:#2a1220;border:2px solid #ff6a78;border-radius:18px;padding:14px}
 .score-big{font-size:44px;font-weight:800;line-height:1}
 .score-note{margin-top:8px;color:#ffd7dc}
@@ -1731,8 +1731,8 @@ function renderInsight(){
 
 function renderScore(energy,clarity,confidence){
   var scoreBox = $('scoreBox');
-  var scoreValue = $('scoreValue');
-  var scoreText = $('scoreText');
+  var scoreValue = $('scoreBig');
+  var scoreText = $('scoreNote');
   if(!scoreBox || !scoreValue || !scoreText) return;
 
   var score;
