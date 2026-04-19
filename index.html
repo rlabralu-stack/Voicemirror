@@ -74,6 +74,9 @@ audio{width:100%;margin-top:10px}
 .compare-text{margin-top:10px;color:#d1d8eb;line-height:1.5}
 .compare-note{margin-top:16px;background:linear-gradient(180deg,rgba(255,77,77,.10),rgba(255,77,77,.05));border:1px solid rgba(255,110,110,.18);border-radius:18px;padding:16px;color:#ffe2e2;font-size:15px;line-height:1.5}
 .hidden{display:none!important}
+.score-box.positive{background:linear-gradient(180deg,rgba(34,197,94,.14),rgba(22,163,74,.08));border-color:rgba(74,222,128,.55)}
+.score-box.positive .score-title,.score-box.positive .score-value,.score-box.positive .score-text{color:#eafff1}
+.score-box.positive .score-value{ text-shadow:0 0 18px rgba(74,222,128,.12)}
 .score-box{margin-top:14px;background:#2a1220;border:2px solid #ff6a78;border-radius:18px;padding:14px}
 .score-big{font-size:44px;font-weight:800;line-height:1}
 .score-note{margin-top:8px;color:#ffd7dc}
@@ -1726,21 +1729,54 @@ function renderInsight(){
 }
 
 function renderScore(energy,clarity,confidence){
+  var scoreBox = $('scoreBox');
+  var scoreValue = $('scoreValue');
+  var scoreText = $('scoreText');
+  if(!scoreBox || !scoreValue || !scoreText) return;
+
+  var score;
   if(state.mode==='challenge'){
-    var score=Math.round(energy*0.34+clarity*0.31+confidence*0.35);
-    $('scoreBox').className='score-box';
-    $('scoreBig').innerHTML=score+'/100';
-    var label=score>=86?tt().challengePassed:score>=72?tt().challengeImpact:score>=58?tt().challengeAlmost:tt().challengeFail;
-    $('scoreNote').innerHTML=label+' · '+tt().challengeLead; return;
+    score = getChallengeScore({energy:energy, clarity:clarity, confidence:confidence});
+  } else if(state.mode==='scene'){
+    score = getSceneScore({energy:energy, clarity:clarity, confidence:confidence});
+  } else {
+    score = Math.round((energy + clarity + confidence) / 3);
   }
-  if(state.mode==='scene'){
-    var score2=Math.round(energy*0.28+clarity*0.37+confidence*0.35);
-    $('scoreBox').className='score-box';
-    $('scoreBig').innerHTML=score2+'/100';
-    var label2=score2>=84?tt().sceneGood:score2>=66?tt().sceneMid:tt().sceneWeak;
-    $('scoreNote').innerHTML=label2+' · '+tt().sceneLead; return;
+
+  scoreBox.className = 'score-box';
+  if(score >= 85){
+    scoreBox.className += ' positive';
   }
-  $('scoreBox').className='score-box hidden';
+
+  scoreValue.innerHTML = score + '/100';
+
+  if(state.mode==='challenge'){
+    scoreText.innerHTML = state.lang==='es'
+      ? (score>=85 ? 'Reto muy bien resuelto: tu voz entra con fuerza, intención y bastante control.' :
+         score>=70 ? 'Buen reto: hay base y momentos potentes, aunque todavía puedes afinar más la entrada.' :
+         'Aún no dominas del todo este reto: falta más intención o más control en la entrada.')
+      : (score>=85 ? 'Very strong challenge result: your voice lands with force, intention and solid control.' :
+         score>=70 ? 'Good challenge: there is a strong base, though you can still refine the entry.' :
+         'You do not fully own this challenge yet: it needs more intention or more control.');
+  } else if(state.mode==='scene'){
+    scoreText.innerHTML = state.lang==='es'
+      ? (score>=85 ? 'Encajas muy bien en esta escena: la voz entra con verdad y vende mejor la situación.' :
+         score>=70 ? 'La escena funciona bastante bien, aunque aún puedes hacerla más creíble.' :
+         'Todavía no termina de sentirse dentro de la escena: falta más verdad o más contexto en la voz.')
+      : (score>=85 ? 'You fit this scene very well: the voice lands truthfully and sells the situation better.' :
+         score>=70 ? 'The scene works fairly well, though it can still feel more believable.' :
+         'It does not fully feel inside the scene yet: it needs more truth or stronger context.');
+  } else {
+    scoreText.innerHTML = state.lang==='es'
+      ? (score>=85 ? 'Resultado muy sólido: presencia, claridad y confianza están jugando a tu favor.' :
+         score>=70 ? 'Buen resultado: hay una base clara, aunque todavía puedes ganar más consistencia.' :
+         'Resultado correcto, pero aún con margen claro de mejora en presencia o seguridad.')
+      : (score>=85 ? 'Very solid result: presence, clarity and confidence are working in your favor.' :
+         score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
+         'Decent result, but there is still clear room to improve presence or confidence.');
+  }
+
+  scoreBox.className = scoreBox.className.replace(' hidden','');
 }
 
 function shareCurrent(){
