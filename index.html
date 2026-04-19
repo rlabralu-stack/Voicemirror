@@ -2195,9 +2195,12 @@ function vmRenderSuperation(score){
   if(history.length === 1){
     headline = 'Tu mejor empieza aquí';
     sub = 'Haz otra toma para empezar a superarte.';
-  } else if(current >= bestNow){
+  } else if(current > bestNow){
     headline = '🏆 Nuevo mejor resultado';
-    sub = 'Has alcanzado o superado tu mejor nivel.';
+    sub = 'Has superado tu mejor ' + bestNow + '/100.';
+  } else if(current === bestNow){
+    headline = '🎯 Has igualado tu mejor';
+    sub = 'Estás en tu techo actual. Intenta superarlo.';
   } else {
     headline = 'Supera tu mejor versión';
     sub = 'Te faltan +' + delta + ' puntos para superar tu mejor ' + bestNow + '/100.';
