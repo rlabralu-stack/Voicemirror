@@ -349,6 +349,10 @@ text-align:center
 .progress-sub{margin-top:8px;font-size:14px;color:#d8def0}
 .progress-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .progress-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
+
+.intent-box{margin-top:12px;padding:12px 14px;border-radius:16px;background:#111b31;border:1px solid #2f477d}
+.intent-head{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;opacity:.72;margin-bottom:6px}
+.intent-text{font-size:15px;color:#eef3ff}
 </style>
 </head>
 <body>
@@ -373,7 +377,7 @@ text-align:center
 
 <section id="mode" class="screen">
 <div class="topbar"><div><h2 id="modeTitle" style="margin:0">🧠 Personalidad</h2><div id="modeSub" class="small" style="margin-top:6px">Descubre qué rasgo transmite tu voz</div></div><div class="langs"><button id="langEs2" class="lang-btn active" onclick="setLang('es')">ES</button><button id="langEn2" class="lang-btn" onclick="setLang('en')">EN</button><button id="homeBtn" class="btn btn-secondary" onclick="showScreen('home')">← Inicio</button></div></div>
-<div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
+<div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div><div id="intentBox" class="intent-box" style="display:none"><div class="intent-head">Intención</div><div id="intentText" class="intent-text"></div></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
 <div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div id="recordTime" class="status" style="font-size:18px;opacity:.95;margin-top:6px;">0.0 s</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
 <div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" preload="metadata" playsinline style="display:none"></audio><div id="customPlayer" class="custom-player" style="display:none"><button id="playerBtn" class="player-btn" type="button" onclick="togglePlayback()">▶</button><div class="player-main"><div id="playerTime" class="player-time">0.0 s / 0.0 s</div><div class="player-track"><div id="playerFill" class="player-fill"></div></div></div></div></div>
 <div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
@@ -1383,6 +1387,7 @@ function clearResult(){
   $('scoreBox').className='score-box hidden';
   $('scoreBox').style.display='none';
   try{ vmRenderProgress(); }catch(e){}
+  try{ vmRenderIntent(state.currentIntent || ''); }catch(e){}
 }
 
 
@@ -1502,11 +1507,14 @@ function nextPrompt(){
   state.pendingCompare=false;
   if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
     state.currentPrompt = state.incomingChallenge.prompt;
+    state.currentIntent = '';
   } else {
     var pool = prompts[state.mode][state.lang];
     state.currentPrompt = vmPickPrompt(pool);
+    state.currentIntent = vmPickIntent();
   }
   renderPrompt(state.currentPrompt);
+  vmRenderIntent(state.currentIntent);
   clearResult();
   scrollTopApp();
   setTimeout(scrollTopApp, 30);
@@ -2161,6 +2169,139 @@ function vmPickPrompt(pool){
   if(history.length > 25) history.shift();
   vmSetPromptHistory(history);
   return chosen;
+}
+
+
+function vmIntentHistoryKey(){
+  return 'vm_intent_history_' + state.lang + '_' + state.mode;
+}
+function vmGetIntentHistory(){
+  try{ return JSON.parse(localStorage.getItem(vmIntentHistoryKey()) || '[]'); }catch(e){ return []; }
+}
+function vmSetIntentHistory(arr){
+  try{ localStorage.setItem(vmIntentHistoryKey(), JSON.stringify(arr || [])); }catch(e){}
+}
+function vmGetIntentPool(){
+  if(state.lang === 'es'){
+    if(state.mode === 'personality'){
+      return [
+        'como si no necesitaras convencer a nadie',
+        'como si ya supieras que tienes razón',
+        'como si hablaras desde una calma muy firme',
+        'como si no buscaras aprobación',
+        'como si ocultaras una seguridad muy fuerte',
+        'como si quisieras sonar inevitable',
+        'como si no tuvieras prisa por demostrar nada',
+        'como si toda la fuerza estuviera en el tono'
+      ];
+    }
+    if(state.mode === 'thoughts'){
+      return [
+        'como si acabaras de conocer a alguien',
+        'como si quisieras generar confianza sin forzar nada',
+        'como si no enseñaras todo de ti',
+        'como si quisieras sonar cercano pero no blando',
+        'como si dejaras algo entre líneas',
+        'como si quisieras parecer interesante sin exagerar',
+        'como si midieras cuánto mostrar',
+        'como si quisieras abrir distancia o acercarla'
+      ];
+    }
+    if(state.mode === 'challenge'){
+      return [
+        'como si fuera una advertencia elegante',
+        'como si nadie pudiera frenarte',
+        'como si tuvieras el control total',
+        'como si estuvieras cansado de repetir lo obvio',
+        'como si ya supieras el final',
+        'como si hablaras desde una superioridad tranquila',
+        'como si no hubiera vuelta atrás',
+        'como si escondieras algo peligroso'
+      ];
+    }
+    return [
+      'como si estuvieras dentro de una escena real',
+      'como si lo que dices cambiara la situación',
+      'como si quisieras sonar creíble sin sobreactuar',
+      'como si hubiera tensión debajo de la frase',
+      'como si la otra persona dependiera de tu tono',
+      'como si esta línea fuera más importante de lo que parece',
+      'como si tuvieras que sostener el contexto tú solo',
+      'como si esta frase tuviera historia detrás'
+    ];
+  } else {
+    if(state.mode === 'personality'){
+      return [
+        'as if you needed nobody’s approval',
+        'as if you already knew you were right',
+        'as if your calm carried real authority',
+        'as if you were not trying to impress anyone',
+        'as if the strength lived entirely in the tone',
+        'as if your presence was already enough',
+        'as if you did not need to prove anything',
+        'as if certainty sat underneath the line'
+      ];
+    }
+    if(state.mode === 'thoughts'){
+      return [
+        'as if someone had just met you',
+        'as if you wanted to build trust naturally',
+        'as if you were not revealing everything',
+        'as if you wanted to sound close but not soft',
+        'as if there were something between the lines',
+        'as if you wanted to sound interesting without pushing it',
+        'as if you were measuring how much to show',
+        'as if you could open or close distance with tone'
+      ];
+    }
+    if(state.mode === 'challenge'){
+      return [
+        'as if it were an elegant warning',
+        'as if nobody could stop you',
+        'as if you had total control',
+        'as if you were tired of repeating the obvious',
+        'as if you already knew the ending',
+        'as if you were speaking from calm superiority',
+        'as if there were no way back',
+        'as if you were hiding something dangerous'
+      ];
+    }
+    return [
+      'as if you were inside a real scene',
+      'as if what you say changed the situation',
+      'as if you wanted to sound credible without overacting',
+      'as if tension lived underneath the line',
+      'as if the other person depended on your tone',
+      'as if this line mattered more than it seems',
+      'as if you had to carry the whole context',
+      'as if there were a story behind this sentence'
+    ];
+  }
+}
+function vmPickIntent(){
+  var pool = vmGetIntentPool();
+  if(!pool || !pool.length) return '';
+  var history = vmGetIntentHistory();
+  var recent = history.slice(-6);
+  var available = pool.filter(function(x){ return recent.indexOf(x) === -1; });
+  if(!available.length) available = pool.slice();
+  var chosen = available[Math.floor(Math.random() * available.length)];
+  history.push(chosen);
+  if(history.length > 12) history.shift();
+  vmSetIntentHistory(history);
+  return chosen;
+}
+function vmRenderIntent(text){
+  var box = document.getElementById('intentBox');
+  var target = document.getElementById('intentText');
+  if(!box || !target) return;
+  if(!text){
+    box.style.display = 'none';
+    target.innerHTML = '';
+    return;
+  }
+  box.style.display = 'block';
+  target.innerHTML = text;
 }
 
 function toggleRecording(){
