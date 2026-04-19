@@ -376,7 +376,7 @@ text-align:center
 <div class="panel panel-hero"><div id="promptLabel" class="label">Instrucción / frase</div><div id="promptText" class="prompt"></div></div><div id="incomingChallengeBox" class="panel hidden" style="margin-top:12px"><div class="box-title" id="incomingChallengeTitle">Reto recibido</div><div id="incomingChallengeText" class="small"></div></div>
 <div class="panel" style="margin-top:12px"><div class="mic-wrap"><button id="micBtn" class="mic-btn" onclick="toggleRecording()" title="Pulsa para grabar / vuelve a pulsar para parar">🎤</button><div id="recordStatus" class="status">Pulsa para grabar y lee la frase</div><div id="recordTime" class="status" style="font-size:18px;opacity:.95;margin-top:6px;">0.0 s</div><div class="bar-wrap"><div id="recordBar" class="bar"></div></div><div id="visualizer" class="visualizer"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
 <div class="panel" style="margin-top:12px"><div id="audioLabel" class="label">Tu grabación</div><div id="audioHint" class="small">Aquí podrás escuchar tu voz.</div><audio id="audioPlayer" preload="metadata" playsinline style="display:none"></audio><div id="customPlayer" class="custom-player" style="display:none"><button id="playerBtn" class="player-btn" type="button" onclick="togglePlayback()">▶</button><div class="player-main"><div id="playerTime" class="player-time">0.0 s / 0.0 s</div><div class="player-track"><div id="playerFill" class="player-fill"></div></div></div></div></div>
-<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="superationBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
+<div class="panel" style="margin-top:12px"><div id="resultLabel" class="label">Resultado</div><div id="resultTitle" class="result-title">Tu resultado aparecerá aquí</div><div id="resultDesc" class="result-desc">Graba una toma para ver el análisis.</div><div id="resultExtra" class="result-extra"></div><div id="keywordRow" class="pills"></div><div class="metrics"><div class="metric"><div id="metricEnergy" class="metric-value">--</div><div id="metricEnergyLabel" class="metric-label">Energía</div></div><div class="metric"><div id="metricClarity" class="metric-value">--</div><div id="metricClarityLabel" class="metric-label">Claridad</div></div><div class="metric"><div id="metricConfidence" class="metric-value">--</div><div id="metricConfidenceLabel" class="metric-label">Confianza</div></div></div><div id="scoreBox" class="score-box hidden"><div id="scoreLabel" class="box-title">Puntuación</div><div id="scoreBig" class="score-big">0/100</div><div id="scoreNote" class="score-note">—</div></div><div id="progressBox" class="box" style="display:none;margin-top:14px"></div><div id="compareBox" class="box" style="display:none"><div id="compareTitle" class="box-title">Comparación de tomas</div><div id="compareGrid" class="small"></div><div id="compareSummary" class="small" style="margin-top:8px"></div></div><div id="insightBox" class="box" style="display:none"><div id="insightTitle" class="box-title">Lectura rápida</div><div id="insightText" class="small" style="font-size:15px"></div></div><div class="actions" style="margin-top:14px"><button id="retryBtn" class="btn btn-primary" onclick="retrySamePrompt()">Volver a probar</button><button id="newBtn" class="btn btn-secondary" onclick="nextPrompt()">Nueva frase</button><button id="shareBtn" class="btn btn-secondary" onclick="shareCurrent()">Compartir</button><button id="challengeFriendBtn" class="btn btn-secondary hidden" onclick="challengeFriend()">Retar a alguien</button><button id="duelBtn" class="btn btn-secondary hidden" onclick="showDuel()">Ver duelo</button><button id="compareBtn" class="btn btn-secondary hidden" onclick="showComparison()">Ver comparativa</button></div></div>
 
 </section>
 
@@ -1814,7 +1814,6 @@ function renderScore(energy,clarity,confidence){
          score>=70 ? 'Good result: there is a clear base, though you can still gain consistency.' :
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
-  vmRenderSuperation(score);
   vmRenderProgress(score);
   return score;
 }
@@ -2116,70 +2115,63 @@ function vmGetLevel(score){
   return state.lang==='es' ? 'Presencia real 🔥' : 'Real presence 🔥';
 }
 
-function vmRenderSuperation(score){
-  var box = document.getElementById('superationBox');
-  if(!box) return;
 
-  var history = vmGetHistory();
-  var bestBefore = history.length ? Math.max.apply(null, history) : 0;
-  var current = score;
 
-  var headline = '';
-  var sub = '';
-  var delta = bestBefore - current;
-
+function vmGetProgressMessage(current, bestBefore){
   if(!bestBefore){
-    headline = 'Tu mejor empieza aquí';
-    sub = 'Haz otra toma para empezar a superarte.';
-  } else if(current > bestBefore){
-    headline = '🏆 Nuevo mejor resultado';
-    sub = 'Has superado tu mejor anterior ' + bestBefore + '/100.';
-  } else if(current === bestBefore){
-    headline = '🎯 Has igualado tu mejor';
-    sub = 'Estás en tu techo actual. Intenta superarlo.';
-  } else {
-    headline = 'Supera tu mejor versión';
-    sub = 'Te faltan +' + delta + ' puntos para superar tu mejor ' + bestBefore + '/100.';
+    return state.lang==='es' ? 'Tu mejor empieza aquí.' : 'Your best starts here.';
   }
-
-  var nextTarget = Math.min(100, bestBefore + 1);
-
-  box.style.display = 'block';
-  box.innerHTML =
-    '<div class="superation-head">Modo superación</div>' +
-    '<div class="superation-main">' + headline + '</div>' +
-    '<div class="superation-sub">' + sub + '</div>' +
-    '<div class="superation-row">' +
-      '<div class="superation-pill">Tu mejor: ' + (current > bestBefore ? current : bestBefore) + '/100</div>' +
-      '<div class="superation-pill">Ahora: ' + current + '/100</div>' +
-      '<div class="superation-pill accent">Objetivo: ' + nextTarget + '/100</div>' +
-    '</div>';
+  if(current > bestBefore){
+    return state.lang==='es' ? '🏆 Acabas de romper tu techo.' : '🏆 You just broke your ceiling.';
+  }
+  if(current === bestBefore){
+    return state.lang==='es' ? '🎯 Has igualado tu mejor. Una toma más y lo rompes.' : '🎯 You matched your best. One more take and you break it.';
+  }
+  var delta = bestBefore - current;
+  if(delta <= 1){
+    return state.lang==='es' ? '🔥 Estás a 1 punto de tu mejor versión.' : '🔥 You are 1 point away from your best version.';
+  }
+  if(delta <= 3){
+    return state.lang==='es' ? '⚡ Estás muy cerca de tu mejor nivel.' : '⚡ You are very close to your best level.';
+  }
+  if(delta <= 7){
+    return state.lang==='es' ? ('📈 Te faltan +' + delta + ' puntos para volver a tu mejor nivel.') : ('📈 You need +' + delta + ' points to get back to your best level.');
+  }
+  return state.lang==='es' ? ('🎯 Aún hay margen: te faltan +' + delta + ' puntos.') : ('🎯 There is still room: you need +' + delta + ' points.');
 }
-
 function vmRenderProgress(score){
   var box = document.getElementById('progressBox');
   if(!box) return;
   var history = vmGetHistory();
+
+  var bestBefore = history.length ? Math.max.apply(null, history) : 0;
+
   if(typeof score === 'number' && !isNaN(score)){
     history.push(score);
     if(history.length > 5) history.shift();
     vmSetHistory(history);
   }
+
   if(!history.length){
     box.style.display = 'none';
     return;
   }
+
   var best = Math.max.apply(null, history);
-  var current = history[history.length - 1];
+  var current = (typeof score === 'number' && !isNaN(score)) ? score : history[history.length - 1];
+  var level = vmGetLevel(current);
+  var message = vmGetProgressMessage(current, bestBefore);
+
   box.style.display = 'block';
   box.innerHTML =
     '<div class="progress-head">' + (state.lang==='es' ? 'Progreso' : 'Progress') + '</div>' +
-    '<div class="progress-level">' + vmGetLevel(current) + '</div>' +
+    '<div class="progress-level">' + level + '</div>' +
     '<div class="progress-sub">' + (state.lang==='es' ? 'Mejor puntuación' : 'Best score') + ': <strong>' + best + '/100</strong></div>' +
     '<div class="progress-sub">' + (state.lang==='es' ? 'Últimas tomas' : 'Last takes') + '</div>' +
     '<div class="progress-row">' +
       history.map(function(s){ return '<div class="progress-pill">' + s + '/100</div>'; }).join('') +
-    '</div>';
+    '</div>' +
+    '<div class="progress-sub" style="margin-top:12px"><strong>' + message + '</strong></div>';
 }
 
 
