@@ -1374,6 +1374,7 @@ function clearResult(){
   $('compareBox').style.display='none';
   $('insightBox').style.display='none';
   $('scoreBox').className='score-box hidden';
+  $('scoreBox').style.display='none';
 }
 
 
@@ -1776,7 +1777,7 @@ function renderScore(energy,clarity,confidence){
          'Decent result, but there is still clear room to improve presence or confidence.');
   }
 
-  scoreBox.className = scoreBox.className.replace(' hidden','');
+  scoreBox.style.display = 'block';
 }
 
 function shareCurrent(){
