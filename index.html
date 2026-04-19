@@ -542,7 +542,7 @@ function scrollTopApp(){
   requestAnimationFrame(doScroll);
 }
 
-var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}}};
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}},recordMimeType:'',audioStats:null,audioContext:null,analyser:null,sourceNode:null,analysisTimer:null};
 
 var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
 en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
@@ -1843,7 +1843,10 @@ function finishRecording(){
   stopBar();
   animateViz(true);
   stopRecordTimer();
-  var blob=new Blob(state.chunks,{type:'audio/webm'});
+  stopLiveAudioAnalysis();
+
+  var blobType = state.recordMimeType || (state.mediaRecorder && state.mediaRecorder.mimeType) || 'audio/mp4';
+  var blob=new Blob(state.chunks,{type:blobType});
   if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
   state.audioUrl=URL.createObjectURL(blob);
   $('audioPlayer').src=state.audioUrl;
@@ -1865,15 +1868,27 @@ function finishRecording(){
   }catch(e){}
   showCustomPlayer();
 
-  var energy=Math.floor(Math.random()*39)+60, clarity=Math.floor(Math.random()*40)+58, confidence=Math.round(energy*.46+clarity*.54);
-  if(confidence>98) confidence=98;
+  var metrics = computeMetricsFromAudio(duration);
+  var energy = metrics.energy;
+  var clarity = metrics.clarity;
+  var confidence = metrics.confidence;
+
   if(state.pendingCompare && state.lastResult && state.lastResult.prompt===state.currentPrompt && state.lastResult.mode===state.mode){ state.previousResult=state.lastResult; } else { state.previousResult=null; }
 
   var chosen = null;
   try{ chosen = chooseResult(energy,clarity,confidence); }catch(e){ chosen = null; }
+
+  if(metrics.silent){
+    try{
+      var weakPool = (results[state.mode][state.lang] || []).filter(function(x){ return x.archetype==='weak' || x.archetype==='reserve' || x.archetype==='mystery' || x.archetype==='cold'; });
+      if(weakPool.length) chosen = weakPool[0];
+    }catch(e){}
+  }
+
   if(!chosen){
     try{ chosen = results[state.mode][state.lang][0]; }catch(e){ chosen = {emoji:'🎭',title:(state.lang==='es'?'Resultado generado':'Generated result'),desc:(state.lang==='es'?'La app generó un resultado de respaldo.':'The app generated a fallback result.'),tags:['voz','resultado','análisis'],archetype:'mid'}; }
   }
+
   var result={mode:state.mode,prompt:state.currentPrompt,energy:energy,clarity:clarity,confidence:confidence,title:chosen.emoji+' '+chosen.title,desc:chosen.desc,tags:chosen.tags,archetype:chosen.archetype};
   state.lastResult=result;
   rememberResult(result);
@@ -1886,8 +1901,8 @@ function finishRecording(){
   $('resultTitle').innerHTML=result.title;
   $('resultDesc').innerHTML=result.desc;
   $('resultExtra').innerHTML=state.lang==='es'
-    ? ('Toma registrada ('+duration.toFixed(1)+' s).')
-    : ('Take recorded ('+duration.toFixed(1)+' s).');
+    ? ('Toma registrada ('+duration.toFixed(1)+' s).' + (metrics.silent ? ' Se detectó muy poca voz real en la toma.' : ''))
+    : ('Take recorded ('+duration.toFixed(1)+' s).' + (metrics.silent ? ' Very little real voice was detected in this take.' : ''));
   $('metricEnergy').innerHTML=energy; $('metricClarity').innerHTML=clarity; $('metricConfidence').innerHTML=confidence;
   formatTags(result.tags);
   var forcedScore = renderScore(energy,clarity,confidence);
@@ -1961,6 +1976,98 @@ function togglePlayback(){
   }
 }
 
+
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+function getBestRecorderMimeType(){
+  var candidates = ['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'];
+  try{
+    if(typeof MediaRecorder==='undefined' || !MediaRecorder.isTypeSupported) return '';
+    for(var i=0;i<candidates.length;i++){
+      if(MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
+    }
+  }catch(e){}
+  return '';
+}
+
+function resetAudioStats(){
+  state.audioStats = {samples:0,speechFrames:0,sumRms:0,peakRms:0,speechRatio:0,avgRms:0};
+}
+
+function startLiveAudioAnalysis(stream){
+  resetAudioStats();
+  try{
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    state.audioContext = new AudioCtx();
+    state.sourceNode = state.audioContext.createMediaStreamSource(stream);
+    state.analyser = state.audioContext.createAnalyser();
+    state.analyser.fftSize = 1024;
+    state.analyser.smoothingTimeConstant = 0.65;
+    state.sourceNode.connect(state.analyser);
+    var data = new Uint8Array(state.analyser.fftSize);
+    state.analysisTimer = setInterval(function(){
+      if(!state.analyser || !state.isRecording || !state.audioStats) return;
+      state.analyser.getByteTimeDomainData(data);
+      var sum = 0;
+      for(var i=0;i<data.length;i++){
+        var v = (data[i]-128)/128;
+        sum += v*v;
+      }
+      var rms = Math.sqrt(sum / data.length);
+      state.audioStats.samples += 1;
+      state.audioStats.sumRms += rms;
+      if(rms > state.audioStats.peakRms) state.audioStats.peakRms = rms;
+      if(rms > 0.018) state.audioStats.speechFrames += 1;
+      state.audioStats.avgRms = state.audioStats.sumRms / Math.max(1, state.audioStats.samples);
+      state.audioStats.speechRatio = state.audioStats.speechFrames / Math.max(1, state.audioStats.samples);
+    }, 120);
+  }catch(e){}
+}
+
+function stopLiveAudioAnalysis(){
+  try{ if(state.analysisTimer){ clearInterval(state.analysisTimer); state.analysisTimer = null; } }catch(e){}
+  try{ if(state.sourceNode){ state.sourceNode.disconnect(); state.sourceNode = null; } }catch(e){}
+  try{ if(state.analyser){ state.analyser.disconnect && state.analyser.disconnect(); state.analyser = null; } }catch(e){}
+  try{
+    if(state.audioContext){
+      var ctx = state.audioContext;
+      state.audioContext = null;
+      if(ctx.state !== 'closed' && ctx.close) ctx.close();
+    }
+  }catch(e){}
+}
+
+function computeMetricsFromAudio(duration){
+  var s = state.audioStats || {samples:0,speechFrames:0,sumRms:0,peakRms:0,speechRatio:0,avgRms:0};
+  var avg = s.avgRms || 0;
+  var peak = s.peakRms || 0;
+  var ratio = s.speechRatio || 0;
+  var speaking = s.speechFrames || 0;
+  var dynamic = Math.max(0, peak - avg);
+  var durationBoost = Math.min(12, duration * 2.2);
+
+  if(s.samples < 2 || speaking < 2 || ratio < 0.10 || avg < 0.010){
+    return {
+      energy: clamp(Math.round(18 + ratio*120 + avg*900 + duration*3), 12, 42),
+      clarity: clamp(Math.round(28 + ratio*80 + duration*2), 20, 50),
+      confidence: clamp(Math.round(20 + ratio*90 + avg*700 + duration*2), 15, 45),
+      silent: true
+    };
+  }
+
+  var energy = Math.round(30 + avg*1200 + ratio*38 + durationBoost + dynamic*260);
+  var clarity = Math.round(42 + ratio*28 + (1-Math.min(1,dynamic*8))*16 + Math.min(8,duration*1.2));
+  var confidence = Math.round(34 + avg*820 + ratio*34 + Math.min(10,duration*1.7) + dynamic*110);
+
+  return {
+    energy: clamp(energy, 38, 96),
+    clarity: clamp(clarity, 40, 96),
+    confidence: clamp(confidence, 35, 96),
+    silent: false
+  };
+}
+
 function toggleRecording(){
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
     alert(state.lang==='es'?'Tu navegador no permite grabar audio.':'Your browser cannot record audio.');
@@ -1970,14 +2077,21 @@ function toggleRecording(){
     try{ state.mediaRecorder.stop(); }catch(e){}
     state.isRecording=false;
     stopRecordTimer();
+    stopLiveAudioAnalysis();
     $('micBtn').className='mic-btn';
     $('recordStatus').innerHTML=state.lang==='es'?'Procesando grabación...':'Processing recording...';
     return;
   }
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     state.stream=stream;
-    state.mediaRecorder=new MediaRecorder(stream);
     state.chunks=[];
+    state.recordMimeType = getBestRecorderMimeType();
+    try{
+      state.mediaRecorder = state.recordMimeType ? new MediaRecorder(stream,{mimeType:state.recordMimeType}) : new MediaRecorder(stream);
+    }catch(e){
+      state.mediaRecorder = new MediaRecorder(stream);
+      state.recordMimeType = state.mediaRecorder.mimeType || '';
+    }
     state.mediaRecorder.ondataavailable=function(e){ if(e.data && e.data.size>0) state.chunks.push(e.data); };
     state.mediaRecorder.onstop=function(){
       if(state.stream){ try{ state.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} }
@@ -1991,6 +2105,7 @@ function toggleRecording(){
     startBar();
     animateViz(false);
     startRecordTimer();
+    startLiveAudioAnalysis(stream);
     playTone('start');
   }).catch(function(){
     alert(state.lang==='es'?'No se pudo acceder al micrófono.':'Could not access the microphone.');
