@@ -1503,7 +1503,8 @@ function nextPrompt(){
   if(state.mode==='challenge' && state.incomingChallenge && state.autoChallengeMode){
     state.currentPrompt = state.incomingChallenge.prompt;
   } else {
-    state.currentPrompt = chooseSmartPrompt(prompts[state.mode][state.lang]);
+    var pool = prompts[state.mode][state.lang];
+    state.currentPrompt = vmPickPrompt(pool);
   }
   renderPrompt(state.currentPrompt);
   clearResult();
@@ -2137,6 +2138,29 @@ function vmRenderProgress(score){
     '<div class="progress-row">' +
       history.map(function(s){ return '<div class="progress-pill">' + s + '/100</div>'; }).join('') +
     '</div>';
+}
+
+
+function vmPromptHistoryKey(){
+  return 'vm_prompt_history_' + state.lang + '_' + state.mode;
+}
+function vmGetPromptHistory(){
+  try{ return JSON.parse(localStorage.getItem(vmPromptHistoryKey()) || '[]'); }catch(e){ return []; }
+}
+function vmSetPromptHistory(arr){
+  try{ localStorage.setItem(vmPromptHistoryKey(), JSON.stringify(arr || [])); }catch(e){}
+}
+function vmPickPrompt(pool){
+  if(!pool || !pool.length) return '';
+  var history = vmGetPromptHistory();
+  var recent = history.slice(-15);
+  var available = pool.filter(function(p){ return recent.indexOf(p) === -1; });
+  if(!available.length) available = pool.slice();
+  var chosen = available[Math.floor(Math.random() * available.length)];
+  history.push(chosen);
+  if(history.length > 25) history.shift();
+  vmSetPromptHistory(history);
+  return chosen;
 }
 
 function toggleRecording(){
