@@ -2023,6 +2023,43 @@ document.addEventListener('visibilitychange', function(){
     }
   }catch(e){}
 });
+
+// --- Smart rotation system ---
+var vm_history = {phrases:[], types:[]};
+
+function vm_getType(text){
+  if(!text) return 'neutral';
+  if(/control|lider|decidir|mand/i.test(text)) return 'authority';
+  if(/calma|tranquil/i.test(text)) return 'calm';
+  if(/miedo|tenso|presion/i.test(text)) return 'tension';
+  if(/secreto|misterio|intriga/i.test(text)) return 'mystery';
+  if(/seduc|atra/i.test(text)) return 'magnet';
+  if(/precis|claro/i.test(text)) return 'precision';
+  return 'neutral';
+}
+
+function vm_pick(pool){
+  var filtered = pool.filter(p=>!vm_history.phrases.includes(p));
+  if(filtered.length<5) filtered = pool;
+
+  var candidates = filtered.filter(p=>{
+    var t = vm_getType(p);
+    return !vm_history.types.slice(-2).includes(t);
+  });
+
+  if(!candidates.length) candidates = filtered;
+
+  var pick = candidates[Math.floor(Math.random()*candidates.length)];
+
+  vm_history.phrases.push(pick);
+  vm_history.types.push(vm_getType(pick));
+
+  if(vm_history.phrases.length>15) vm_history.phrases.shift();
+  if(vm_history.types.length>10) vm_history.types.shift();
+
+  return pick;
+}
+
 </script>
 </body>
 </html>
