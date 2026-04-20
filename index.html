@@ -2330,30 +2330,75 @@ function buildSpecificFeedback(mode, score, silent){
 
 function buildMicroChallenge(mode){
   var d = getUnifiedDiagnosis(mode, state.lastScore || 0, false);
-  var optionsEs = [d.challengeEs];
-  var optionsEn = [d.challengeEn];
+  var optionsEs = [];
+  var optionsEn = [];
 
+  // Base option from the unified diagnosis
+  optionsEs.push(d.challengeEs);
+  optionsEn.push(d.challengeEn);
+
+  // Add diagnosis-specific variations
   if(d.tier==='strong_entry_refine'){
-    optionsEs.push('Prueba otra toma con la misma seguridad, pero entrando un poco antes en la frase.');
-    optionsEn.push('Try another take with the same confidence, but entering the line a bit earlier.');
+    optionsEs.push('Haz otra toma entrando antes en situación, sin endurecer más la voz.');
+    optionsEs.push('Repite la frase con la misma seguridad, pero apoyando mejor la primera palabra.');
+    optionsEn.push('Take another shot entering the situation earlier, without making the voice harder.');
+    optionsEn.push('Repeat the line with the same confidence, but support the first word better.');
   } else if(d.tier==='strong_finish_refine'){
-    optionsEs.push('Haz una toma igual de sólida, pero redondeando mejor el final.');
-    optionsEn.push('Do a similarly solid take, but round off the ending better.');
+    optionsEs.push('Haz una toma igual de sólida, pero cerrando la última parte con más peso.');
+    optionsEs.push('Repite la frase manteniendo el final tan estable como el arranque.');
+    optionsEn.push('Do a similarly solid take, but close the last part with more weight.');
+    optionsEn.push('Repeat the line keeping the ending as stable as the opening.');
   } else if(d.tier==='mid_entry' || d.tier==='scene_entry'){
-    optionsEs.push('Repite la frase entrando con más intención desde la primera palabra.');
-    optionsEn.push('Repeat the line entering with more intention from the first word.');
+    optionsEs.push('Repite la frase con una entrada más clara, pero sin acelerar.');
+    optionsEs.push('Haz otra toma marcando mejor la primera mitad, sin subir el volumen.');
+    optionsEn.push('Repeat the line with a clearer opening, but without speeding up.');
+    optionsEn.push('Do another take marking the first half better, without raising the volume.');
+  } else if(d.tier==='mid_finish' || d.tier==='challenge_finish'){
+    optionsEs.push('Haz otra toma sosteniendo más la última parte de la frase.');
+    optionsEs.push('Repite la frase rematando mejor el cierre, sin perder control.');
+    optionsEn.push('Do another take holding the last part of the line more.');
+    optionsEn.push('Repeat the line with a stronger finish, without losing control.');
   } else if(d.tier==='broken' || d.tier==='challenge_broken' || d.tier==='scene_broken'){
     optionsEs.push('Hazla otra vez sin frenarte a mitad de la frase.');
+    optionsEs.push('Prueba una toma más corrida, con menos pausas intermedias.');
     optionsEn.push('Do it again without braking in the middle of the line.');
+    optionsEn.push('Try a smoother take with fewer mid-line pauses.');
   } else if(d.tier==='challenge_strong'){
     optionsEs.push('Mantén esta fuerza y aprieta un poco más la precisión.');
+    optionsEs.push('Haz otra toma igual de potente, pero con la dicción un poco más limpia.');
     optionsEn.push('Keep this strength and tighten precision a bit more.');
+    optionsEn.push('Do another equally strong take, but with slightly cleaner diction.');
+  } else if(d.tier==='thoughts_strong' || d.tier==='thoughts_mid'){
+    optionsEs.push('Repite la frase un poco más suelta, sin perder claridad.');
+    optionsEs.push('Haz otra toma dejando respirar más el ritmo.');
+    optionsEn.push('Repeat the line a bit looser, without losing clarity.');
+    optionsEn.push('Do another take letting the rhythm breathe more.');
+  } else if(d.tier==='scene_strong' || d.tier==='scene_mid'){
+    optionsEs.push('Haz otra toma como si la escena empezara un segundo antes de hablar.');
+    optionsEs.push('Repite la frase sosteniendo el contexto hasta la última palabra.');
+    optionsEn.push('Do another take as if the scene started one second before speaking.');
+    optionsEn.push('Repeat the line holding the context until the last word.');
+  } else if(d.tier==='strong_clean'){
+    optionsEs.push('Repite la frase un poco más lenta sin perder presencia.');
+    optionsEs.push('Haz otra toma igual de sólida, pero con un ritmo un poco más limpio.');
+    optionsEn.push('Repeat the line slightly slower without losing presence.');
+    optionsEn.push('Do another equally solid take, but with a slightly cleaner rhythm.');
+  } else {
+    optionsEs.push('Haz otra toma manteniendo la misma línea general, pero más ordenada.');
+    optionsEs.push('Repite la frase con el mismo tono, afinando un poco más el ritmo.');
+    optionsEn.push('Do another take keeping the same overall line, but more organized.');
+    optionsEn.push('Repeat the line with the same tone, refining the rhythm a bit more.');
   }
 
   var options = state.lang==='es' ? optionsEs : optionsEn;
   var recent = state.lastChallenges || [];
-  var chosen = options.find(function(x){ return recent.indexOf(x) === -1; }) || options[0];
-  state.lastChallenges = recent.concat([chosen]).slice(-5);
+
+  // Prefer options not used recently; if all used, rotate by count.
+  var filtered = options.filter(function(x){ return recent.indexOf(x) === -1; });
+  var pool = filtered.length ? filtered : options;
+  var chosen = pool[Math.floor(Math.random() * pool.length)];
+
+  state.lastChallenges = recent.concat([chosen]).slice(-6);
   return chosen;
 }
 
