@@ -2098,11 +2098,11 @@ function buildSpecificFeedback(mode, score, silent){
 
   if(mode==='personality'){
     if(a.entry==='weak'){
-      es = soft('Hay buena base general.', 'Si arrancas con más decisión, tu presencia sube mucho.');
-      en = soft('There is a solid base.', 'If you enter with more decision, your presence rises a lot.');
+      es = soft('Hay buena base general.', 'La entrada puede ganar un poco más de decisión para sonar aún más firme.');
+      en = soft('There is a solid base.', 'The opening can gain a bit more decision to sound even firmer.');
     } else if(a.finish==='drops'){
-      es = soft('La entrada funciona bien.', 'Ahora mantén el final igual de firme.');
-      en = soft('The entry works well.', 'Now keep the ending as firm.');
+      es = soft('La entrada funciona bien.', 'Ahora mantén el final igual de firme para cerrar con más peso.');
+      en = soft('The entry works well.', 'Now keep the ending equally firm to close with more weight.');
     } else {
       es = 'Suena bastante sólido y natural.';
       en = 'It sounds quite solid and natural.';
@@ -2209,34 +2209,51 @@ function computeMetricsFromAudio(duration){
     };
   }
 
-  var energy = Math.round(26 + avg*980 + ratio*34 + durationBoost + dynamic*180);
-  var clarity = Math.round(36 + ratio*24 + (1-Math.min(1,dynamic*7))*14 + Math.min(8,duration*1.2));
-  var confidence = Math.round(28 + avg*720 + ratio*28 + Math.min(10,duration*1.7) + dynamic*85);
+  var energy = Math.round(28 + avg*900 + ratio*30 + durationBoost + dynamic*150);
+  var clarity = Math.round(52 + ratio*18 + (1-Math.min(1,dynamic*6))*10 + Math.min(6,duration*0.9));
+  var confidence = Math.round(30 + avg*700 + ratio*24 + Math.min(8,duration*1.3) + dynamic*70);
 
   var analysis = analyzeVoiceProfile(duration);
-  if(analysis.entry === 'weak') confidence -= 6;
-  if(analysis.finish === 'drops') confidence -= 4;
-  if(analysis.pacing === 'broken') clarity -= 9;
-  if(analysis.control === 'high') clarity += 6;
-  if(analysis.intensity === 'high' && analysis.control !== 'low') energy += 6;
-  if(analysis.intensity === 'low' && ratio < 0.45) energy -= 7;
+
+  if(analysis.entry === 'weak'){
+    confidence -= 5;
+    clarity -= 3;
+  }
+  if(analysis.finish === 'drops'){
+    confidence -= 3;
+    clarity -= 2;
+  }
+  if(analysis.pacing === 'broken'){
+    clarity -= 7;
+  }
+  if(analysis.control === 'high'){
+    clarity += 7;
+    confidence += 2;
+  }
+  if(analysis.intensity === 'high' && analysis.control !== 'low'){
+    energy += 5;
+  }
+  if(analysis.intensity === 'low' && ratio < 0.45){
+    energy -= 5;
+  }
 
   if(state.mode==='challenge'){
-    if(analysis.control === 'high') clarity += 4;
-    if(analysis.pacing === 'broken') clarity -= 4;
+    if(analysis.control === 'high') clarity += 3;
+    if(analysis.pacing === 'broken') clarity -= 3;
   } else if(state.mode==='scene'){
-    if(analysis.entry === 'strong' && analysis.finish === 'held') confidence += 5;
-    if(analysis.pacing === 'broken') confidence -= 5;
+    if(analysis.entry === 'strong' && analysis.finish === 'held') confidence += 4;
+    if(analysis.pacing === 'broken') confidence -= 4;
   } else if(state.mode==='thoughts'){
     if(analysis.intensity === 'low' && analysis.pacing === 'stable') clarity += 3;
   } else if(state.mode==='personality'){
-    if(analysis.entry === 'strong') confidence += 4;
+    if(analysis.entry === 'strong') confidence += 3;
+    if(analysis.control === 'high') clarity += 2;
   }
 
   return {
-    energy: clamp(energy, 35, 95),
-    clarity: clamp(clarity, 35, 95),
-    confidence: clamp(confidence, 30, 95),
+    energy: clamp(energy, 38, 95),
+    clarity: clamp(clarity, 42, 92),
+    confidence: clamp(confidence, 35, 95),
     silent: false
   };
 }
