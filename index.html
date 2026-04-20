@@ -548,7 +548,7 @@ function scrollTopApp(){
   requestAnimationFrame(doScroll);
 }
 
-var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}},recordMimeType:'',audioStats:null,audioContext:null,analyser:null,sourceNode:null,analysisTimer:null,analysisSummary:null};
+var state={lang:'es',mode:'personality',isRecording:false,mediaRecorder:null,stream:null,chunks:[],currentPrompt:'',lastResult:null,previousResult:null,pendingCompare:false,audioUrl:null,barTimer:null,barProgress:0,saved:{personality:null,thoughts:null},settings:{saveHistory:JSON.parse(localStorage.getItem('vm_saveHistory')||'true'),sounds:JSON.parse(localStorage.getItem('vm_sounds')||'true')},incomingChallenge:null,lastChallengeScore:null,lastChallengeResult:null,autoChallengeMode:false,lastResults:[],progress:JSON.parse(localStorage.getItem('vm_progress_v4')||'{"takes":0,"bestScore":0,"wins":0,"totals":{"energy":0,"clarity":0,"confidence":0},"modes":{"personality":{"takes":0,"score":0},"thoughts":{"takes":0,"score":0},"challenge":{"takes":0,"score":0},"scene":{"takes":0,"score":0}}}'),recordStartTs:null,recordSeconds:0,recordTimer:null,promptHistory:{es:{personality:[],thoughts:[],challenge:[],scene:[]},en:{personality:[],thoughts:[],challenge:[],scene:[]}},recordMimeType:'',audioStats:null,audioContext:null,analyser:null,sourceNode:null,analysisTimer:null,analysisSummary:null,lastChallenges:[]};
 
 var texts={es:{tagline:'TU VOZ REVELA MÁS DE LO QUE CREES',personality:'🧠 Personalidad',personalitySub:'Descubre qué rasgo transmite tu voz',thoughts:'🪞 ¿Qué piensan de ti?',thoughtsSub:'Lectura social de tu primera impresión',challenge:'🔥 Desafíos',challengeSub:'Pruebas de tono, control e impacto',scene:'🎬 Escenarios',sceneSub:'Cómo sonarías en situaciones reales',compareMode:'⚖️ Comparativa',compareModeSub:'Cómo eres vs cómo te perciben',homeBtn:'← Inicio',promptLabel:'Instrucción / frase',audioLabel:'Tu grabación',audioHint:'Aquí podrás escuchar tu voz.',resultLabel:'Resultado',resultPlaceholderTitle:'Tu resultado aparecerá aquí',resultPlaceholderDesc:'Graba una toma para ver el análisis.',recordIdle:'Pulsa para grabar y lee la frase',recordOn:'Grabando... vuelve a pulsar para parar',energy:'Energía',clarity:'Claridad',confidence:'Confianza',compare:'Comparación de tomas',insight:'Lectura rápida',retry:'Volver a probar',newPhrase:'Nueva frase',compareBtn:'Ver comparativa',share:'Compartir',retryTitle:'Vuelve a grabar',retryDesc:'Se comparará con tu toma anterior.',homePersonalityDesc:'Descubre el rasgo dominante de tu voz',homeThoughtsDesc:'La primera impresión que transmites',homeChallengeDesc:'Supera pruebas de tono, control e impacto',homeSceneDesc:'Prueba tu voz en situaciones reales',homeCompareDesc:'Mira la diferencia entre cómo eres y cómo te perciben',history:'Historial',settings:'Ajustes',bottom:'TU VOZ. TU HISTORIA.',compareHero:'Tu voz por dentro y por fuera',compareCard1:'Cómo eres',compareCard2:'Cómo te perciben',retestPersonality:'Repetir Personalidad',retestThoughts:'Repetir Percepción',score:'Puntuación',challengeLead:'Aquí importa si suenas convincente de verdad, no solo correcto.',challengePassed:'Reto superado',challengeAlmost:'Casi',challengeFail:'No has entrado del todo',challengeImpact:'Muy potente',challengeControl:'Buen control',sceneGood:'Encajas muy bien en esta escena',sceneMid:'La escena funciona, pero podrías entrar con más intención',sceneWeak:'Aún no se siente del todo dentro del contexto',sceneLead:'Aquí importa si tu voz entra de verdad en la situación.',historyTitle:'🕘 Historial',historySub:'Tus últimas lecturas',settingsTitle:'⚙️ Ajustes',settingsSub:'Controla la experiencia local',clearHistory:'Borrar historial',noHistory:'Aún no hay historial.',saveHistoryLabel:'Guardar historial',saveHistoryDesc:'Guarda resultados en este dispositivo.',soundsLabel:'Sonidos',soundsDesc:'Activa o desactiva los efectos de audio.',micPermissionLabel:'Comprobar permiso del micrófono',micPermissionDesc:'Revisa si el navegador ya recuerda el permiso.',check:'Comprobar',on:'Activado',off:'Desactivado',historyCleared:'Historial borrado.',challengeFriend:'Retar a alguien',incomingChallengeTitle:'Reto recibido',useIncomingChallenge:'Usar este reto',challengeShareLead:'Te reto en VoiceMirror 🔥',challengeNeedResult:'Haz una grabación en Desafíos primero.',challengeCopied:'Reto copiado para compartir.',shareChallengeResult:'Mi resultado',challengeYourTurn:'A ver si me superas.',incomingReady:'Se ha detectado un reto en el enlace. Ya está cargado automáticamente para que puedas grabarlo.',duelTitle:'⚔️ Duelo',duelSub:'Comparación automática de desafío',duelWinner:'Ganador',duelTie:'Empate técnico',duelYou:'Tu resultado',duelRival:'Resultado rival',duelReason:'Motivo',duelStart:'Ver duelo',duelNoIncoming:'No hay reto rival cargado.',duelShareResult:'Compartir duelo',rematch:'Revancha'},
 en:{tagline:'YOUR VOICE REVEALS MORE THAN YOU THINK',personality:'🧠 Personality',personalitySub:'Discover which trait your voice projects',thoughts:'🪞 What do people think of you?',thoughtsSub:'Social reading of your first impression',challenge:'🔥 Challenges',challengeSub:'Tests of tone, control and impact',scene:'🎬 Scenarios',sceneSub:'How you would sound in real situations',compareMode:'⚖️ Comparison',compareModeSub:'Who you are vs how you are perceived',homeBtn:'← Home',promptLabel:'Instruction + line',audioLabel:'Your recording',audioHint:'You can listen to your voice here.',resultLabel:'Result',resultPlaceholderTitle:'Your result will appear here',resultPlaceholderDesc:'Record a take to see the analysis.',recordIdle:'Tap to record and read the line',recordOn:'Recording... tap again to stop',energy:'Energy',clarity:'Clarity',confidence:'Confidence',compare:'Take comparison',insight:'Quick read',retry:'Try again',newPhrase:'New phrase',compareBtn:'View comparison',share:'Share',retryTitle:'Record again',retryDesc:'It will be compared with your previous take.',homePersonalityDesc:'Discover the dominant trait in your voice',homeThoughtsDesc:'The first impression you transmit',homeChallengeDesc:'Beat tests of tone, control and impact',homeSceneDesc:'Try your voice in real situations',homeCompareDesc:'See the difference between who you are and how people perceive you',history:'History',settings:'Settings',bottom:'YOUR VOICE. YOUR STORY.',compareHero:'Your voice inside and out',compareCard1:'Who you are',compareCard2:'How you are perceived',retestPersonality:'Retake Personality',retestThoughts:'Retake Perception',score:'Score',challengeLead:'What matters here is whether you sound convincing, not just correct.',challengePassed:'Challenge passed',challengeAlmost:'Almost',challengeFail:'Not fully in yet',challengeImpact:'High impact',challengeControl:'Good control',sceneGood:'You fit this scene very well',sceneMid:'The scene works, but you could enter with more intention',sceneWeak:'It does not fully feel inside the context yet',sceneLead:'What matters here is whether your voice truly enters the situation.',historyTitle:'🕘 History',historySub:'Your latest readings',settingsTitle:'⚙️ Settings',settingsSub:'Control your local experience',clearHistory:'Clear history',noHistory:'No history yet.',saveHistoryLabel:'Save history',saveHistoryDesc:'Save results on this device.',soundsLabel:'Sounds',soundsDesc:'Enable or disable audio effects.',micPermissionLabel:'Check microphone permission',micPermissionDesc:'See whether the browser already remembers the permission.',check:'Check',on:'On',off:'Off',historyCleared:'History cleared.',challengeFriend:'Challenge someone',incomingChallengeTitle:'Incoming challenge',useIncomingChallenge:'Use this challenge',challengeShareLead:'I challenge you on VoiceMirror 🔥',challengeNeedResult:'Record something in Challenges first.',challengeCopied:'Challenge copied to share.',shareChallengeResult:'My result',challengeYourTurn:'Let us see if you can beat me.',incomingReady:'A challenge was detected in the link. It has been loaded automatically so you can record it.',duelTitle:'⚔️ Duel',duelSub:'Automatic challenge comparison',duelWinner:'Winner',duelTie:'Technical tie',duelYou:'Your result',duelRival:'Rival result',duelReason:'Reason',duelStart:'View duel',duelNoIncoming:'No rival challenge loaded.',duelShareResult:'Share duel',rematch:'Rematch'}};
@@ -2079,6 +2079,7 @@ function analyzeVoiceProfile(duration){
   state.analysisSummary = summary;
   return summary;
 }
+
 function buildSpecificFeedback(mode, score, silent){
   var a = state.analysisSummary || {};
   if(silent){
@@ -2086,42 +2087,101 @@ function buildSpecificFeedback(mode, score, silent){
       ? 'Se detectó muy poca voz real. Habla un poco más fuerte y mantén la frase viva hasta el final.'
       : 'Very little real voice was detected. Speak a bit louder and keep the line alive until the end.';
   }
+
+  var positive = score >= 80;
   var es = '';
   var en = '';
-  if(mode==='personality'){
-    if(a.entry==='strong' && a.finish==='held' && a.control==='high'){ es='Entras con presencia y sostienes bien la frase. Eso te hace sonar más firme.'; en='You enter with presence and hold the line well. That makes you sound firmer.'; }
-    else if(a.entry==='weak'){ es='La frase entra floja. Si arrancas con más decisión, tu presencia sube mucho.'; en='The line starts weak. If you enter with more decision, your presence rises a lot.'; }
-    else if(a.finish==='drops'){ es='Empiezas mejor de lo que terminas. Mantén el final más firme para que la frase no se caiga.'; en='You start better than you finish. Hold the ending more firmly so the line does not fall apart.'; }
-    else { es='Hay base, pero todavía puedes sonar más sólido si controlas mejor el ritmo.'; en='There is a good base, but you can still sound more solid if you control the rhythm better.'; }
-  } else if(mode==='thoughts'){
-    if(a.pacing==='stable' && a.control==='high'){ es='Tu voz se escucha más clara y fácil de leer. Eso mejora mucho la impresión que dejas.'; en='Your voice sounds clearer and easier to read. That improves the impression you leave.'; }
-    else if(a.pacing==='broken'){ es='La toma tiene cortes o pausas que te vuelven menos natural. Busca una línea más seguida.'; en='The take has breaks or pauses that make you sound less natural. Aim for a more continuous line.'; }
-    else if(a.intensity==='low'){ es='Suena demasiado plana. Un poco más de intención haría que resultaras más interesante.'; en='It sounds too flat. A little more intention would make you come across as more interesting.'; }
-    else { es='La impresión es correcta, pero aún puedes sonar más natural si aflojas un poco la tensión.'; en='The impression is decent, but you can still sound more natural if you release a bit of tension.'; }
-  } else if(mode==='challenge'){
-    if(a.control==='high' && a.intensity!=='low'){ es='Buen reto: hay control y la voz no pierde fuerza. Eso hace que el desafío suene más resuelto.'; en='Good challenge: there is control and the voice does not lose force. That makes the challenge sound more resolved.'; }
-    else if(a.pacing==='broken'){ es='El reto pierde fuerza por cortes o dudas. Prueba una toma más continua y con menos frenazos.'; en='The challenge loses strength because of breaks or hesitation. Try a more continuous take with fewer stops.'; }
-    else if(a.finish==='drops'){ es='La intención está al principio, pero el final cae. Remata la frase con más decisión.'; en='The intention is there at the start, but the ending drops. Finish the line with more decision.'; }
-    else { es='Hay intención, pero todavía puedes dominar mejor el reto si ordenas más la entrada.'; en='There is intention, but you can still own the challenge better if you organize the entry more.'; }
-  } else {
-    if(a.entry==='strong' && a.finish==='held' && a.pacing!=='broken'){ es='La escena entra creíble y se sostiene bastante bien. Suena más vivida que leída.'; en='The scene enters believably and holds together well. It sounds more lived than read.'; }
-    else if(a.pacing==='broken'){ es='La escena se corta demasiado y pierde verdad. Busca una toma más seguida para vender mejor el contexto.'; en='The scene breaks too much and loses truth. Aim for a smoother take to sell the context better.'; }
-    else if(a.entry==='weak'){ es='La escena tarda en arrancar. Si entras antes en situación, sonará mucho más real.'; en='The scene takes too long to start. If you enter the situation earlier, it will sound much more real.'; }
-    else { es='La escena funciona, pero aún puedes hacerla más creíble si sostienes mejor el final.'; en='The scene works, but you can still make it more believable if you hold the ending better.'; }
+
+  function soft(msgGood, msgImprove){
+    return positive ? msgGood + ' ' + msgImprove : msgImprove;
   }
-  if(score >= 85){ es += ' Este ya es un intento fuerte.'; en += ' This is already a strong take.'; }
-  else if(score < 60){ es += ' Aquí todavía hay margen claro de mejora.'; en += ' There is still clear room for improvement here.'; }
+
+  if(mode==='personality'){
+    if(a.entry==='weak'){
+      es = soft('Hay buena base general.', 'Si arrancas con más decisión, tu presencia sube mucho.');
+      en = soft('There is a solid base.', 'If you enter with more decision, your presence rises a lot.');
+    } else if(a.finish==='drops'){
+      es = soft('La entrada funciona bien.', 'Ahora mantén el final igual de firme.');
+      en = soft('The entry works well.', 'Now keep the ending as firm.');
+    } else {
+      es = 'Suena bastante sólido y natural.';
+      en = 'It sounds quite solid and natural.';
+    }
+  } else if(mode==='challenge'){
+    if(a.pacing==='broken'){
+      es = soft('Hay intención clara.', 'Haz la toma más continua para que el reto suene más limpio.');
+      en = soft('There is clear intention.', 'Make the take smoother so it sounds cleaner.');
+    } else {
+      es = 'Buen control general en el reto.';
+      en = 'Good overall control in the challenge.';
+    }
+  } else {
+    if(a.intensity==='low'){
+      es = soft('Se entiende bien.', 'Añade un poco más de intensidad.');
+      en = soft('It is understandable.', 'Add a bit more intensity.');
+    } else {
+      es = 'Resultado equilibrado y creíble.';
+      en = 'Balanced and believable result.';
+    }
+  }
+
   return state.lang==='es' ? es : en;
 }
+
+
 function buildMicroChallenge(mode){
   var a = state.analysisSummary || {};
-  if(a.entry==='weak') return state.lang==='es' ? 'Micro-reto: vuelve a hacerla entrando más fuerte en la primera mitad.' : 'Micro-challenge: do it again with a stronger entry in the first half.';
-  if(a.finish==='drops') return state.lang==='es' ? 'Micro-reto: repite la frase manteniendo el final igual de firme que el inicio.' : 'Micro-challenge: repeat the line keeping the ending as firm as the opening.';
-  if(a.pacing==='broken') return state.lang==='es' ? 'Micro-reto: haz una toma más seguida, con menos cortes y menos frenazos.' : 'Micro-challenge: make a smoother take with fewer breaks and fewer stops.';
-  if(mode==='challenge') return state.lang==='es' ? 'Micro-reto: conserva la energía, pero añade un punto más de control.' : 'Micro-challenge: keep the energy, but add a bit more control.';
-  if(mode==='scene') return state.lang==='es' ? 'Micro-reto: vuelve a grabarla como si ya estuvieras dentro de la escena desde la primera palabra.' : 'Micro-challenge: record it again as if you were already inside the scene from the first word.';
-  return state.lang==='es' ? 'Micro-reto: repítela un poco más lenta y con la misma presencia.' : 'Micro-challenge: repeat it slightly slower with the same presence.';
+  var candidates = [];
+
+  if(a.entry==='weak'){
+    candidates.push(state.lang==='es'
+      ? 'Vuelve a hacerla entrando más fuerte en la primera mitad.'
+      : 'Do it again with a stronger entry in the first half.');
+  }
+  if(a.finish==='drops'){
+    candidates.push(state.lang==='es'
+      ? 'Mantén el final igual de firme que el inicio.'
+      : 'Keep the ending as firm as the opening.');
+  }
+  if(a.pacing==='broken'){
+    candidates.push(state.lang==='es'
+      ? 'Haz una toma más seguida, con menos cortes.'
+      : 'Make a smoother take with fewer breaks.');
+  }
+  if(a.control!=='high'){
+    candidates.push(state.lang==='es'
+      ? 'Busca más control manteniendo el ritmo constante.'
+      : 'Aim for more control by keeping a steady rhythm.');
+  }
+
+  // fallback contextual
+  if(candidates.length === 0){
+    if(mode==='challenge'){
+      candidates.push(state.lang==='es'
+        ? 'Mantén la energía pero con más precisión.'
+        : 'Keep the energy but with more precision.');
+    } else if(mode==='scene'){
+      candidates.push(state.lang==='es'
+        ? 'Entra en la escena desde la primera palabra.'
+        : 'Enter the scene from the first word.');
+    } else {
+      candidates.push(state.lang==='es'
+        ? 'Repítela un poco más lenta sin perder presencia.'
+        : 'Repeat it slightly slower without losing presence.');
+    }
+  }
+
+  // avoid repetition
+  var chosen = candidates.find(c => !(state.lastChallenges||[]).includes(c)) || candidates[0];
+
+  // store last challenges (max 5)
+  state.lastChallenges = state.lastChallenges || [];
+  state.lastChallenges.push(chosen);
+  if(state.lastChallenges.length > 5) state.lastChallenges.shift();
+
+  return chosen;
 }
+
 
 function computeMetricsFromAudio(duration){
   var s = state.audioStats || {samples:0,speechFrames:0,sumRms:0,peakRms:0,speechRatio:0,avgRms:0};
