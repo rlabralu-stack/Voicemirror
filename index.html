@@ -1722,32 +1722,14 @@ function renderComparison(current){
 }
 
 function renderInsight(){
-  var txt='';
-  var e = state.lastResult ? state.lastResult.energy : 0;
-  var c = state.lastResult ? state.lastResult.clarity : 0;
-  var f = state.lastResult ? state.lastResult.confidence : 0;
-  if(state.mode==='personality'){
-    txt = state.lang==='es'
-      ? (f>=80 ? 'En personalidad estás entrando con seguridad alta. La voz cae como alguien que no necesita justificar demasiado.' : c>=80 ? 'Tu rasgo más fuerte aquí es la claridad interna: suenas ordenado y legible, aunque todavía puedas ganar más pegada.' : 'Aquí todavía pesa más la reserva que la decisión. La mejora está en entrar con menos duda.')
-      : (f>=80 ? 'In personality you are entering with high confidence. The voice lands like someone who does not need too much justification.' : c>=80 ? 'Your strongest trait here is inner clarity: you sound ordered and readable, though you can still gain more impact.' : 'Here reservation still weighs more than decision. Improvement lies in entering with less doubt.');
-  }
-  if(state.mode==='thoughts'){
-    txt = state.lang==='es'
-      ? (f>=78 && c>=74 ? 'La primera impresión que dejas ahora mismo es bastante fiable: seguridad sin exceso y buena lectura social.' : e<68 ? 'Lo que más se nota aquí es que la presencia entra baja. Puedes caer mejor si el inicio tuviera más peso.' : 'La percepción social aún no es del todo estable. Falta afinar si quieres sonar más cercano, más serio o más difícil de leer.')
-      : (f>=78 && c>=74 ? 'The first impression you leave right now feels fairly reliable: confidence without excess and good social readability.' : e<68 ? 'What stands out most here is low entry presence. You could land better if the opening carried more weight.' : 'The social perception is not fully stable yet. It needs tuning if you want to sound warmer, more serious, or harder to read.');
-  }
-  if(state.mode==='challenge'){
-    txt = state.lang==='es'
-      ? (e>=80 && f>=78 ? 'En desafíos estás rindiendo bien cuando te comprometes del todo. El reto se sostiene por impacto y decisión.' : c>=80 ? 'Tu mejor punto en desafíos es el control. Ya se entiende la intención, pero aún puedes meter más golpe al entrar.' : 'Aquí se nota más la distancia entre lo que quieres sonar y lo que termina llegando. La mejora está en creértelo antes.')
-      : (e>=80 && f>=78 ? 'In challenges you perform well when you fully commit. The take holds through impact and decision.' : c>=80 ? 'Your best point in challenges is control. The intention is clear, but you can still hit harder on entry.' : 'Here the gap between what you want to sound like and what actually lands is more noticeable. The improvement is believing it earlier.');
-  }
-  if(state.mode==='scene'){
-    txt = state.lang==='es'
-      ? (c>=80 && f>=74 ? 'En escenarios estás entrando con buena credibilidad contextual: la frase parece vivida, no solo leída.' : e>=80 ? 'La escena tiene energía, pero todavía puede ganar más verdad contextual para sentirse completamente real.' : 'Aquí el reto no es solo decir la frase: es meterla dentro de una situación. La mejora está en sonar más dentro que encima.')
-      : (c>=80 && f>=74 ? 'In scenarios you are entering with good contextual credibility: the line feels lived, not merely read.' : e>=80 ? 'The scene has energy, but it can still gain more contextual truth to feel fully real.' : 'Here the challenge is not only saying the line: it is placing it inside a situation. Improvement lies in sounding more inside than on top of it.');
-  }
-  $('insightText').innerHTML=txt;
-  $('insightBox').style.display='block';
+  var box = $('insightBox');
+  var title = $('insightTitle');
+  var body = $('insightText');
+  if(!box || !title || !body || !state.lastResult) return;
+  var d = getUnifiedDiagnosis(state.mode, state.lastScore || 0, false);
+  title.innerHTML = state.lang==='es' ? 'Lectura rápida' : 'Quick read';
+  body.innerHTML = state.lang==='es' ? d.quickEs : d.quickEn;
+  box.style.display='block';
 }
 
 function renderScore(energy,clarity,confidence){
@@ -1782,7 +1764,9 @@ function renderScore(energy,clarity,confidence){
   scoreBox.style.display = 'block';
   if(scoreLabel) scoreLabel.innerHTML = state.lang==='es' ? 'Puntuación' : 'Score';
   scoreValue.innerHTML = score + '/100';
-  scoreText.innerHTML = buildSpecificFeedback(state.mode, score, metricsSilent);
+  state.lastScore = score;
+  var diagnosis = getUnifiedDiagnosis(state.mode, score, metricsSilent);
+  scoreText.innerHTML = state.lang==='es' ? diagnosis.feedbackEs : diagnosis.feedbackEn;
 
   if($('microChallengeBox')){
     $('microChallengeBox').style.display='block';
@@ -2080,105 +2064,296 @@ function analyzeVoiceProfile(duration){
   return summary;
 }
 
-function buildSpecificFeedback(mode, score, silent){
+
+function getUnifiedDiagnosis(mode, score, silent){
   var a = state.analysisSummary || {};
   if(silent){
-    return state.lang==='es'
-      ? 'Se detectó muy poca voz real. Habla un poco más fuerte y mantén la frase viva hasta el final.'
-      : 'Very little real voice was detected. Speak a bit louder and keep the line alive until the end.';
+    return {
+      tier:'silent',
+      summaryEs:'Se detectó muy poca voz real.',
+      feedbackEs:'Se detectó muy poca voz real. Habla un poco más fuerte y mantén la frase viva hasta el final.',
+      quickEs:'La toma tiene muy poca voz útil como para sostener una lectura fiable.',
+      challengeEs:'Vuelve a grabarla con más voz real y menos cortes.',
+      summaryEn:'Very little real voice detected.',
+      feedbackEn:'Very little real voice was detected. Speak a bit louder and keep the line alive until the end.',
+      quickEn:'The take contains too little usable voice for a reliable read.',
+      challengeEn:'Record it again with more real voice and fewer breaks.'
+    };
   }
 
-  var positive = score >= 80;
-  var es = '';
-  var en = '';
-
-  function soft(msgGood, msgImprove){
-    return positive ? msgGood + ' ' + msgImprove : msgImprove;
-  }
+  var strongScore = score >= 82;
+  var midScore = score >= 68;
 
   if(mode==='personality'){
+    if(a.entry==='weak' && strongScore){
+      return {
+        tier:'strong_entry_refine',
+        summaryEs:'Hay una base fuerte y bastante segura.',
+        feedbackEs:'Hay buena base general. La entrada puede ganar un poco más de decisión para sonar aún más firme.',
+        quickEs:'En personalidad ya transmites seguridad clara, pero aún puedes entrar con un poco más de decisión.',
+        challengeEs:'Repite la frase entrando un poco más decidido, sin subir más el volumen.',
+        summaryEn:'There is a strong and confident base.',
+        feedbackEn:'There is a solid general base. The opening can gain a bit more decision to sound even firmer.',
+        quickEn:'In personality mode you already sound confident, though the opening can be a bit more decisive.',
+        challengeEn:'Repeat the line with a slightly more decisive opening, without raising the volume.'
+      };
+    }
+    if(a.finish==='drops' && strongScore){
+      return {
+        tier:'strong_finish_refine',
+        summaryEs:'La presencia está bastante bien sostenida.',
+        feedbackEs:'La entrada funciona bien. Ahora mantén el final igual de firme para cerrar con más peso.',
+        quickEs:'La seguridad está clara, pero el cierre todavía puede sostenerse con más peso.',
+        challengeEs:'Haz otra toma cerrando la última parte con la misma firmeza que el inicio.',
+        summaryEn:'Presence is held quite well.',
+        feedbackEn:'The opening works well. Now keep the ending equally firm to close with more weight.',
+        quickEn:'Confidence is clear, though the ending can still hold more weight.',
+        challengeEn:'Do another take and keep the last part as firm as the beginning.'
+      };
+    }
+    if(strongScore){
+      return {
+        tier:'strong_clean',
+        summaryEs:'Suena sólido y con bastante control.',
+        feedbackEs:'Suena bastante sólido y natural.',
+        quickEs:'En personalidad ya suenas como alguien que no necesita justificarse demasiado.',
+        challengeEs:'Repite la frase un poco más lenta manteniendo la misma presencia.',
+        summaryEn:'It sounds solid and controlled.',
+        feedbackEn:'It sounds quite solid and natural.',
+        quickEn:'In personality mode you already sound like someone who does not need to over-explain themselves.',
+        challengeEn:'Repeat the line slightly slower while keeping the same presence.'
+      };
+    }
     if(a.entry==='weak'){
-      es = soft('Hay buena base general.', 'La entrada puede ganar un poco más de decisión para sonar aún más firme.');
-      en = soft('There is a solid base.', 'The opening can gain a bit more decision to sound even firmer.');
-    } else if(a.finish==='drops'){
-      es = soft('La entrada funciona bien.', 'Ahora mantén el final igual de firme para cerrar con más peso.');
-      en = soft('The entry works well.', 'Now keep the ending equally firm to close with more weight.');
-    } else {
-      es = 'Suena bastante sólido y natural.';
-      en = 'It sounds quite solid and natural.';
+      return {
+        tier:'mid_entry',
+        summaryEs:'Hay base, pero la entrada todavía duda un poco.',
+        feedbackEs:'La frase entra floja. Si arrancas con más decisión, tu presencia sube mucho.',
+        quickEs:'La presencia está ahí, pero la primera parte aún puede sonar más firme.',
+        challengeEs:'Vuelve a hacerla entrando más fuerte en la primera mitad.',
+        summaryEn:'There is a base, but the opening still hesitates a bit.',
+        feedbackEn:'The line starts weak. If you enter with more decision, your presence rises a lot.',
+        quickEn:'The presence is there, but the first half can still sound firmer.',
+        challengeEn:'Do it again with a stronger first half.'
+      };
     }
-  } else if(mode==='challenge'){
-    if(a.pacing==='broken'){
-      es = soft('Hay intención clara.', 'Haz la toma más continua para que el reto suene más limpio.');
-      en = soft('There is clear intention.', 'Make the take smoother so it sounds cleaner.');
-    } else {
-      es = 'Buen control general en el reto.';
-      en = 'Good overall control in the challenge.';
+    if(a.finish==='drops'){
+      return {
+        tier:'mid_finish',
+        summaryEs:'La base es correcta, pero el final cae.',
+        feedbackEs:'Empiezas mejor de lo que terminas. Mantén el final más firme para que la frase no se caiga.',
+        quickEs:'La toma entra bien, pero el cierre no sostiene toda la presencia que promete.',
+        challengeEs:'Repite la frase manteniendo el final igual de firme que el inicio.',
+        summaryEn:'The base is correct, but the ending falls.',
+        feedbackEn:'You start better than you finish. Hold the ending more firmly so the line does not fall apart.',
+        quickEn:'The take starts well, but the ending does not hold all the presence it promises.',
+        challengeEn:'Repeat the line keeping the ending as firm as the opening.'
+      };
     }
-  } else {
-    if(a.intensity==='low'){
-      es = soft('Se entiende bien.', 'Añade un poco más de intensidad.');
-      en = soft('It is understandable.', 'Add a bit more intensity.');
-    } else {
-      es = 'Resultado equilibrado y creíble.';
-      en = 'Balanced and believable result.';
-    }
+    return {
+      tier:'mid_clean',
+      summaryEs:'Hay base, pero aún puedes sonar más sólido.',
+      feedbackEs:'Hay base, pero todavía puedes sonar más sólido si controlas mejor el ritmo.',
+      quickEs:'La seguridad general está presente, aunque todavía puedes ordenar mejor la frase.',
+      challengeEs:'Repítela un poco más lenta y con la misma presencia.',
+      summaryEn:'There is a base, but you can still sound more solid.',
+      feedbackEn:'There is a good base, but you can still sound more solid if you control the rhythm better.',
+      quickEn:'General confidence is there, though you can still organize the line better.',
+      challengeEn:'Repeat it slightly slower with the same presence.'
+    };
   }
 
-  return state.lang==='es' ? es : en;
+  if(mode==='thoughts'){
+    if(a.pacing==='broken'){
+      return {
+        tier:'broken',
+        summaryEs:'La impresión es irregular por los cortes.',
+        feedbackEs:'La toma tiene cortes o pausas que te vuelven menos natural. Busca una línea más seguida.',
+        quickEs:'Se entiende la intención, pero los cortes hacen que la impresión sea menos natural.',
+        challengeEs:'Haz una toma más seguida, con menos cortes y menos frenazos.',
+        summaryEn:'The impression feels uneven because of breaks.',
+        feedbackEn:'The take has breaks or pauses that make you sound less natural. Aim for a more continuous line.',
+        quickEn:'The intention is understandable, but the breaks make the impression less natural.',
+        challengeEn:'Make a smoother take with fewer breaks and fewer stops.'
+      };
+    }
+    if(strongScore){
+      return {
+        tier:'thoughts_strong',
+        summaryEs:'La impresión que dejas es bastante buena.',
+        feedbackEs:'Tu voz se escucha más clara y fácil de leer. Eso mejora mucho la impresión que dejas.',
+        quickEs:'Aquí ya suenas bastante abierto y legible, sin dar demasiadas vueltas.',
+        challengeEs:'Ahora repítela con la misma claridad, pero un poco más relajado.',
+        summaryEn:'The impression you leave is quite good.',
+        feedbackEn:'Your voice sounds clearer and easier to read. That improves the impression you leave a lot.',
+        quickEn:'Here you already sound quite open and readable, without overdoing it.',
+        challengeEn:'Now repeat it with the same clarity, but slightly more relaxed.'
+      };
+    }
+    return {
+      tier:'thoughts_mid',
+      summaryEs:'La impresión es correcta, pero aún puede ser más natural.',
+      feedbackEs:'La impresión es correcta, pero aún puedes sonar más natural si aflojas un poco la tensión.',
+      quickEs:'La voz ya se entiende, aunque todavía puede sentirse menos rígida.',
+      challengeEs:'Haz otra toma soltando un poco más el ritmo, sin perder claridad.',
+      summaryEn:'The impression is decent, but it can still feel more natural.',
+      feedbackEn:'The impression is decent, but you can still sound more natural if you release a bit of tension.',
+      quickEn:'The voice is already understandable, though it can still feel less rigid.',
+      challengeEn:'Take another shot releasing the rhythm a bit more without losing clarity.'
+    };
+  }
+
+  if(mode==='challenge'){
+    if(a.pacing==='broken'){
+      return {
+        tier:'challenge_broken',
+        summaryEs:'Hay intención, pero el reto se rompe por cortes.',
+        feedbackEs:'El reto pierde fuerza por cortes o dudas. Prueba una toma más continua y con menos frenazos.',
+        quickEs:'La energía está, pero el reto no termina de sentirse limpio porque la toma se corta.',
+        challengeEs:'Haz una toma más seguida, con menos cortes y menos frenazos.',
+        summaryEn:'There is intention, but the challenge breaks because of pauses.',
+        feedbackEn:'The challenge loses strength because of breaks or hesitation. Try a more continuous take with fewer stops.',
+        quickEn:'The energy is there, but the challenge does not feel clean because the take breaks.',
+        challengeEn:'Make a smoother take with fewer breaks and fewer stops.'
+      };
+    }
+    if(strongScore){
+      return {
+        tier:'challenge_strong',
+        summaryEs:'El reto ya suena bastante resuelto.',
+        feedbackEs:'Buen reto: hay control y la voz no pierde fuerza. Eso hace que el desafío suene más resuelto.',
+        quickEs:'En desafíos ya se nota control, intención y una entrada bastante limpia.',
+        challengeEs:'Mantén esta energía, pero añade un punto más de precisión en la dicción.',
+        summaryEn:'The challenge already sounds quite resolved.',
+        feedbackEn:'Good challenge: there is control and the voice does not lose force. That makes the challenge sound more resolved.',
+        quickEn:'In challenges there is already control, intention and a rather clean entry.',
+        challengeEn:'Keep this energy, but add a bit more precision to the diction.'
+      };
+    }
+    if(a.finish==='drops'){
+      return {
+        tier:'challenge_finish',
+        summaryEs:'Hay intención, pero el final cae.',
+        feedbackEs:'La intención está al principio, pero el final cae. Remata la frase con más decisión.',
+        quickEs:'El reto arranca bien, aunque el cierre todavía pierde algo de mando.',
+        challengeEs:'Repite la frase rematando la última parte con más decisión.',
+        summaryEn:'There is intention, but the ending drops.',
+        feedbackEn:'The intention is there at the start, but the ending drops. Finish the line with more decision.',
+        quickEn:'The challenge starts well, though the ending still loses some command.',
+        challengeEn:'Repeat the line finishing the last part with more decision.'
+      };
+    }
+    return {
+      tier:'challenge_mid',
+      summaryEs:'Hay intención, pero todavía puedes dominar mejor el reto.',
+      feedbackEs:'Hay intención, pero todavía puedes dominar mejor el reto si ordenas más la entrada.',
+      quickEs:'La base del reto está, aunque todavía puede sonar más controlado de principio a fin.',
+      challengeEs:'Conserva la energía, pero añade un punto más de control.',
+      summaryEn:'There is intention, but you can still own the challenge better.',
+      feedbackEn:'There is intention, but you can still own the challenge better if you organize the entry more.',
+      quickEn:'The base of the challenge is there, though it can still sound more controlled from start to finish.',
+      challengeEn:'Keep the energy, but add a bit more control.'
+    };
+  }
+
+  if(mode==='scene'){
+    if(a.pacing==='broken'){
+      return {
+        tier:'scene_broken',
+        summaryEs:'La escena pierde verdad por los cortes.',
+        feedbackEs:'La escena se corta demasiado y pierde verdad. Busca una toma más seguida para vender mejor el contexto.',
+        quickEs:'La intención escénica existe, pero los cortes hacen que parezca más leída que vivida.',
+        challengeEs:'Haz otra toma más seguida, como si ya estuvieras dentro de la escena.',
+        summaryEn:'The scene loses truth because of breaks.',
+        feedbackEn:'The scene breaks too much and loses truth. Aim for a smoother take to sell the context better.',
+        quickEn:'The scene intention exists, but the breaks make it sound more read than lived.',
+        challengeEn:'Take another smoother shot as if you were already inside the scene.'
+      };
+    }
+    if(strongScore){
+      return {
+        tier:'scene_strong',
+        summaryEs:'La escena entra creíble y se sostiene bien.',
+        feedbackEs:'La escena entra creíble y se sostiene bastante bien. Suena más vivida que leída.',
+        quickEs:'Aquí ya se siente bastante situación, no solo lectura.',
+        challengeEs:'Repite la escena manteniendo esta credibilidad, pero con un cierre un poco más redondo.',
+        summaryEn:'The scene enters believably and holds well.',
+        feedbackEn:'The scene enters believably and holds together quite well. It sounds more lived than read.',
+        quickEn:'Here it already feels like a situation, not just reading.',
+        challengeEn:'Repeat the scene keeping this credibility, but with a slightly rounder ending.'
+      };
+    }
+    if(a.entry==='weak'){
+      return {
+        tier:'scene_entry',
+        summaryEs:'La escena tarda un poco en arrancar.',
+        feedbackEs:'La escena tarda en arrancar. Si entras antes en situación, sonará mucho más real.',
+        quickEs:'La escena tiene base, pero la primera parte aún tarda en meterse del todo.',
+        challengeEs:'Vuelve a grabarla como si ya estuvieras dentro de la escena desde la primera palabra.',
+        summaryEn:'The scene takes a little too long to start.',
+        feedbackEn:'The scene takes too long to start. If you enter the situation earlier, it will sound much more real.',
+        quickEn:'The scene has a base, but the first part still takes time to fully get into it.',
+        challengeEn:'Record it again as if you were already inside the scene from the first word.'
+      };
+    }
+    return {
+      tier:'scene_mid',
+      summaryEs:'La escena funciona, pero aún puede ser más creíble.',
+      feedbackEs:'La escena funciona, pero aún puedes hacerla más creíble si sostienes mejor el final.',
+      quickEs:'Se entiende la intención escénica, aunque todavía puede sonar más completa.',
+      challengeEs:'Haz otra toma sosteniendo el final con más verdad escénica.',
+      summaryEn:'The scene works, but it can still be more believable.',
+      feedbackEn:'The scene works, but you can still make it more believable if you hold the ending better.',
+      quickEn:'The scene intention is clear, though it can still sound more complete.',
+      challengeEn:'Do another take holding the ending with more scene truth.'
+    };
+  }
+
+  return {
+    tier:'fallback',
+    summaryEs:'Hay base general.',
+    feedbackEs:'Hay una base general bastante correcta.',
+    quickEs:'La toma funciona de forma bastante estable.',
+    challengeEs:'Haz otra toma manteniendo la misma línea general.',
+    summaryEn:'There is a general base.',
+    feedbackEn:'There is a fairly solid overall base.',
+    quickEn:'The take works in a fairly stable way.',
+    challengeEn:'Do another take keeping the same overall line.'
+  };
+}
+
+function buildSpecificFeedback(mode, score, silent){
+  var d = getUnifiedDiagnosis(mode, score, silent);
+  return state.lang==='es' ? d.feedbackEs : d.feedbackEn;
 }
 
 
 function buildMicroChallenge(mode){
-  var a = state.analysisSummary || {};
-  var candidates = [];
+  var d = getUnifiedDiagnosis(mode, state.lastScore || 0, false);
+  var optionsEs = [d.challengeEs];
+  var optionsEn = [d.challengeEn];
 
-  if(a.entry==='weak'){
-    candidates.push(state.lang==='es'
-      ? 'Vuelve a hacerla entrando más fuerte en la primera mitad.'
-      : 'Do it again with a stronger entry in the first half.');
-  }
-  if(a.finish==='drops'){
-    candidates.push(state.lang==='es'
-      ? 'Mantén el final igual de firme que el inicio.'
-      : 'Keep the ending as firm as the opening.');
-  }
-  if(a.pacing==='broken'){
-    candidates.push(state.lang==='es'
-      ? 'Haz una toma más seguida, con menos cortes.'
-      : 'Make a smoother take with fewer breaks.');
-  }
-  if(a.control!=='high'){
-    candidates.push(state.lang==='es'
-      ? 'Busca más control manteniendo el ritmo constante.'
-      : 'Aim for more control by keeping a steady rhythm.');
+  if(d.tier==='strong_entry_refine'){
+    optionsEs.push('Prueba otra toma con la misma seguridad, pero entrando un poco antes en la frase.');
+    optionsEn.push('Try another take with the same confidence, but entering the line a bit earlier.');
+  } else if(d.tier==='strong_finish_refine'){
+    optionsEs.push('Haz una toma igual de sólida, pero redondeando mejor el final.');
+    optionsEn.push('Do a similarly solid take, but round off the ending better.');
+  } else if(d.tier==='mid_entry' || d.tier==='scene_entry'){
+    optionsEs.push('Repite la frase entrando con más intención desde la primera palabra.');
+    optionsEn.push('Repeat the line entering with more intention from the first word.');
+  } else if(d.tier==='broken' || d.tier==='challenge_broken' || d.tier==='scene_broken'){
+    optionsEs.push('Hazla otra vez sin frenarte a mitad de la frase.');
+    optionsEn.push('Do it again without braking in the middle of the line.');
+  } else if(d.tier==='challenge_strong'){
+    optionsEs.push('Mantén esta fuerza y aprieta un poco más la precisión.');
+    optionsEn.push('Keep this strength and tighten precision a bit more.');
   }
 
-  // fallback contextual
-  if(candidates.length === 0){
-    if(mode==='challenge'){
-      candidates.push(state.lang==='es'
-        ? 'Mantén la energía pero con más precisión.'
-        : 'Keep the energy but with more precision.');
-    } else if(mode==='scene'){
-      candidates.push(state.lang==='es'
-        ? 'Entra en la escena desde la primera palabra.'
-        : 'Enter the scene from the first word.');
-    } else {
-      candidates.push(state.lang==='es'
-        ? 'Repítela un poco más lenta sin perder presencia.'
-        : 'Repeat it slightly slower without losing presence.');
-    }
-  }
-
-  // avoid repetition
-  var chosen = candidates.find(c => !(state.lastChallenges||[]).includes(c)) || candidates[0];
-
-  // store last challenges (max 5)
-  state.lastChallenges = state.lastChallenges || [];
-  state.lastChallenges.push(chosen);
-  if(state.lastChallenges.length > 5) state.lastChallenges.shift();
-
+  var options = state.lang==='es' ? optionsEs : optionsEn;
+  var recent = state.lastChallenges || [];
+  var chosen = options.find(function(x){ return recent.indexOf(x) === -1; }) || options[0];
+  state.lastChallenges = recent.concat([chosen]).slice(-5);
   return chosen;
 }
 
