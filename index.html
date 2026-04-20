@@ -349,6 +349,13 @@ text-align:center
 .progress-sub{margin-top:8px;font-size:14px;color:#d8def0}
 .progress-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .progress-pill{padding:6px 10px;border-radius:999px;background:#111b31;border:1px solid #2f477d;font-size:13px}
+
+.stars{
+  margin-top:6px;
+  font-size:18px;
+  letter-spacing:2px;
+  opacity:0.9;
+}
 </style>
 </head>
 <body>
@@ -1732,6 +1739,14 @@ function renderInsight(){
   box.style.display='block';
 }
 
+
+function getStars(score){
+  if(score >= 90) return '★★★★★';
+  if(score >= 80) return '★★★★☆';
+  if(score >= 65) return '★★★☆☆';
+  if(score >= 50) return '★★☆☆☆';
+  return '★☆☆☆☆';
+}
 function renderScore(energy,clarity,confidence){
   var scoreBox = $('scoreBox');
   var scoreLabel = $('scoreLabel');
@@ -1763,10 +1778,10 @@ function renderScore(energy,clarity,confidence){
   scoreBox.className = 'score-box' + (score >= 85 ? ' positive' : '');
   scoreBox.style.display = 'block';
   if(scoreLabel) scoreLabel.innerHTML = state.lang==='es' ? 'Puntuación' : 'Score';
-  scoreValue.innerHTML = score + '/100';
+  scoreValue.innerHTML = score + '/100' + '<div class="stars">' + getStars(score) + '</div>';
   state.lastScore = score;
   var diagnosis = getUnifiedDiagnosis(state.mode, score, metricsSilent);
-  scoreText.innerHTML = state.lang==='es' ? diagnosis.feedbackEs : diagnosis.feedbackEn;
+  scoreText.innerHTML = '';
 
   if($('microChallengeBox')){
     $('microChallengeBox').style.display='block';
