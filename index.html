@@ -1390,6 +1390,7 @@ function clearResult(){
   $('insightBox').style.display='none';
   $('scoreBox').className='score-box hidden';
   $('scoreBox').style.display='none';
+  if($('scoreNote')) $('scoreNote').style.display='none';
   try{ vmRenderProgress(); }catch(e){}
 }
 
@@ -1782,6 +1783,7 @@ function renderScore(energy,clarity,confidence){
   state.lastScore = score;
   var diagnosis = getUnifiedDiagnosis(state.mode, score, metricsSilent);
   scoreText.innerHTML = '';
+  scoreText.style.display = 'none';
 
   if($('microChallengeBox')){
     $('microChallengeBox').style.display='block';
